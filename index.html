@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f9fc">
+  <meta name="description" content="SubFree – kostenlose Subdomains für persönliche Projekte und Entwickler.">
+  <title>SubFree – Deine Subdomain. Kostenlos.</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="SubFree Startseite"><span class="brand-mark">S</span><span>subfree</span></a>
+    <nav aria-label="Hauptnavigation">
+      <a href="#so-funktionierts">So funktioniert's</a>
+      <a href="#regeln">Regeln</a>
+      <a class="nav-cta" href="#anfragen">Subdomain anfragen</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="status-dot"></span> Kostenloses Community-Projekt</span>
+        <h1>Deine Idee verdient<br><span>eine eigene Adresse.</span></h1>
+        <p class="hero-lead">SubFree soll kostenlose Subdomains für persönliche Websites, kleine Projekte und Entwickler bereitstellen. Ohne Preislisten. Ohne komplizierte Pakete.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#anfragen">Subdomain anfragen <span aria-hidden="true">→</span></a>
+          <a class="button button-secondary" href="#so-funktionierts">Mehr erfahren</a>
+        </div>
+        <p class="micro-note">Noch in der Aufbauphase. Eine Anfrage ist keine automatische Freischaltung.</p>
+      </div>
+      <div class="preview-card" aria-label="Beispiel einer Subdomain">
+        <div class="preview-top"><span></span><span></span><span></span><small>DEINE NEUE ADRESSE</small></div>
+        <div class="preview-content">
+          <div class="preview-icon">S</div>
+          <p class="preview-label">Dein Projekt könnte hier liegen</p>
+          <div class="domain-example"><strong>deinprojekt</strong><span>.admin-coding.is-a.dev</span></div>
+          <span class="preview-tag">BEISPIEL · NOCH NICHT AKTIV</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="Projektgrundsätze">
+      <div><strong>0 €</strong><span>Geplante Nutzung</span></div>
+      <div><strong>Für Projekte</strong><span>Persönlich & kreativ</span></div>
+      <div><strong>Einfach</strong><span>Klare Anfrage</span></div>
+    </section>
+
+    <section class="section" id="so-funktionierts">
+      <div class="section-heading"><span class="eyebrow">DER ABLAUF</span><h2>In drei Schritten zur Wunschadresse.</h2><p>Die Vergabe wird zunächst manuell geprüft. Automatisierung kommt erst, wenn die technische Grundlage sicher steht.</p></div>
+      <div class="steps">
+        <article class="step-card"><span class="step-number">01</span><h3>Namen auswählen</h3><p>Überlege dir einen kurzen Namen, der zu deinem Projekt passt.</p></article>
+        <article class="step-card"><span class="step-number">02</span><h3>Anfrage senden</h3><p>Gib den gewünschten Namen, dein Ziel und eine Kontaktmöglichkeit an.</p></article>
+        <article class="step-card"><span class="step-number">03</span><h3>Prüfung abwarten</h3><p>Wir prüfen die Anfrage und melden uns. Erst danach kann eine Subdomain eingerichtet werden.</p></article>
+      </div>
+    </section>
+
+    <section class="request-section" id="anfragen">
+      <div class="request-intro"><span class="eyebrow">DEIN PROJEKT STARTET HIER</span><h2>Eine Subdomain anfragen.</h2><p>Beschreibe kurz, wofür du die Adresse verwenden möchtest. Beim Absenden wird eine E-Mail mit deinen Angaben vorbereitet.</p><div class="notice"><strong>Hinweis:</strong> SubFree befindet sich im Aufbau. Die gewünschte Domainendung ist noch nicht als verfügbar oder freigegeben bestätigt.</div></div>
+      <form id="request-form" class="request-form">
+        <label for="subdomain">Wunschname</label>
+        <div class="domain-input"><input id="subdomain" name="subdomain" type="text" placeholder="meinprojekt" minlength="3" maxlength=" treinta" pattern="[a-z0-9-]+" required autocomplete="off"><span>.admin-coding.is-a.dev</span></div>
+        <small>Nur Kleinbuchstaben, Zahlen und Bindestriche. Keine Leerzeichen.</small>
+        <label for="target">Wohin soll die Subdomain zeigen?</label>
+        <input id="target" name="target" type="url" placeholder="https://meine-website.example" required>
+        <label for="purpose">Wofür möchtest du sie nutzen?</label>
+        <textarea id="purpose" name="purpose" rows="4" maxlength="600" placeholder="Erkläre kurz dein Projekt und was du veröffentlichen möchtest." required></textarea>
+        <label for="contact">Deine Kontakt-E-Mail</label>
+        <input id="contact" name="contact" type="email" placeholder="name@example.com" required>
+        <label class="checkbox-label"><input type="checkbox" id="rules" required><span>Ich werde die Subdomain nur rechtmäßig verwenden und keine Phishing-, Malware- oder Spam-Inhalte veröffentlichen.</span></label>
+        <button class="button button-primary submit-button" type="submit">E-Mail-Anfrage vorbereiten <span aria-hidden="true">→</span></button>
+        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="section rules-section" id="regeln">
+      <div class="section-heading"><span class="eyebrow">FAIR PLAY</span><h2>Kostenlos heißt nicht regellos.</h2><p>Damit der Dienst für alle nutzbar bleibt, gelten klare Grundregeln.</p></div>
+      <div class="rules-grid">
+        <div class="rule"><span class="rule-check">✓</span><div><h3>Erlaubte Projekte</h3><p>Persönliche Websites, Portfolios, Lernprojekte und nicht-kommerzielle Softwareprojekte.</p></div></div>
+        <div class="rule"><span class="rule-check">✓</span><div><h3>Keine Kosten</h3><p>Es ist geplant, Subdomains ohne Gebühren bereitzustellen. Es gibt keine Garantie für dauerhafte Verfügbarkeit.</p></div></div>
+        <div class="rule"><span class="rule-cross">×</span><div><h3>Kein Missbrauch</h3><p>Phishing, Schadsoftware, Spam, Betrug und rechtswidrige Inhalte sind verboten.</p></div></div>
+        <div class="rule"><span class="rule-cross">×</span><div><h3>Keine Sofortfreigabe</h3><p>Eine Anfrage reserviert keinen Namen. Jede Vergabe muss geprüft und technisch eingerichtet werden.</p></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Community-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="mailto:adam_kraus@icloud.com">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
+  <script src="script.js"></script>
+</body>
+</html>
