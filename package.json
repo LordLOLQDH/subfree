@@ -1,0 +1,11 @@
+{
+  "name": "subfree",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@vercel/functions": "^3.11.0"
+  }
+}
