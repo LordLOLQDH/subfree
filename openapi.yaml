@@ -1,0 +1,70 @@
+openapi: 3.1.0
+info:
+  title: SubFree Project File API
+  version: 1.0.0
+  description: Upload or update files in one SubFree project. Each API key is scoped to one project.
+servers:
+  - url: https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api
+security:
+  - SubFreeToken: []
+paths:
+  /:
+    post:
+      operationId: pushFileToSubFree
+      summary: Upload or update a project file
+      description: Saves a file in the project belonging to the API key. If the project is online, public files are published automatically. Use one request per file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - path
+                - content
+              properties:
+                action:
+                  type: string
+                  const: api_push
+                path:
+                  type: string
+                  description: Relative file path. Use index.html for the website's main HTML.
+                  example: index.html
+                content:
+                  type: string
+                  description: Complete file content, maximum 500 KB.
+                isPrivate:
+                  type: boolean
+                  default: false
+                  description: Store the file privately and do not publish it.
+      responses:
+        "200":
+          description: File saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  saved:
+                    type: boolean
+                  published:
+                    type: boolean
+                  path:
+                    type: string
+                  message:
+                    type: string
+        "401":
+          description: Missing, invalid or revoked API key
+        "403":
+          description: API key does not have file-write permission
+        "413":
+          description: File exceeds 500 KB
+components:
+  securitySchemes:
+    SubFreeToken:
+      type: apiKey
+      in: header
+      name: x-subfree-token
