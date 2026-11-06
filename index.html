@@ -126,13 +126,18 @@
           <p id="manage-message" class="form-message" role="status" aria-live="polite"></p>
         </div>
         <div id="editor" class="editor" hidden>
-          <div class="editor-heading"><div><strong id="project-title">Projekt</strong><span id="project-meta"></span></div><a id="project-url" target="_blank" rel="noopener">Website öffnen ↗</a></div>
-          <div class="editor-controls">
-            <label for="file-path">Dateipfad</label>
-            <input id="file-path" value="index.html" spellcheck="false">
-            <button class="button button-secondary" id="new-file" type="button">Neue Datei</button>
-          </div>
-          <label for="file-content">Dateiinhalt</label>
+          <div class="editor-heading"><div><strong id="project-title">Projekt</strong><span id="project-meta"></span><span id="project-status" class="project-status">Status wird geladen</span></div><div class="editor-heading-actions"><a id="project-url" target="_blank" rel="noopener">Website öffnen ↗</a><button class="button button-secondary" id="offline-project" type="button">Website offline nehmen</button></div></div>
+          <p class="deploy-notice">Nach dem Veröffentlichen kann es einen Moment dauern, bis GitHub Pages die Änderungen bereitstellt und die Website erreichbar ist.</p>
+          <div class="file-manager">
+            <aside class="file-sidebar"><div class="file-sidebar-heading"><strong>Dateien</strong><button class="button button-secondary compact-button" id="new-folder" type="button">+ Ordner</button></div><div class="file-list" id="file-list"></div></aside>
+            <div class="file-workspace">
+              <div class="editor-controls">
+                <label for="file-path">Dateipfad</label>
+                <input id="file-path" value="index.html" spellcheck="false">
+                <button class="button button-secondary" id="new-file" type="button">Neue Datei</button>
+              </div>
+              <label for="file-content">Dateiinhalt</label>
+              <label class="private-toggle"><input type="checkbox" id="file-private"><span>Datei privat halten (nicht öffentlich veröffentlichen)</span></label>
           <textarea id="file-content" class="code-editor" spellcheck="false" rows="18"><!doctype html>
 <html lang="de">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meine Website</title></head>
@@ -143,7 +148,8 @@
             <button class="button button-secondary" id="publish-project" type="button">Projekt veröffentlichen</button>
             <span id="save-message" class="form-message" role="status" aria-live="polite"></span>
           </div>
-          <div class="file-list" id="file-list"></div>
+          </div>
+          </div>
         </div>
       </div>
     </section>
