@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow"><title>weiterleiten</title>
+<style>
+:root{color-scheme:dark;--sf-green:#00ff88;--sf-bg:#030604;--sf-panel:#07110b;--sf-border:#1d4930;--sf-muted:#9db5a4;--sf-text:#e8f5ec}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;width:100%;font-family:"VT323","SFMono-Regular",Consolas,monospace}
+body{display:flex;flex-direction:column;background:#000;color:var(--sf-text)}
+#status{padding:24px;color:var(--sf-muted);font-size:18px}
+iframe{display:block;flex:1 0 auto;width:100%;height:100vh;min-height:100vh;border:0;background:#fff}
+.subfree-ad{position:relative;isolation:isolate;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px 24px;width:100%;max-width:100%;padding:17px clamp(14px,3vw,34px);overflow:hidden;background-color:var(--sf-bg);background-image:linear-gradient(rgba(0,255,136,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.045) 1px,transparent 1px);background-size:16px 16px;border-top:2px solid var(--sf-green);box-shadow:0 -4px 18px rgba(0,255,136,.08);color:var(--sf-muted);font:16px/1.45 "VT323","SFMono-Regular",Consolas,monospace;text-align:left}
+.subfree-ad:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(0,255,136,.07),transparent 55%)}
+.subfree-ad-copy{min-width:0}
+.subfree-ad-kicker{display:flex;align-items:center;gap:8px;margin:0 0 5px;color:var(--sf-green);font:8px/1.8 "Press Start 2P","VT323",monospace;letter-spacing:.2px}
+.subfree-ad-kicker:before{content:"";width:7px;height:7px;flex:0 0 7px;background:var(--sf-green);box-shadow:0 0 9px var(--sf-green)}
+.subfree-ad strong{display:block;margin:0 0 3px;color:var(--sf-text);font:clamp(13px,1.4vw,16px)/1.7 "Press Start 2P","VT323",monospace}
+.subfree-ad p{margin:0;color:var(--sf-muted);font:17px/1.35 "VT323","SFMono-Regular",Consolas,monospace}
+.subfree-ad a{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;max-width:100%;padding:10px 15px;border:1px solid var(--sf-green);background:#06170d;color:var(--sf-green);font:9px/1.7 "Press Start 2P","VT323",monospace;text-align:center;text-decoration:none;box-shadow:3px 3px 0 #092013;transition:transform .15s ease,background .15s ease,box-shadow .15s ease}
+.subfree-ad a:after{content:"↗";font:17px/1 "VT323",monospace}
+.subfree-ad a:hover,.subfree-ad a:focus-visible{background:#0b2a17;color:#dffff0;transform:translate(-1px,-1px);box-shadow:2px 2px 0 var(--sf-green);outline:2px solid transparent}
+@media(max-width:640px){.subfree-ad{grid-template-columns:minmax(0,1fr);gap:12px;padding:15px 14px}.subfree-ad strong{font-size:12px}.subfree-ad p{font-size:16px}.subfree-ad a{justify-self:start;width:auto;min-height:40px;font-size:8px}}
+@media(prefers-reduced-motion:reduce){.subfree-ad a{transition:none}}
+</style></head>
+<body><div id="status" role="status">Website wird geladen …</div><script>
+(async()=>{const slug="weiterleiten",api="https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api";try{const r=await fetch(api,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"public_site",slug})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Website nicht verfügbar");let html=d.html||"<h1>Diese Website ist noch leer.</h1>";const base="<base href=\""+location.pathname.replace(/[^/]*$/,"")+"\">";if(/<head[^>]*>/i.test(html))html=html.replace(/<head[^>]*>/i,m=>m+base);else html="<!doctype html><head>"+base+"</head>"+html;const frame=document.createElement("iframe");frame.setAttribute("sandbox","allow-scripts allow-forms allow-popups");frame.title="SubFree-Projekt "+slug;frame.srcdoc=html;const badge=document.createElement("footer");badge.className="subfree-ad";badge.setAttribute("aria-label","Hinweis auf SubFree");badge.innerHTML='<div class="subfree-ad-copy"><div class="subfree-ad-kicker">HOSTED ON SUBFREE</div><strong>Diese Website läuft mit SubFree.</strong><p>Erstelle deine eigene Website. Kostenlos und unkompliziert.</p></div><a href="https://lordlolqdh.github.io/subfree/" target="_top" rel="noopener">Eigene Website starten</a>';document.body.replaceChildren(frame,badge);}catch(e){document.getElementById("status").textContent="Diese Website ist derzeit nicht verfügbar: "+e.message;}})();
+</script></body></html>
