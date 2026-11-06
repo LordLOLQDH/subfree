@@ -1,43 +1,68 @@
 # SubFree
 
-**Kostenlose Pfad-Weiterleitungen für persönliche Projekte und Entwickler.**
+**Kostenlos geplante Projekt-Websites und HTTPS-Weiterleitungen.**
 
-SubFree ist ein unabhängiges Community-Projekt. Nutzer können einen Wunschnamen registrieren, der als Pfad unter der Hauptdomain erreichbar ist, zum Beispiel:
+SubFree ist ein Community-Projekt für persönliche Websites, Portfolios, Lernprojekte und kleine Entwicklerprojekte.
 
-`https://subfree.is-a.dev/wunschname`
+## Öffentliche Website
 
-## So funktioniert es
+- Gewünschte Domain: https://subfree.is-a.dev
+- GitHub Pages (aktuelle technische Adresse): https://lordlolqdh.github.io/subfree/
 
-1. Das HTML-Formular öffnet ein vorausgefülltes GitHub-Issue mit dem Titel `DOMAIN_REG: wunschname`.
-2. Nach dem Erstellen löst das Issue die GitHub Action `.github/workflows/register-redirect.yml` aus.
-3. Die Action validiert den Namen und die HTTPS-Zieladresse und ergänzt `redirects.json`.
-4. Vercel erstellt nach dem GitHub-Commit automatisch ein neues Deployment.
-5. Die Vercel-Middleware liest die eingebundene JSON-Datenbank und leitet registrierte Pfade weiter.
+Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und DNS-Konfiguration abgeschlossen sind.
 
-## Dateien
+## Konzept
 
-- `index.html`, `styles.css`, `script.js`: Website und Registrierungsformular
-- `redirects.json`: Redirect-Datenbank
-- `middleware.js`: Vercel Routing Middleware
-- `vercel.json`: Middleware-Einstiegspunkt und Matcher
-- `package.json`: Abhängigkeit `@vercel/functions`
-- `.github/workflows/register-redirect.yml`: automatische Issue-Verarbeitung
-- `.github/workflows/pages.yml`: bestehende GitHub-Pages-Bereitstellung
+- Keine klassischen Benutzerkonten und keine Passwörter.
+- Nutzer registrieren ein Projekt mit Projektname, Anzeigename, GitHub-Benutzername, Kontakt-E-Mail und Beschreibung.
+- SubFree erzeugt einen persönlichen Verwaltungscode. Dieser Code ist ein Geheimnis und erlaubt den Zugriff auf das jeweilige Projekt.
+- Registrierungsdaten und Projektdateien werden in eigenen SubFree-Tabellen im bestehenden Supabase-Projekt gespeichert.
+- Projektdateien werden später in einen Ordner `/<projektname>/` im GitHub-Repository veröffentlicht.
+- Beispieladresse: `https://subfree.is-a.dev/meinprojekt/`.
 
-## Lokal testen
+## Backend
 
-Die statische Website kann direkt über `index.html` geöffnet werden. Die Middleware benötigt eine Vercel-Bereitstellung.
+Supabase-Projekt: `KDS-AI-v1`
+
+- Edge Function: `subfree-api`
+- Datenbanktabellen: `subfree_sites`, `subfree_site_files`
+- Die Tabellen sind mit Row Level Security geschützt. Direkter Zugriff durch Browserrollen ist gesperrt. Die Edge Function verwendet den serverseitigen Service-Key.
+- Es werden keine KDS-AI-Tabellen oder bestehenden Edge Functions für SubFree benötigt.
+
+## GitHub-Veröffentlichung aktivieren
+
+Die Registrierung kann bereits in Supabase gespeichert werden. Für das automatische Erstellen und Aktualisieren von Projektordnern benötigt die Edge Function ein privates GitHub-Token.
+
+In Supabase unter **Project Settings → Edge Functions → Secrets** folgende Secrets hinzufügen:
+
+- `GITHUB_TOKEN`: Fine-grained Personal Access Token mit Zugriff nur auf `LordLOLQDH/subfree`, Repository permission **Contents: Read and write**.
+- Optional: `GITHUB_OWNER` = `LordLOLQDH`
+- Optional: `GITHUB_REPO` = `subfree`
+- Optional: `GITHUB_BRANCH` = `main`
+
+Das Token darf niemals in `index.html`, `script.js` oder anderen öffentlichen Dateien stehen.
+
+Nach dem Hinzufügen muss die Edge Function ggf. erneut deployed werden, damit sie die Secrets übernimmt.
 
 ## Wichtige Hinweise
 
-- Die Weiterleitung ist eine Pfad-Weiterleitung, keine DNS-Subdomain.
-- Die Root-URL `/` wird von der Middleware nicht umgeleitet.
-- Unbekannte Pfade werden normal an die Website weitergereicht.
-- Nur HTTPS-Zieladressen werden akzeptiert.
-- Die automatische Registrierung darf nicht für Phishing, Malware, Spam, Betrug oder rechtswidrige Inhalte missbraucht werden.
-- Vercel Hobby hat Nutzungsbeschränkungen, insbesondere für kommerzielle Nutzung. Vor einem öffentlichen Betrieb sind die aktuellen Bedingungen zu prüfen.
-- Die eigene Domain `subfree.is-a.dev` ist noch nicht mit Vercel verbunden. Bis zur DNS-Einrichtung funktioniert die Middleware nur auf der Vercel-Adresse.
+- Der persönliche Zugangscode wird nur einmal angezeigt. Wer ihn besitzt, kann das Projekt verwalten.
+- E-Mail-Adressen werden aktuell nicht verifiziert.
+- Der öffentliche Dienst benötigt Schutz vor Spam und automatisierten Massenregistrierungen, bevor er breit beworben wird.
+- GitHub Pages ist statisches Hosting. Backend-Funktionen, Uploads und die Veröffentlichung benötigen zusätzliche serverseitige Verarbeitung.
+- Nutzerinhalte müssen isoliert ausgeliefert werden. JavaScript von Nutzern darf nicht direkt im Sicherheitskontext der SubFree-Verwaltungsseite laufen.
+- Die Domain `subfree.is-a.dev` ist nicht automatisch mit GitHub Pages verbunden.
+- Free-Tarife haben Limits; dauerhafte kostenlose Verfügbarkeit kann nicht zugesichert werden.
 
-## Lizenz
+## Verzeichnisstruktur
 
-Noch keine Lizenz festgelegt. Bis zur Ergänzung einer Lizenz gelten die üblichen urheberrechtlichen Regeln.
+Nach aktivierter GitHub-Verbindung entstehen Projektordner direkt im Repository:
+
+```
+/<projektname>/
+  index.html
+  assets/
+  ...
+```
+
+Die SubFree-Startseite bleibt im Repository-Root.
