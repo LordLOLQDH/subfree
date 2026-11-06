@@ -1,35 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <title>SubFree 32-bit Pixel Logo</title>
+  <title>SubFree S</title>
   <defs>
-    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#8aff9f"/>
-      <stop offset=".48" stop-color="#18f36c"/>
+    <linearGradient id="s" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9affad"/>
+      <stop offset=".5" stop-color="#18f36c"/>
       <stop offset="1" stop-color="#087c3e"/>
     </linearGradient>
-    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="5" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
   <rect width="512" height="512" fill="#050505"/>
-  <g fill="#39ff88" opacity=".9">
-    <rect x="42" y="48" width="8" height="8"/><rect x="82" y="112" width="7" height="7"/>
-    <rect x="458" y="62" width="9" height="9"/><rect x="430" y="174" width="7" height="7"/>
-    <rect x="38" y="284" width="8" height="8"/><rect x="470" y="300" width="8" height="8"/>
-    <rect x="88" y="444" width="8" height="8"/><rect x="414" y="442" width="8" height="8"/>
-  </g>
-  <g fill="#39ff88" filter="url(#glow)">
-    <path d="M156 46h12v24h-12zM150 52h24v12h-24z"/>
-    <path d="M346 118h10v20h-10zM341 123h20v10h-20z"/>
-  </g>
-  <path d="M112 238 181 118h203l-22 30H199l-35 60h190l-24 31H112Z" fill="url(#green)"/>
-  <path d="m112 238 218 0 29 30-24 31H163l-25 39h205l-23 32H83l70-101h188l-28-31H112Z" fill="url(#green)"/>
-  <path d="M108 238h220l-27 27H92zM166 298h190l-28 29H146z" fill="#050505" opacity=".92"/>
-  <path d="M68 276C96 160 227 70 365 70c48 0 80 12 94 31-7-42-53-67-117-67C198 34 64 130 34 238 15 305 39 345 91 354" fill="none" stroke="#39ff88" stroke-width="12" stroke-linecap="square"/>
-  <path d="M444 238c-32 91-129 157-244 169" fill="none" stroke="#18f36c" stroke-width="8" stroke-dasharray="12 10"/>
-  <g fill="#39ff88" font-family="monospace" font-weight="900" text-anchor="middle">
-    <text x="256" y="424" font-size="52" letter-spacing="2">SUBFREE</text>
-  </g>
-  <path d="M54 442h112l20 18h140l20-18h112" fill="none" stroke="#39ff88" stroke-width="6"/>
-  <g fill="#39ff88"><rect x="196" y="450" width="10" height="18"/><rect x="216" y="450" width="10" height="18"/><rect x="236" y="450" width="10" height="18"/><rect x="256" y="450" width="10" height="18"/><rect x="276" y="450" width="10" height="18"/><rect x="296" y="450" width="10" height="18"/></g>
+  <path fill="url(#s)" d="M128 104H384V136H416V224H192V256H352V288H416V376H384V408H128V376H96V288H320V256H160V224H96V136H128Z"/>
 </svg>
