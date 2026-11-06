@@ -28,7 +28,7 @@ if (year) year.textContent = new Date().getFullYear();
 const localSettings = (()=>{try{return JSON.parse(localStorage.getItem(localStoreKey)||"{}")}catch{return {}}})();
 const localName=document.querySelector("#local-name"),localEmail=document.querySelector("#local-email"),rememberKey=document.querySelector("#remember-key");
 if(localName)localName.value=localSettings.name||"";
-if(localEmail)localEmail.value=localSettings.email||"";
+if(localEmail)localEmail.value=localSettings.email||"adam_kraus@icloud.com";
 if(rememberKey)rememberKey.checked=Boolean(localSettings.rememberKey);
 if(localSettings.rememberKey&&localSettings.accessKey){accessInput.value=localSettings.accessKey}
 document.querySelector("#save-local-settings")?.addEventListener("click",()=>{
@@ -135,7 +135,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#publish-project").textContent = result.site.status === "active" ? "Änderungen veröffentlichen" : "Website veröffentlichen";
     document.querySelector("#project-title").textContent = result.site.display_name;
     document.querySelector("#project-meta").textContent = (result.site.github_username && result.site.github_username !== "subfree-user" ? "@" + result.site.github_username : "SubFree-Account ohne GitHub") + " · " + result.site.slug;
-    const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:kraus-digital@proton.me";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
+    const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"adam_kraus@icloud.com";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:adam_kraus@icloud.com";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
     document.querySelector("#project-url").href = "https://lordlolqdh.github.io/subfree/" + result.site.slug + "/";
     const files = result.files || [];
     renderFiles(files, currentFolders);
