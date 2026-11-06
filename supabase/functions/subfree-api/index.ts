@@ -263,6 +263,121 @@ runTest();
 </script></body></html>`;
 }
 
+
+const diagnosticRate = new Map<string, number>();
+
+function isPublicIPv4(value: string) {
+  const p = value.split(".").map(Number);
+  if (p.length !== 4 || p.some(n => !Number.isInteger(n) || n < 0 || n > 255)) return false;
+  const [a,b,c] = p;
+  if (a === 0 || a === 10 || a === 127 || a >= 224) return false;
+  if (a === 100 && b >= 64 && b <= 127) return false;
+  if (a === 169 && b === 254) return false;
+  if (a === 172 && b >= 16 && b <= 31) return false;
+  if (a === 192 && (b === 0 || b === 168)) return false;
+  if (a === 198 && (b === 18 || b === 19 || (b === 51 && c === 100))) return false;
+  if (a === 203 && b === 0 && c === 113) return false;
+  return true;
+}
+function isPublicIPv6(value: string) {
+  const ip = value.toLowerCase().split("%")[0];
+  if (!ip.includes(":")) return false;
+  if (ip.startsWith("::ffff:")) {
+    const mapped = ip.slice(7);
+    return mapped.includes(".") ? isPublicIPv4(mapped) : false;
+  }
+  if (ip === "::" || ip === "::1") return false;
+  if (/^(fc|fd|fe[89ab]|ff)/.test(ip)) return false;
+  if (ip.startsWith("2001:db8:") || ip.startsWith("2001:10:")) return false;
+  return true;
+}
+function isPublicAddress(value: string) {
+  return value.includes(":") ? isPublicIPv6(value) : isPublicIPv4(value);
+}
+async function resolvePublicHost(host: string) {
+  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") ||
+      host.endsWith(".internal") || host.endsWith(".home.arpa")) {
+    throw new Error("Private oder lokale Zieladresse ist nicht erlaubt.");
+  }
+  if (/^[0-9.]+$/.test(host) || host.includes(":")) {
+    if (!isPublicAddress(host)) throw new Error("Private oder reservierte IP-Adresse ist nicht erlaubt.");
+    return;
+  }
+  const lookup = async (type: "A" | "AAAA") => {
+    const response = await fetch(
+      "https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(host) + "&type=" + type,
+      { headers: { accept: "application/dns-json" }, signal: AbortSignal.timeout(3000) }
+    );
+    if (!response.ok) throw new Error("DNS-Prüfung fehlgeschlagen.");
+    const data = await response.json();
+    if (data.Status !== 0) return [];
+    return (data.Answer || []).filter((entry: any) => entry.type === (type === "A" ? 1 : 28)).map((entry: any) => String(entry.data));
+  };
+  const [ipv4, ipv6] = await Promise.all([lookup("A"), lookup("AAAA")]);
+  const addresses = [...ipv4, ...ipv6];
+  if (!addresses.length) throw new Error("DNS-Auflösung fehlgeschlagen. Keine öffentliche IP-Adresse gefunden.");
+  if (addresses.some(address => !isPublicAddress(address))) {
+    throw new Error("Das Ziel verweist auf eine private oder reservierte IP-Adresse und wurde blockiert.");
+  }
+}
+async function runRedirectDiagnostic(slug: string, request: Request) {
+  const rows = await db("subfree_sites?slug=eq." + encodeURIComponent(slug) +
+    "&status=eq.active&site_type=eq.redirect&select=slug,redirect_url");
+  const site = rows[0];
+  if (!site?.redirect_url) throw new Error("Aktives Weiterleitungsprojekt nicht gefunden.");
+  const clientIp = request.headers.get("cf-connecting-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rateKey = clientIp + ":" + slug;
+  const now = Date.now();
+  const previous = diagnosticRate.get(rateKey) || 0;
+  if (now - previous < 2500) throw new Error("Bitte warte kurz vor dem nächsten Verbindungstest.");
+  diagnosticRate.set(rateKey, now);
+  if (diagnosticRate.size > 5000) {
+    for (const [key, stamp] of diagnosticRate) if (now - stamp > 60000) diagnosticRate.delete(key);
+  }
+  const target = new URL(site.redirect_url);
+  if (target.protocol !== "https:" || target.username || target.password || (target.port && target.port !== "443")) {
+    throw new Error("Ungültiges oder nicht erlaubtes HTTPS-Ziel.");
+  }
+  const started = performance.now();
+  try {
+    await resolvePublicHost(target.hostname.replaceAll("[", "").replaceAll("]", "").toLowerCase());
+  } catch (error) {
+    return { reachable: false, ok: false, dnsStatus: "failed", httpStatus: null,
+      responseTimeMs: Math.round(performance.now() - started),
+      error: String(error instanceof Error ? error.message : error).slice(0, 220) };
+  }
+  try {
+    let response = await fetch(target.toString(), {
+      method: "HEAD", redirect: "manual", cache: "no-store",
+      signal: AbortSignal.timeout(4500),
+      headers: { "User-Agent": "SubFree-Network-Diagnostic/1.0" }
+    });
+    let method = "HEAD";
+    if (response.status === 405 || response.status === 501) {
+      try { await response.body?.cancel(); } catch {}
+      response = await fetch(target.toString(), {
+        method: "GET", redirect: "manual", cache: "no-store",
+        signal: AbortSignal.timeout(4500),
+        headers: { "Range": "bytes=0-0", "User-Agent": "SubFree-Network-Diagnostic/1.0" }
+      });
+      method = "GET";
+    }
+    try { await response.body?.cancel(); } catch {}
+    const status = response.status;
+    return { reachable: true, ok: status >= 200 && status < 400, dnsStatus: "ok",
+      httpStatus: status, responseTimeMs: Math.round(performance.now() - started),
+      method, redirected: status >= 300 && status < 400,
+      error: status >= 400 ? "Der Server antwortet, meldet aber einen HTTP-Fehler." : null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { reachable: false, ok: false, dnsStatus: "ok", httpStatus: null,
+      responseTimeMs: Math.round(performance.now() - started),
+      error: /timed out|abort/i.test(message) ? "Zeitüberschreitung: Der Server hat nicht rechtzeitig geantwortet." :
+        "Keine HTTPS-Verbindung möglich: " + message.slice(0, 150) };
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Nur POST ist erlaubt." }, 405);
