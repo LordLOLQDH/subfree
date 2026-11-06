@@ -7,7 +7,7 @@ SubFree ist ein Community-Projekt für persönliche Websites, Portfolios, Lernpr
 ## Öffentliche Website
 
 - Gewünschte Domain: https://subfree.is-a.dev
-- GitHub Pages (aktuelle technische Adresse): https://lordlolqdh.github.io/subfree/
+- GitHub Pages (aktuelle technische Adresse): https://lordlolqdh.github.io/subfree
 
 Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und DNS-Konfiguration abgeschlossen sind.
 
