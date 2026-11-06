@@ -10,7 +10,7 @@ const API_URL = `${SUPABASE_URL}/functions/v1/subfree-api`;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-subfree-key",
+  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-subfree-key, x-subfree-token",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json; charset=utf-8"
 };
@@ -39,6 +39,43 @@ const makeKey = () => {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return "sf_" + btoa(String.fromCharCode(...bytes)).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 };
+
+const makeApiToken = () => {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return "sfa_" + [...bytes].map(x => x.toString(16).padStart(2, "0")).join("");
+};
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, ch =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]!)
+);
+function starterWebsite(displayName: string, slug: string) {
+  const title = escapeHtml(displayName || slug);
+  const project = escapeHtml(slug);
+  return `<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050805"><meta name="description" content="${title} | Eine Website mit SubFree">
+<title>${title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#050805;--panel:#0a110b;--line:#244d2d;--green:#00ff66;--text:#eaffed;--muted:#9ab19d}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background-color:var(--bg);background-image:linear-gradient(#00ff660b 1px,transparent 1px),linear-gradient(90deg,#00ff660b 1px,transparent 1px);background-size:18px 18px;color:var(--text);font-family:"VT323",monospace;font-size:22px}
+a{color:var(--green)}.wrap{width:min(100% - 36px,1000px);margin:auto}.top{padding:18px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;align-items:center}.logo{font:14px/1.6 "Press Start 2P",monospace;color:white}.logo span{color:var(--green)}.tag{font-size:18px;color:var(--green)}.hero{padding:clamp(64px,12vw,120px) 0 76px}.eyebrow{font:9px/2 "Press Start 2P",monospace;color:var(--green)}h1{font:clamp(25px,5vw,48px)/1.55 "Press Start 2P",monospace;margin:24px 0;color:#fff}h1 span{color:var(--green)}.lead{max-width:680px;color:var(--muted);font-size:26px;line-height:1.35}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px}.btn{display:inline-block;padding:13px 17px;border:1px solid var(--green);background:#07170b;color:var(--green);font:9px/1.8 "Press Start 2P",monospace;text-decoration:none;box-shadow:4px 4px 0 #173d25}.btn.primary{background:var(--green);color:#041006}.section{padding:48px 0;border-top:1px solid var(--line)}h2{font:15px/1.8 "Press Start 2P",monospace;color:white}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:24px}.card{padding:22px;background:var(--panel);border:1px solid var(--line);box-shadow:4px 4px 0 #102417}.card h3{font:10px/1.8 "Press Start 2P",monospace;color:var(--green)}.card p{color:var(--muted);line-height:1.35}.terminal{padding:20px;background:#020402;border:1px solid var(--line);color:var(--green);font-size:20px;line-height:1.5}.terminal small{display:block;color:var(--muted)}footer{padding:25px 0;border-top:1px solid var(--line);color:var(--muted);font-size:18px}
+@media(max-width:560px){.top{align-items:flex-start;flex-direction:column}.logo{font-size:11px}h1{font-size:23px}.eyebrow{font-size:8px}.btn{font-size:8px}}
+</style>
+</head>
+<body>
+<header class="top wrap"><div class="logo">SUBFREE<span>.</span></div><div class="tag">SYSTEM READY // ${project}</div></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">▶ PERSONAL WEBSITE // ONLINE</div><h1>${title}<br><span>WELCOME.</span></h1><p class="lead">Deine neue Website ist bereit. Ersetze diesen Text, ergänze eigene Dateien und gestalte deinen Platz im Web ganz nach deinen Vorstellungen.</p><div class="actions"><a class="btn primary" href="#about">PROJEKT ANSEHEN</a><a class="btn" href="#contact">KONTAKT</a></div></section>
+<section class="section" id="about"><div class="eyebrow">01 // ABOUT</div><h2>ÜBER DIESES PROJEKT</h2><p class="lead">Hier ist Platz für deine Vorstellung, dein Portfolio oder die Idee hinter deinem Projekt.</p><div class="grid"><article class="card"><h3>DEIN INHALT</h3><p>Schreibe hier, was Besucher über deine Website wissen sollen.</p></article><article class="card"><h3>DEIN DESIGN</h3><p>Bearbeite HTML und CSS direkt im SubFree-Dateimanager.</p></article><article class="card"><h3>DEIN WEBSPACE</h3><p>Ergänze Bilder, Skripte und weitere Dateien in deinem Projekt.</p></article></div></section>
+<section class="section" id="contact"><div class="eyebrow">02 // STATUS</div><h2>PROJECT STATUS</h2><div class="terminal">&gt; SUBFREE SYSTEM CHECK<br>&gt; PROJECT: ${project}<br>&gt; STATUS: <strong>READY</strong><small>Diese Startseite ist eine Vorlage. Passe sie im Dashboard an.</small></div></section>
+</main>
+<footer><div class="wrap">POWERED BY SUBFREE // ${project}</div></footer>
+</body></html>`;
+}
 const b64 = (value: string) => {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
@@ -474,7 +511,7 @@ Deno.serve(async (req: Request) => {
       const site = rows[0];
       const initialHtml = siteType === "redirect"
         ? `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${redirectUrl}"><meta name="robots" content="noindex"><title>Weiterleitung</title></head><body><p>Weiterleitung zu <a href="${redirectUrl}">${redirectUrl}</a> …</p></body></html>`
-        : `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${displayName.replace(/[<>]/g,"")}</title></head><body><h1>${displayName.replace(/[<>]/g,"")}</h1><p>Deine SubFree-Website wurde angelegt. Bearbeite diese Datei im SubFree-Dashboard.</p></body></html>`;
+        : starterWebsite(displayName, slug);
       await db("subfree_site_files?on_conflict=site_id%2Cfile_path", {
         method: "POST",
         headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
@@ -507,6 +544,38 @@ Deno.serve(async (req: Request) => {
       }, 201);
     }
 
+    if (action === "api_push") {
+      const apiToken = req.headers.get("x-subfree-token") ?? "";
+      if (!apiToken.startsWith("sfa_")) return json({ error: "API-Schlüssel fehlt oder ist ungültig." }, 401);
+      const tokenHash = await sha256(apiToken);
+      const tokenRows = await db("subfree_api_tokens?token_hash=eq." + tokenHash + "&revoked_at=is.null&select=id,site_id,scopes");
+      const token = tokenRows[0];
+      if (!token) return json({ error: "API-Schlüssel ist ungültig oder wurde widerrufen." }, 401);
+      if (!(token.scopes || []).includes("files:write")) return json({ error: "Dem API-Schlüssel fehlt files:write." }, 403);
+      const owned = await db("subfree_sites?id=eq." + token.site_id + "&select=id,slug,status,github_folder_created");
+      const apiSite = owned[0];
+      if (!apiSite) return json({ error: "Zugehöriges Projekt wurde nicht gefunden." }, 404);
+      const path = safePath(String(body.path ?? "index.html"));
+      const content = String(body.content ?? "");
+      const isPrivate = path === "index.html" ? false : Boolean(body.isPrivate);
+      if (new TextEncoder().encode(content).length > 500000) return json({ error: "Datei ist größer als 500 KB." }, 413);
+      await db("subfree_api_tokens?id=eq." + token.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ last_used_at: new Date().toISOString() }) });
+      await db("subfree_site_files?on_conflict=site_id%2Cfile_path", {
+        method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({ site_id: apiSite.id, file_path: path, content, is_private: isPrivate,
+          mime_type: path.endsWith(".html") ? "text/html" : path.endsWith(".css") ? "text/css" : path.endsWith(".js") ? "text/javascript" : "text/plain",
+          updated_at: new Date().toISOString() })
+      });
+      let published = false;
+      if (GITHUB_TOKEN && apiSite.status === "active") {
+        if (isPrivate) await removeGitHubFile(apiSite.slug + "/" + path);
+        else if (path === "index.html") await writeGitHubFile(apiSite.slug + "/index.html", publicWrapper(apiSite.slug));
+        else await writeGitHubFile(apiSite.slug + "/" + path, content);
+        published = true;
+      }
+      return json({ success: true, saved: true, published, path, message: published ? "Datei gespeichert und Veröffentlichung angestoßen." : "Datei gespeichert. Veröffentlichung ist noch nicht aktiv." });
+    }
+
     const accessKey = req.headers.get("x-subfree-key") ?? String(body.accessKey ?? "");
     if (!accessKey.startsWith("sf_")) return json({ error: "Zugangscode fehlt oder ist ungültig." }, 401);
     const hash = await sha256(accessKey);
@@ -518,6 +587,49 @@ Deno.serve(async (req: Request) => {
       const files = await db(`subfree_site_files?site_id=eq.${site.id}&select=file_path,content,mime_type,updated_at,is_private&order=file_path.asc`);
       const folders = await db(`subfree_site_folders?site_id=eq.${site.id}&select=folder_path,is_private&order=folder_path.asc`);
       return json({ success: true, site, files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
+    }
+
+    if (action === "list_api_tokens") {
+      const tokens = await db(`subfree_api_tokens?site_id=eq.${site.id}&select=id,name,token_prefix,scopes,created_at,last_used_at,revoked_at&order=created_at.desc`);
+      return json({ success: true, tokens });
+    }
+
+    if (action === "create_api_token") {
+      const name = String(body.name ?? "ChatGPT").trim().slice(0, 80) || "ChatGPT";
+      const token = makeApiToken();
+      await db("subfree_api_tokens", {
+        method: "POST", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ site_id: site.id, name, token_hash: await sha256(token),
+          token_prefix: token.slice(0, 12), scopes: ["files:write", "deploy:write"] })
+      });
+      return json({ success: true, token, message: "API-Schlüssel erstellt. Er wird nur jetzt vollständig angezeigt." }, 201);
+    }
+
+    if (action === "revoke_api_token") {
+      const id = String(body.id ?? "");
+      if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: "Ungültige Schlüssel-ID." }, 400);
+      await db(`subfree_api_tokens?id=eq.${id}&site_id=eq.${site.id}&revoked_at=is.null`, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ revoked_at: new Date().toISOString() })
+      });
+      return json({ success: true, message: "API-Schlüssel widerrufen." });
+    }
+
+    if (action === "delete_project") {
+      if (site.github_folder_created && !GITHUB_TOKEN) {
+        return json({ error: "Die GitHub-Verbindung fehlt. Die Website wurde nicht gelöscht, damit keine öffentlichen Dateien zurückbleiben." }, 503);
+      }
+      if (GITHUB_TOKEN && site.github_folder_created) {
+        const files = await db(`subfree_site_files?site_id=eq.${site.id}&select=file_path`);
+        for (const file of files) await removeGitHubFile(site.slug + "/" + safePath(file.file_path));
+        await removeGitHubFile(site.slug + "/index.html");
+        await removePublicRegistry(site.slug);
+      }
+      await db(`subfree_api_tokens?site_id=eq.${site.id}`, { method: "DELETE" });
+      await db(`subfree_site_folders?site_id=eq.${site.id}`, { method: "DELETE" });
+      await db(`subfree_site_files?site_id=eq.${site.id}`, { method: "DELETE" });
+      await db(`subfree_sites?id=eq.${site.id}`, { method: "DELETE" });
+      return json({ success: true, deleted: true, message: "Projekt, Zugang und gespeicherte Daten wurden gelöscht." });
     }
 
     if (action === "save_file") {
