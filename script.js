@@ -10,25 +10,58 @@ form?.addEventListener("submit", (event) => {
 
   const data = new FormData(form);
   const subdomain = String(data.get("subdomain") || "").trim().toLowerCase();
-  const target = String(data.get("target") || "").trim();
+  const targetValue = String(data.get("target") || "").trim();
   const purpose = String(data.get("purpose") || "").trim();
   const contact = String(data.get("contact") || "").trim();
 
-  if (!/^[a-z0-9-]{3,30}$/.test(subdomain) || subdomain.startsWith("-") || subdomain.endsWith("-")) {
+  if (!/^[a-z0-9-]{3,30}$/.test(subdomain) ||
+      subdomain.startsWith("-") ||
+      subdomain.endsWith("-")) {
     message.textContent = "Bitte nutze 3 bis 30 Zeichen: Kleinbuchstaben, Zahlen und Bindestriche. Der Name darf nicht mit einem Bindestrich beginnen oder enden.";
     return;
   }
 
-  const subject = encodeURIComponent("SubFree-Anfrage: " + subdomain);
-  const body = encodeURIComponent(
-    "Hallo SubFree-Team,\n\n" +
-    "ich möchte folgende Subdomain anfragen: " + subdomain + ".subfree.is-a.dev\n" +
-    "Zieladresse: " + target + "\n" +
-    "Projektbeschreibung: " + purpose + "\n" +
-    "Kontakt-E-Mail: " + contact + "\n\n" +
-    "Ich bestätige, dass ich die Nutzungsregeln gelesen habe.\n"
-  );
+  const reserved = [
+    "admin", "api", "assets", "contact", "index",
+    "login", "register", "registrieren", "rules"
+  ];
 
-  message.textContent = "Dein E-Mail-Programm wird geöffnet. Die Anfrage gilt erst als versendet, wenn du die E-Mail selbst abschickst.";
-  window.location.href = "mailto:adam_kraus@icloud.com?subject=" + subject + "&body=" + body;
+  if (reserved.includes(subdomain)) {
+    message.textContent = "Dieser Name ist reserviert. Bitte wähle einen anderen.";
+    return;
+  }
+
+  let target;
+
+  try {
+    target = new URL(targetValue);
+  } catch {
+    message.textContent = "Bitte gib eine gültige Ziel-URL ein.";
+    return;
+  }
+
+  if (target.protocol !== "https:" || target.username || target.password) {
+    message.textContent = "Nur HTTPS-Ziele ohne Zugangsdaten sind erlaubt.";
+    return;
+  }
+
+  const title = "DOMAIN_REG: " + subdomain;
+  const body = [
+    "Automatische Weiterleitungsregistrierung",
+    "",
+    "Wunschname: " + subdomain,
+    "Ziel-URL: " + target.toString(),
+    "Projektbeschreibung: " + purpose,
+    "Kontakt-E-Mail: " + contact,
+    "",
+    "Ich bestätige, dass ich die SubFree-Nutzungsregeln gelesen habe."
+  ].join("\n");
+
+  const issueURL =
+    "https://github.com/LordLOLQDH/subfree/issues/new" +
+    "?title=" + encodeURIComponent(title) +
+    "&body=" + encodeURIComponent(body);
+
+  message.textContent = "GitHub wird geöffnet. Bitte prüfe deine Angaben und klicke dort auf „Create issue“. Danach übernimmt die Automatisierung.";
+  window.location.assign(issueURL);
 });
