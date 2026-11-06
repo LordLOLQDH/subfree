@@ -259,3 +259,54 @@ tempMailCopy?.addEventListener("click", async () => {
     if (tempMailResult) tempMailResult.textContent = address + " (bitte manuell kopieren)";
   }
 });
+
+
+/* PUBLIC GITHUB PAGES DEPLOY MONITOR */
+(() => {
+  const panel = document.querySelector("#deploy-status");
+  if (!panel) return;
+  const indicator = document.querySelector("#deploy-status-indicator");
+  const label = document.querySelector("#deploy-status-label");
+  const detail = document.querySelector("#deploy-status-detail");
+  const checkedAt = document.querySelector("#deploy-checked-at");
+  const updatedAt = document.querySelector("#deploy-updated-at");
+  const runLink = document.querySelector("#deploy-run-link");
+  const workflowUrl = "https://api.github.com/repos/LordLOLQDH/subfree/actions/workflows/pages.yml/runs?per_page=1";
+  const siteUrl = location.origin + location.pathname;
+  const timeText = value => value ? new Date(value).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"}) : "Noch kein Deployment";
+  const setState = (state, title, message) => {
+    indicator.dataset.state = state;
+    label.textContent = title;
+    detail.textContent = message;
+    checkedAt.textContent = new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  };
+  async function checkDeployment() {
+    try {
+      const response = await fetch(workflowUrl,{headers:{Accept:"application/vnd.github+json"},cache:"no-store"});
+      if (!response.ok) throw new Error("GitHub Actions ist gerade nicht erreichbar (HTTP "+response.status+").");
+      const data = await response.json();
+      const run = data.workflow_runs?.[0];
+      if (run) {
+        updatedAt.textContent = timeText(run.updated_at || run.created_at);
+        runLink.href = run.html_url || "https://github.com/LordLOLQDH/subfree/actions";
+        if (run.status !== "completed") {
+          setState("deploying","WIRD VERÖFFENTLICHT","GitHub Pages baut oder veröffentlicht gerade die aktuelle Version.");
+          return;
+        }
+        if (run.conclusion !== "success") {
+          setState("error","DEPLOY FEHLGESCHLAGEN","Das letzte Deployment wurde nicht erfolgreich abgeschlossen. Details stehen im GitHub-Actions-Protokoll.");
+          return;
+        }
+      } else {
+        updatedAt.textContent = "Noch kein Deployment gefunden";
+      }
+      const live = await fetch(siteUrl,{method:"HEAD",cache:"no-store"});
+      if (live.ok) setState("online","WEBSITE ONLINE","Das letzte Deployment war erfolgreich und diese Website antwortet aktuell mit HTTP "+live.status+".");
+      else setState("error","WEBSITE NICHT ERREICHBAR","GitHub Pages meldet HTTP "+live.status+". Die Website ist möglicherweise noch nicht verfügbar.");
+    } catch (error) {
+      setState("checking","STATUS NICHT VERFÜGBAR",error.message || "Der Live-Status konnte gerade nicht abgefragt werden.");
+    }
+  }
+  checkDeployment();
+  window.setInterval(checkDeployment,45000);
+})();
