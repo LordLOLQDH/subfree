@@ -345,3 +345,11 @@ table caption{padding:10px;text-align:left;color:#00ff88}
 .hero-temp-mail .temp-mail-info p,.hero-temp-mail .temp-mail-info small{font-size:14px;line-height:1.45}
 .hero-temp-mail .temp-mail-info a{font-size:14px}
 @media(max-width:760px){.hero-temp-mail{width:100%;padding:12px}.temp-mail-terminal-heading{font-size:7px}.temp-mail-status{width:100%;margin-left:22px}.hero-temp-mail .temp-mail-address span{font-size:11px;padding:0 7px}.temp-mail-disclaimer{font-size:13px}}
+
+/* LARGE WORKSPACE EDITOR: customer files remain untouched until the user saves them */
+.manage-section{max-width:1500px}
+.manage-panel{width:100%;min-width:0}
+.file-manager{grid-template-columns:minmax(220px,280px) minmax(0,1fr);gap:22px}
+.file-workspace{min-width:0;width:100%;padding:22px}
+.file-workspace .code-editor{display:block;width:100%;height:72vh;min-height:620px;max-height:1100px;resize:vertical;font-size:15px!important;line-height:1.6!important;tab-size:2;padding:20px}
+@media(max-width:760px){.manage-section{padding-left:10px;padding-right:10px}.file-workspace{padding:14px 10px}.file-workspace .code-editor{height:62vh;min-height:440px;font-size:14px!important;line-height:1.55!important;padding:14px}}
