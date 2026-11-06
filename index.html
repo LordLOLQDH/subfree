@@ -169,7 +169,7 @@
     <section class="manage-section" id="verwalten">
       <div class="section-heading"><span class="eyebrow">PROJEKTVERWALTUNG</span><h2>Deine Website bearbeiten.</h2><p>Gib deinen Zugangscode ein. Damit erhältst du Zugriff auf genau das Projekt, für das der Code erstellt wurde.</p></div>
       <div class="manage-panel">
-        <div class="local-account-panel"><div><span class="eyebrow">LOKALES PROFIL</span><h3>Account & Einstellungen</h3><p>Dein Profil und deine Dashboard-Einstellungen werden auf diesem Gerät gespeichert.</p></div><div class="local-account-fields"><label for="local-name">Anzeigename</label><input id="local-name" placeholder="Dein Name" autocomplete="name"><label for="local-email">E-Mail-Schnellzugriff</label><input id="local-email" type="email" placeholder="name@example.com" autocomplete="email"><label class="setting-toggle"><input id="remember-key" type="checkbox"> Zugangscode auf diesem Gerät merken</label><button class="button button-secondary" id="save-local-settings" type="button">Einstellungen speichern</button><span id="local-settings-status" class="form-message" role="status"></span></div></div>
+        <div class="local-account-panel"><div><span class="eyebrow">LOKALES PROFIL</span><h3>Account & Einstellungen</h3><p>Dein Profil und deine Dashboard-Einstellungen werden auf diesem Gerät gespeichert.</p></div><div class="local-account-fields"><label for="local-name">Anzeigename</label><input id="local-name" placeholder="Dein Name" autocomplete="name"><label for="local-email">E-Mail-Schnellzugriff</label><input id="local-email" type="email" placeholder="name@example.com" autocomplete="email"><label class="setting-toggle"><input id="remember-key" type="checkbox"> Zugangscode auf diesem Gerät merken</label><button class="button button-secondary" id="save-local-settings" type="button">Einstellungen speichern</button><button class="button button-secondary" id="clear-local-settings" type="button">Lokale Profildaten auf diesem Gerät löschen</button><span id="local-settings-status" class="form-message" role="status"></span></div></div>
         <div class="manage-login">
           <label for="access-key">Persönlicher Zugangscode</label>
           <input id="access-key" type="password" placeholder="sf_…" autocomplete="off">
@@ -179,6 +179,21 @@
         <div id="editor" class="editor" hidden>
           <div class="editor-heading"><div><strong id="project-title">Projekt</strong><span id="project-meta"></span><span id="project-status" class="project-status">Status wird geladen</span></div><div class="editor-heading-actions"><a id="project-url" target="_blank" rel="noopener">Website öffnen ↗</a><a id="email-shortcut" href="mailto:adam_kraus@icloud.com">E-Mail-Schnellzugriff ↗</a><button class="button button-secondary" id="offline-project" type="button">Website offline nehmen</button></div></div>
           <p class="deploy-notice">Nach dem Veröffentlichen kann es einen Moment dauern, bis GitHub Pages die Änderungen bereitstellt und die Website erreichbar ist.</p>
+          <section class="api-access-panel" id="api-access">
+            <div class="api-panel-heading"><span class="eyebrow">SUBFREE API // AI ACCESS</span><h3>ChatGPT und andere Tools verbinden.</h3></div>
+            <p>Erstelle einen eigenen API-Schlüssel für dieses Projekt. Damit können autorisierte Tools Dateien direkt in SubFree speichern und veröffentlichen. Der Schlüssel wird nur bei der Erstellung vollständig angezeigt.</p>
+            <div class="api-token-create"><label for="api-token-name">Bezeichnung</label><input id="api-token-name" maxlength="80" value="ChatGPT"><button class="button button-primary" id="create-api-token" type="button">API-Schlüssel erstellen</button></div>
+            <p id="api-token-message" class="form-message" role="status"></p>
+            <div id="api-token-result" class="api-token-result" hidden><strong>Neuer API-Schlüssel. Jetzt sicher kopieren:</strong><code id="api-token-value"></code><button class="button button-secondary" id="copy-api-token" type="button">Schlüssel kopieren</button><small>Dieser Schlüssel wird nicht erneut vollständig angezeigt.</small></div>
+            <div id="api-token-list" class="api-token-list"></div>
+            <details class="api-docs"><summary>API-Aufruf anzeigen</summary><p>POST an <code>https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api</code> mit den Headern <code>Content-Type: application/json</code> und <code>x-subfree-token: DEIN_SCHLUESSEL</code>.</p><pre>{"action":"api_push","path":"index.html","content":"<!doctype html>...","isPrivate":false}</pre><p>Die API speichert die Datei und veröffentlicht sie direkt, wenn das Projekt online und GitHub verbunden ist. Maximale Dateigröße: 500 KB.</p></details>
+          </section>
+          <section class="danger-zone" id="delete-project-zone">
+            <div><span class="eyebrow">DANGER ZONE // PERMANENT</span><h3>Projekt und Daten löschen</h3><p>Löscht das Projekt, alle gespeicherten Dateien und Ordner, API-Schlüssel, den Zugangscode sowie die öffentliche Veröffentlichung. Diese Aktion kann nicht rückgängig gemacht werden.</p></div>
+            <button class="button button-danger" id="delete-project" type="button">Projekt und sämtliche Daten löschen</button>
+            <p id="delete-project-message" class="form-message" role="status"></p>
+          </section>
+
           <div class="file-manager">
             <aside class="file-sidebar"><div class="file-sidebar-heading"><strong>Dateien</strong><button class="button button-secondary compact-button" id="new-folder" type="button">+ Ordner</button></div><div class="file-list" id="file-list"></div></aside>
             <div class="file-workspace">
