@@ -7,7 +7,7 @@
   <meta name="description" content="SubFree: kostenlose Projekt-Websites und Weiterleitungen. Registriere einen Namen, verwalte deine Dateien und veröffentliche dein Projekt.">
   <title>SubFree – Kostenlose Projekt-Websites</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20261106-3">
+  <link rel="stylesheet" href="styles.css?v=20261106-4">
 </head>
 <body>
   <header class="site-header">
@@ -15,7 +15,7 @@
     <nav aria-label="Hauptnavigation">
       <a href="#funktionen">Funktionen</a>
       <a href="#ablauf">Ablauf</a>
-      <a href="#regeln">Regeln</a>
+      <a href="#temp-mail">Temp-Mail</a><a href="#regeln">Regeln</a>
       <a class="nav-cta" href="#registrieren">Projekt erstellen</a>
     </nav>
   </header>
@@ -58,6 +58,24 @@
         <article class="step-card"><span class="step-number">04</span><h3>Eigener Zugangscode</h3><p>Kein Benutzerkonto. Ein einmalig angezeigter Zugangscode schützt die Verwaltung deines Projekts.</p></article>
         <article class="step-card"><span class="step-number">05</span><h3>Online und offline</h3><p>Nimm deine Website jederzeit offline und veröffentliche sie später mit einem Klick erneut.</p></article>
         <article class="step-card"><span class="step-number">06</span><h3>Automatisch veröffentlicht</h3><p>SubFree startet die erste Veröffentlichung direkt nach der Registrierung und zeigt dir deinen Zugangscode.</p></article>
+      </div>
+    </section>
+
+    <section class="section temp-mail-section" id="temp-mail">
+      <div class="section-heading"><span class="eyebrow">TEMPORÄRE E-MAIL</span><h2>Eine Adresse. Kein neues Postfach.</h2><p>Erstelle eine frei wählbare Empfangsadresse für Testregistrierungen und Bestätigungscodes. Alle Adressen laufen in den PNTR-Testposteingang.</p></div>
+      <div class="temp-mail-panel">
+        <div class="temp-mail-generator">
+          <label for="temp-mail-name">Gewünschter Name</label>
+          <div class="temp-mail-address"><input id="temp-mail-name" type="text" maxlength="40" placeholder="deinname" autocomplete="off" spellcheck="false"><span>@temp-admin-001.pntr.dev</span></div>
+          <p class="temp-mail-result" id="temp-mail-result" aria-live="polite">deinname@temp-admin-001.pntr.dev</p>
+          <button class="button button-primary" id="copy-temp-mail" type="button">E-Mail-Adresse kopieren</button>
+        </div>
+        <div class="temp-mail-info">
+          <strong>So funktioniert es</strong>
+          <p>Du kannst vor dem @ jeden Namen verwenden. Eingehende Nachrichten landen im gemeinsamen PNTR-Posteingang und werden im kostenlosen Tarif nach 48 Stunden automatisch gelöscht.</p>
+          <a href="https://pntr.dev/" target="_blank" rel="noopener">PNTR-Posteingang öffnen ↗</a>
+          <small>Der E-Mail-Empfang muss für <code>temp-admin-001.pntr.dev</code> bei PNTR aktiviert sein. SubFree versendet keine E-Mails und bietet keine dauerhaften Postfächer.</small>
+        </div>
       </div>
     </section>
 
@@ -168,6 +186,6 @@
   </main>
 
   <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Hosting-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="datenschutz.html">Datenschutz</a><a href="impressum.html">Impressum</a><a href="mailto:kraus-digital@proton.me">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
-  <script src="script.js?v=20261106-3" defer></script>
+  <script src="script.js?v=20261106-4" defer></script>
 </body>
 </html>
