@@ -150,3 +150,125 @@ body{background:#090d14;color:#e6edf7}
 .github-check{display:block;min-height:18px;color:#90a5bf;font-size:11px}
 #email-shortcut{font-size:12px;color:#a9cfff}
 @media(max-width:760px){.local-account-panel{grid-template-columns:1fr;padding:18px}.site-header nav{gap:7px}.site-header nav a:not(.nav-cta):not(.nav-manage){display:none}.hero{padding-top:48px}}
+
+
+/* SUBFREE // BLACK TERMINAL THEME */
+:root{
+  color-scheme:dark;
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  background:#000;
+  color:#e8f5ec;
+  --blue:#00ff88;
+  --blue-dark:#00c96b;
+  --ink:#e8f5ec;
+  --muted:#82958a;
+  --line:#1d2b23;
+  --white:#050806;
+}
+html{background:#000}
+body{background:#000;color:#e8f5ec;font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(0,255,136,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.025) 1px,transparent 1px);background-size:32px 32px}
+a{color:inherit}
+.site-header{background:rgba(0,0,0,.96);border-bottom:1px solid #183326;backdrop-filter:blur(12px)}
+.brand{font-family:inherit;letter-spacing:1px;text-transform:uppercase}
+.brand:before{content:"./";color:#00ff88}
+.brand-mark,.preview-icon{background:#00170c;color:#00ff88;border:1px solid #145b35;border-radius:3px;box-shadow:0 0 18px #00ff8818}
+.site-header nav{font-family:inherit;color:#9aada1;text-transform:uppercase;letter-spacing:.4px;font-size:11px}
+.site-header nav a:hover,.site-footer a:hover,.hero-how-link:hover{color:#00ff88}
+.nav-cta,.button-secondary{background:#050a07;border:1px solid #28523a;color:#dfffea;border-radius:3px}
+.nav-cta:hover,.button-secondary:hover{background:#0b1c11;border-color:#00ff88}
+.hero{max-width:1240px}
+.eyebrow,.step-number{color:#00ff88;font-family:inherit;letter-spacing:1.5px}
+.status-dot{background:#00ff88;box-shadow:0 0 0 4px #00ff8818,0 0 12px #00ff88}
+.hero h1{font-family:inherit;letter-spacing:-2px;text-transform:uppercase}
+.hero h1 span{color:#00ff88;text-shadow:0 0 24px #00ff8826}
+.hero-lead,.section-heading p,.request-intro>p{color:#9aada1}
+.micro-note,.preview-label{color:#71877a}
+.button{font-family:inherit;text-transform:uppercase;letter-spacing:.4px;border-radius:3px}
+.button-primary{background:#00d977;color:#001407;box-shadow:0 0 22px #00ff8822}
+.button-primary:hover{background:#00ff88}
+.manage-hero-button{background:#050806;border-color:#28523a;color:#e8f5ec;box-shadow:none}
+.preview-card,.trust-strip,.step-card,.temp-mail-panel,.request-form,.manage-panel,.file-sidebar,.file-workspace,.site-footer,.local-account-panel{background:#050806;border:1px solid #1d3325;border-radius:4px;box-shadow:0 12px 50px #000}
+.preview-card{position:relative}
+.preview-top{background:#080d09;border-bottom:1px solid #1d3325}
+.preview-top>span{background:#476151;border-radius:0}
+.preview-top small{color:#00ff88;font-family:inherit}
+.preview-content{padding:40px 30px}
+.preview-icon{border-radius:3px}
+.domain-example{background:#000;border:1px solid #28523a;border-radius:3px;font-family:inherit}
+.domain-example span{color:#8ca394}.domain-example strong{color:#00ff88}
+.preview-tag{background:#07120b;border:1px solid #21432d;border-radius:2px;color:#91a99a;font-family:inherit}
+.preview-tag i{background:#00ff88}
+.preview-terminal{background:#000;border:1px solid #21432d;border-radius:3px;font-family:inherit}
+.preview-terminal>span:before{content:"> ";color:#00ff88}
+.preview-terminal code{color:#00ff88;font-family:inherit}
+.preview-terminal small{color:#82958a;font-family:inherit}
+.preview-terminal b{color:#00ff88}
+.trust-strip{color:#e8f5ec;border-radius:3px}
+.trust-strip div+div{border-color:#1d3325}
+.trust-strip strong{font-family:inherit;color:#00ff88}
+.trust-strip span,.step-card p,.temp-mail-info p,.temp-mail-info small{color:#91a397}
+.section-heading h2,.request-intro h2{font-family:inherit;text-transform:uppercase;letter-spacing:-1px}
+.step-card{background:#050806;border-radius:3px}
+.step-card h3,.rule h3{font-family:inherit;color:#e8f5ec}
+.step-card p,.rule p{font-family:inherit}
+.request-section{background:#030604;border:1px solid #1d3325;border-radius:4px}
+.notice,.deploy-notice{background:#07120b;border:1px solid #28523a;border-radius:3px;color:#b3c7b9}
+.notice strong{color:#00ff88}
+.request-form,.manage-panel{border-radius:3px}
+.request-form label,.manage-login label,.file-workspace label,.local-account-fields label{font-family:inherit;color:#c6d8cb}
+.request-form input:not([type=checkbox]),.request-form textarea,.request-form select,.manage-panel input,.file-workspace input,.temp-mail-address,.temp-mail-address input,.local-account-fields input{background:#000!important;color:#e8f5ec!important;border:1px solid #294433!important;border-radius:3px!important;font-family:inherit!important}
+.request-form input:focus,.request-form textarea:focus,.request-form select:focus,.manage-panel input:focus,.local-account-fields input:focus{border-color:#00ff88!important;box-shadow:0 0 0 2px #00ff8818!important}
+.domain-input{background:#000;border:1px solid #294433;border-radius:3px}
+.domain-input:focus-within{border-color:#00ff88;box-shadow:0 0 0 2px #00ff8818}
+.domain-input span{color:#00ff88;font-family:inherit}
+.checkbox-label{color:#9aada1}
+.checkbox-label input,.setting-toggle input,.private-toggle input{accent-color:#00ff88}
+.key-result{background:#020503;border:1px solid #28523a;border-radius:3px}
+.key-result code{background:#000;border:1px solid #1d3325;border-radius:2px;color:#00ff88;font-family:inherit}
+.form-message{color:#00ff88}
+.manage-section{background:transparent}
+.manage-panel{border-radius:3px}
+.local-account-panel{background:#030604;border:1px solid #1d3325;border-radius:3px}
+.local-account-panel h3{font-family:inherit;text-transform:uppercase;color:#00ff88}
+.local-account-panel p{color:#91a397}
+.editor{border-color:#1d3325}
+.editor-heading strong{font-family:inherit;color:#e8f5ec}
+.editor-heading span{color:#91a397}
+.editor-heading a,#email-shortcut{color:#00ff88}
+.project-status{color:#00ff88}
+.code-editor{background:#000;color:#baffd2;border:1px solid #28523a;border-radius:3px;font-family:"SFMono-Regular",Consolas,monospace}
+.file-sidebar,.file-workspace{background:#030604;border:1px solid #1d3325;border-radius:3px}
+.file-item{background:#07120b;color:#baffd2;border:1px solid #1d3325;border-radius:2px;font-family:inherit}
+.file-item:hover{background:#0b2112;color:#00ff88}
+.file-privacy-button{background:#000;border:1px solid #294433;color:#9aada1;border-radius:2px}
+.file-list{color:#91a397}
+.temp-mail-panel{background:#030604;border:1px solid #1d3325;border-radius:3px}
+.temp-mail-address{background:#000;border:1px solid #294433;border-radius:3px}
+.temp-mail-address span{color:#00ff88;font-family:inherit}
+.temp-mail-result{color:#00ff88;font-family:inherit}
+.temp-mail-info a{color:#00ff88}
+.quick-access{background:#030604;border:1px solid #1d3325;border-radius:3px;box-shadow:none}
+.quick-access-heading h2{font-family:inherit;text-transform:uppercase}
+.quick-access-heading p{color:#91a397}
+.quick-card{background:#050806;border:1px solid #1d3325;border-radius:3px}
+.quick-card:hover{border-color:#00ff88;box-shadow:0 0 18px #00ff8812}
+.quick-card-primary{background:#06200f;border-color:#00a957;color:#e8f5ec}
+.quick-card-primary:hover{background:#083018;border-color:#00ff88}
+.quick-icon,.quick-card-primary .quick-icon{background:#00170c;color:#00ff88;border:1px solid #145b35;border-radius:2px}
+.quick-card-copy small,.quick-arrow{color:#82958a}
+.quick-card-primary .quick-card-copy small,.quick-card-primary .quick-arrow{color:#a9d9b9}
+.rule-check,.rule-cross{background:#071b0d;color:#00ff88;border:1px solid #1c5832;border-radius:2px}
+.rule-cross{background:#180707;color:#ff7777;border-color:#542020}
+.site-footer{border-top:1px solid #1d3325;background:#020403}
+.site-footer p,.site-footer>div{color:#91a397}
+.site-footer>small{color:#617468}
+@media(max-width:760px){
+ .site-header nav a:not(.nav-cta):not(.nav-manage){display:none}
+ .nav-manage{background:#050806!important;border:1px solid #28523a!important;border-radius:3px!important}
+ .hero h1{letter-spacing:-1.5px}
+ .request-section{margin-left:10px;margin-right:10px}
+ .quick-access{margin-left:12px;margin-right:12px}
+}
+::selection{background:#00ff88;color:#000}
+:focus-visible{outline:2px solid #00ff88;outline-offset:3px}
