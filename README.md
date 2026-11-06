@@ -66,3 +66,12 @@ Nach aktivierter GitHub-Verbindung entstehen Projektordner direkt im Repository:
 ```
 
 Die SubFree-Startseite bleibt im Repository-Root.
+
+
+## Vor öffentlichem Start noch erforderlich
+
+- `GITHUB_TOKEN` als Supabase Edge Function Secret hinterlegen.
+- GitHub-Pages-Bereitstellung nach dem ersten echten Test prüfen.
+- Die gewünschte Domain `subfree.is-a.dev` ist noch nicht als aktiv verbunden bestätigt.
+- `impressum.html` und `datenschutz.html` enthalten Platzhalter. Betreiberanschrift und Kontaktangaben müssen ergänzt und die Datenschutzhinweise geprüft werden.
+- E-Mail-Verifizierung, Datei-Upload/ZIP-Import, Projektlöschung und zusätzliche Missbrauchsprüfung sind noch nicht umgesetzt.
