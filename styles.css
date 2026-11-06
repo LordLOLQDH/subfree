@@ -15,3 +15,25 @@
   .domain-input input:not([type=checkbox]){font-size:12px;padding-left:6px;padding-right:6px}
   .submit-button{padding:14px 12px}
 }
+
+
+/* SubFree project manager */
+.file-manager{display:grid;grid-template-columns:minmax(210px,280px) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+.file-sidebar,.file-workspace{min-width:0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+.file-sidebar-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.file-list{display:grid;gap:5px;max-height:420px;overflow:auto}
+.file-tree-row{display:flex;align-items:center;gap:5px;min-width:0}
+.file-item{min-width:0;flex:1;text-align:left;overflow-wrap:anywhere;border:0;border-radius:8px;background:#f7f9fc;color:var(--ink);padding:9px 10px;font:inherit;font-size:13px;cursor:pointer}
+.file-item:hover{background:#edf2ff}
+.folder-item{font-weight:600}
+.file-privacy-button{flex:none;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--muted);padding:7px;font-size:11px;cursor:pointer}
+.compact-button{padding:7px 10px;font-size:12px}
+.file-workspace{display:grid;gap:10px}
+.file-workspace .editor-controls{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.file-workspace .editor-controls label{margin:0}
+.private-toggle{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:0}
+.private-toggle input{width:16px;height:16px;margin:0;flex:none}
+.editor-heading-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.project-status{display:inline-flex;margin-top:7px;font-size:12px;font-weight:700;color:#287a4b}
+.deploy-notice{padding:11px 13px;border:1px solid #dce5f5;border-radius:10px;background:#f5f8ff;color:#52617a;font-size:13px;line-height:1.5}
+@media(max-width:760px){.file-manager{grid-template-columns:1fr}.file-list{max-height:220px}.file-workspace .editor-controls{grid-template-columns:1fr}.editor-heading-actions{align-items:flex-start;flex-direction:column}.editor-heading{align-items:flex-start;gap:12px}}
