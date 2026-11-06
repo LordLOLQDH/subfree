@@ -75,7 +75,7 @@
         <p>Kein Login und kein Benutzerkonto. Gib die nötigen Kontaktdaten an und erhalte einen persönlichen Verwaltungscode.</p>
         <div class="notice"><strong>Wichtig:</strong> Deine E-Mail-Adresse wird für die Verwaltung und Kontaktaufnahme gespeichert, aber aktuell noch nicht per Bestätigungsmail verifiziert. Teile deinen Zugangscode niemals mit anderen.</div>
       </div>
-      <form id="register-form" class="request-form">
+      <form id="register-form" class="request-form" onsubmit="return false;">
         <label for="slug">Gewünschter Projektname</label>
         <div class="domain-input"><span>subfree.is-a.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
         <small>3–30 Zeichen, nur Kleinbuchstaben, Zahlen und Bindestriche.</small>
@@ -160,6 +160,6 @@
   </main>
 
   <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Hosting-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="datenschutz.html">Datenschutz</a><a href="impressum.html">Impressum</a><a href="mailto:kraus-digital@proton.me">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
-  <script src="script.js"></script>
+  <script src="script.js?v=20261106-2" defer></script>
 </body>
 </html>
