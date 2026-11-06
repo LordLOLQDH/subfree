@@ -272,3 +272,23 @@ a{color:inherit}
 }
 ::selection{background:#00ff88;color:#000}
 :focus-visible{outline:2px solid #00ff88;outline-offset:3px}
+
+
+/* Shared legal/contact pages: same terminal identity as the main site */
+.legal-page{min-height:100vh;background:#000;color:#e8f5ec;font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+.legal-page .site-header{position:sticky;top:0}
+.legal-page .section{max-width:900px;padding:76px 28px 110px}
+.legal-page .section>.eyebrow{display:inline-block;margin-bottom:14px;color:#00ff88;font-size:11px;letter-spacing:1.6px}
+.legal-page .section h1{margin:0 0 18px;font:700 clamp(30px,6vw,54px)/1.08 "SFMono-Regular",Consolas,monospace;letter-spacing:-2px;text-transform:uppercase;color:#f0fff4}
+.legal-page .section>p{color:#a4b6a9;font-size:13px;line-height:1.9;max-width:780px}
+.legal-page .section h2{margin:38px 0 12px;padding-bottom:9px;border-bottom:1px solid #1d3325;color:#00ff88;font:700 15px/1.4 "SFMono-Regular",Consolas,monospace;letter-spacing:.3px;text-transform:uppercase}
+.legal-page .section a{color:#00ff88;text-decoration:underline;text-decoration-color:#286443;text-underline-offset:3px}
+.legal-page .section a:hover{color:#baffd2}
+.legal-page .site-footer{background:#020403;border-top:1px solid #1d3325}
+.legal-page .site-footer .brand{color:#e8f5ec;text-decoration:none}
+.contact-terminal{margin-top:28px;padding:24px;background:#030604;border:1px solid #28523a;border-radius:3px;max-width:680px}
+.contact-terminal .terminal-prompt{color:#00ff88;font-size:12px;margin-bottom:14px}
+.contact-terminal strong{display:block;color:#e8f5ec;font-size:15px;margin-bottom:8px}
+.contact-terminal a{font-size:14px;overflow-wrap:anywhere}
+.contact-terminal small{display:block;color:#82958a;margin-top:12px;font-size:11px;line-height:1.7}
+@media(max-width:600px){.legal-page .section{padding:55px 20px 80px}.legal-page .section h1{letter-spacing:-1.5px}.legal-page .section h2{margin-top:30px}}
