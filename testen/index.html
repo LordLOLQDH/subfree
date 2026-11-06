@@ -38,7 +38,7 @@ try{
  const data=await response.json();
  if(!response.ok)throw new Error(data.error||"Website nicht verfügbar");
  let html=data.html||"<h1>Diese Website ist noch leer.</h1>";
- const base="<base href=\\""+location.pathname.replace(/[^/]*$/,"")+"\\">";
+ const base='<base href="'+location.pathname.replace(/[^/]*$/,"")+'">';
  if(/<head[^>]*>/i.test(html))html=html.replace(/<head[^>]*>/i,m=>m+base);
  else html="<!doctype html><head>"+base+"</head>"+html;
  const resizeScript='<scr'+'ipt>(()=>{const send=()=>parent.postMessage({type:"subfree:content-height",height:Math.max(document.documentElement.scrollHeight,document.body?.scrollHeight||0)},"*");addEventListener("load",()=>{send();if("ResizeObserver" in window)new ResizeObserver(send).observe(document.documentElement);setTimeout(send,250);setTimeout(send,1000);});send();})();</scr'+'ipt>';
