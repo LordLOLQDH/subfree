@@ -94,7 +94,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     editor.hidden = false;
     document.querySelector("#project-title").textContent = result.site.display_name;
     document.querySelector("#project-meta").textContent = "@" + result.site.github_username + " · " + result.site.slug;
-    document.querySelector("#project-url").href = "https://subfree.is-a.dev/" + result.site.slug + "/";
+    document.querySelector("#project-url").href = "https://lordlolqdh.github.io/subfree/" + result.site.slug + "/";
     const files = result.files || [];
     renderFiles(files);
     const first = files.find(file => file.file_path === "index.html");
