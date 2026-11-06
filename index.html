@@ -186,6 +186,7 @@
             <p id="api-token-message" class="form-message" role="status"></p>
             <div id="api-token-result" class="api-token-result" hidden><strong>Neuer API-Schlüssel. Jetzt sicher kopieren:</strong><code id="api-token-value"></code><button class="button button-secondary" id="copy-api-token" type="button">Schlüssel kopieren</button><small>Dieser Schlüssel wird nicht erneut vollständig angezeigt.</small></div>
             <div id="api-token-list" class="api-token-list"></div>
+            <p>Für die Einrichtung einer eigenen ChatGPT-Aktion kannst du das <a href="openapi.yaml" target="_blank" rel="noopener">OpenAPI-Schema für ChatGPT Actions</a> importieren. Hinterlege den erzeugten API-Schlüssel dort als API-Key. Der Schlüssel gilt nur für dieses Projekt.</p>
             <details class="api-docs"><summary>API-Aufruf anzeigen</summary><p>POST an <code>https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api</code> mit den Headern <code>Content-Type: application/json</code> und <code>x-subfree-token: DEIN_SCHLUESSEL</code>.</p><pre>{"action":"api_push","path":"index.html","content":"<!doctype html>...","isPrivate":false}</pre><p>Die API speichert die Datei und veröffentlicht sie direkt, wenn das Projekt online und GitHub verbunden ist. Maximale Dateigröße: 500 KB.</p></details>
           </section>
           <section class="danger-zone" id="delete-project-zone">
