@@ -93,3 +93,60 @@
 .preview-tag{display:inline-block;padding:7px 10px;border-radius:20px;background:#f3f5f9;letter-spacing:.65px}
 @media(max-width:900px){.hero{padding-top:55px;gap:35px}}
 @media(max-width:600px){.hero{padding:44px 18px 42px;gap:30px}.hero-main-actions{grid-template-columns:1fr;max-width:none}.hero-main-actions .button{width:100%;min-height:52px}.preview-content{padding:32px 18px 34px}.preview-card{max-width:100%}.hero h1{font-size:clamp(39px,11vw,56px)}}
+
+
+/* SubFree dark developer dashboard */
+:root{color-scheme:dark;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#090d14;color:#e6edf7;--blue:#67a7ff;--blue-dark:#347bd8;--ink:#e6edf7;--muted:#8b9bb1;--line:#253246;--white:#111925}
+body{background:#090d14;color:#e6edf7}
+.site-header{background:rgba(9,13,20,.92);border-color:#202c3c}
+.brand-mark,.preview-icon{background:#14263d;color:#78b7ff;border:1px solid #29486d}
+.site-header nav{color:#aab8ca}
+.site-header nav a:hover,.site-footer a:hover{color:#83bdff}
+.nav-cta,.button-secondary{background:#111a27;border-color:#2b3b52;color:#dce8f7}
+.hero{max-width:1240px}
+.hero h1 span{color:#78b7ff}
+.hero-lead,.section-heading p,.request-intro>p{color:#9baac0}
+.eyebrow,.step-number{color:#78b7ff}
+.status-dot{background:#54d6a0;box-shadow:0 0 0 4px #15372e}
+.button-primary{background:#2878d0;box-shadow:0 0 22px #2878d033}
+.button-primary:hover{background:#3b8be5}
+.micro-note,.preview-label{color:#8292a9}
+.preview-card,.trust-strip,.step-card,.temp-mail-panel,.request-form,.manage-panel,.file-sidebar,.file-workspace,.site-footer,.local-account-panel{background:#0f1723;border-color:#26364b;box-shadow:0 20px 60px #0005}
+.preview-top{background:#111d2b;border-color:#26364b}
+.preview-top>span{background:#40536d}
+.preview-top small,.preview-tag{color:#8296b2}
+.preview-content{padding:38px 30px}
+.domain-example{background:#0a111b;border-color:#2b3c53}
+.domain-example span{color:#9aabc1}.domain-example strong{color:#80baff}
+.preview-tag{background:#172334;border:1px solid #2b405b}
+.preview-tag i{display:inline-block;width:6px;height:6px;background:#55d6a0;border-radius:50%;margin-right:6px}
+.preview-terminal{margin-top:22px;padding:13px 15px;text-align:left;background:#080e17;border:1px solid #24364d;border-radius:10px;display:grid;gap:8px;color:#8295ad;font-size:10px}
+.preview-terminal code{color:#a7d5ff;font-size:12px}.preview-terminal small{font-size:9px;letter-spacing:1px}.preview-terminal b{color:#5bd7a0}
+.trust-strip{color:#e6edf7}.trust-strip span,.step-card p,.temp-mail-info p,.temp-mail-info small{color:#93a3b9}
+.trust-strip div+div{border-color:#29394e}
+.step-card{background:#101a27}.step-card h3{color:#e6edf7}
+.temp-mail-address{background:#0a111b;border-color:#2a3a50}.temp-mail-address input,.request-form input,.request-form textarea,.request-form select,.manage-panel input,.file-workspace input,.file-workspace textarea{background:#0a111b!important;color:#e6edf7!important;border-color:#2a3a50!important}
+.temp-mail-result{color:#e6edf7}.temp-mail-info a{color:#b9d9ff}
+.request-section{background:#0b121d;border-color:#25364b}
+.notice,.deploy-notice{background:#111f30;border-color:#2c4767;color:#b4c5dc}
+.request-form label,.manage-login label,.file-workspace label{color:#c5d2e2}
+.request-form small{color:#8fa0b7}
+.checkbox-label{color:#b8c6d8}
+.key-result{background:#0c1a2a;border-color:#2c4d70}
+.key-result code{color:#8ec7ff}
+.manage-section{background:#0a111b}
+.manage-panel{border-radius:16px}
+.editor-heading{border-color:#2a3a50}
+.project-status{color:#65dba7}
+.file-item{background:#111d2b;color:#dce8f7}
+.file-item:hover{background:#1a2b40}
+.file-privacy-button{background:#0b1420;border-color:#2a3a50;color:#a9bad0}
+.file-list{color:#9aabc1}
+.site-footer{border-top:1px solid #25364b}
+.local-account-panel{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:24px;border:1px solid #26364b;border-radius:14px;margin-bottom:18px}
+.local-account-panel h3{margin:10px 0 7px;font-size:20px}.local-account-panel p{font-size:12px;line-height:1.7;color:#91a2b9}
+.local-account-fields{display:grid;gap:8px}.local-account-fields label{font-size:12px;color:#b8c7d9}.local-account-fields input{width:100%;padding:11px;border-radius:8px;border:1px solid #2a3a50;background:#0a111b;color:#e6edf7}
+.setting-toggle{display:flex;align-items:center;gap:9px}.setting-toggle input{width:auto}
+.github-check{display:block;min-height:18px;color:#90a5bf;font-size:11px}
+#email-shortcut{font-size:12px;color:#a9cfff}
+@media(max-width:760px){.local-account-panel{grid-template-columns:1fr;padding:18px}.site-header nav{gap:7px}.site-header nav a:not(.nav-cta):not(.nav-manage){display:none}.hero{padding-top:48px}}
