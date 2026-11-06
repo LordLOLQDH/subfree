@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261106-11">
+  <link rel="stylesheet" href="styles.css?v=20261106-12">
 </head>
 <body>
   <header class="site-header">
@@ -35,7 +35,23 @@
           <a class="button button-primary" href="#registrieren"><span aria-hidden="true">＋</span> Website erstellen <span aria-hidden="true">→</span></a>
           <a class="button button-secondary manage-hero-button" href="#verwalten"><span aria-hidden="true">⌘</span> Projekt verwalten <span aria-hidden="true">→</span></a>
         </div>
-        <div class="hero-contact-line"><span class="pixel-cursor" aria-hidden="true">▶</span><span>MAIL:</span><a href="mailto:adam_kraus@icloud.com">adam_kraus@icloud.com</a><span class="contact-divider">|</span><a href="kontakt.html">KONTAKT / SUPPORT</a></div>
+      <div class="temp-mail-panel hero-temp-mail">
+        <div class="temp-mail-terminal-heading"><span class="pixel-cursor" aria-hidden="true">▶</span> TEMP MAIL // GENERATOR <span class="temp-mail-status">EMPFANG: NICHT AKTIV</span></div>
+        <div class="temp-mail-generator">
+          <label for="temp-mail-name">Gewünschter Name</label>
+          <div class="temp-mail-address"><input id="temp-mail-name" type="text" maxlength="40" placeholder="deinname" autocomplete="off" spellcheck="false"><span>@temp-admin-001.pntr.dev</span></div>
+          <p class="temp-mail-result" id="temp-mail-result" aria-live="polite">deinname@temp-admin-001.pntr.dev</p>
+          <button class="button button-primary" id="copy-temp-mail" type="button">Adresse kopieren</button>
+          <small class="temp-mail-disclaimer">Adresse erstellen und kopieren möglich. Der PNTR-Posteingang ist noch nicht aktiviert, daher ist der Empfang derzeit nicht verfügbar.</small>
+        </div>
+        <div class="temp-mail-info">
+          <strong>So funktioniert es</strong>
+          <p>Du kannst vor dem @ jeden Namen verwenden. Eingehende Nachrichten landen im gemeinsamen PNTR-Posteingang und werden im kostenlosen Tarif nach 48 Stunden automatisch gelöscht.</p>
+          <a href="https://pntr.dev/" target="_blank" rel="noopener">PNTR-Dashboard öffnen ↗</a>
+          <small>Der E-Mail-Empfang muss für <code>temp-admin-001.pntr.dev</code> bei PNTR aktiviert sein. SubFree versendet keine E-Mails und bietet keine dauerhaften Postfächer.</small>
+        </div>
+      </div>
+    </section>
         <a class="hero-how-link" href="#funktionen">Mehr über SubFree erfahren <span aria-hidden="true">↗</span></a>
         <p class="micro-note">Community-Projekt in Entwicklung. Verfügbarkeit und kostenloser Betrieb können nicht dauerhaft garantiert werden.</p>
       </div>
@@ -68,24 +84,6 @@
         <article class="step-card"><span class="step-number">04</span><h3>Eigener Zugangscode</h3><p>Kein Benutzerkonto. Ein einmalig angezeigter Zugangscode schützt die Verwaltung deines Projekts.</p></article>
         <article class="step-card"><span class="step-number">05</span><h3>Online und offline</h3><p>Nimm deine Website jederzeit offline und veröffentliche sie später mit einem Klick erneut.</p></article>
         <article class="step-card"><span class="step-number">06</span><h3>Automatisch veröffentlicht</h3><p>SubFree startet die erste Veröffentlichung direkt nach der Registrierung und zeigt dir deinen Zugangscode.</p></article>
-      </div>
-    </section>
-
-    <section class="section temp-mail-section" id="temp-mail">
-      <div class="section-heading"><span class="eyebrow">TEMPORÄRE E-MAIL</span><h2>Eine Adresse. Kein neues Postfach.</h2><p>Erstelle eine frei wählbare Empfangsadresse für Testregistrierungen und Bestätigungscodes. Sobald der PNTR-Posteingang aktiviert ist, laufen alle Adressen in den gemeinsamen Testposteingang.</p></div>
-      <div class="temp-mail-panel">
-        <div class="temp-mail-generator">
-          <label for="temp-mail-name">Gewünschter Name</label>
-          <div class="temp-mail-address"><input id="temp-mail-name" type="text" maxlength="40" placeholder="deinname" autocomplete="off" spellcheck="false"><span>@temp-admin-001.pntr.dev</span></div>
-          <p class="temp-mail-result" id="temp-mail-result" aria-live="polite">deinname@temp-admin-001.pntr.dev</p>
-          <button class="button button-primary" id="copy-temp-mail" type="button">E-Mail-Adresse kopieren</button>
-        </div>
-        <div class="temp-mail-info">
-          <strong>So funktioniert es</strong>
-          <p>Du kannst vor dem @ jeden Namen verwenden. Eingehende Nachrichten landen im gemeinsamen PNTR-Posteingang und werden im kostenlosen Tarif nach 48 Stunden automatisch gelöscht.</p>
-          <a href="https://pntr.dev/" target="_blank" rel="noopener">PNTR-Dashboard öffnen ↗</a>
-          <small>Der E-Mail-Empfang muss für <code>temp-admin-001.pntr.dev</code> bei PNTR aktiviert sein. SubFree versendet keine E-Mails und bietet keine dauerhaften Postfächer.</small>
-        </div>
       </div>
     </section>
 
