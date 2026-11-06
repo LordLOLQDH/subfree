@@ -152,3 +152,18 @@ document.querySelector("#save-file")?.addEventListener("click", async () => {
     button.disabled = false;
   }
 });
+
+document.querySelector("#publish-project")?.addEventListener("click", async () => {
+  if (!currentKey) { saveMessage.textContent = "Lade zuerst dein Projekt."; return; }
+  const button = document.querySelector("#publish-project");
+  button.disabled = true;
+  saveMessage.textContent = "Projekt wird veröffentlicht …";
+  try {
+    const result = await api({ action: "publish" }, currentKey);
+    saveMessage.textContent = result.message + " " + (result.projectUrl || "");
+  } catch (error) {
+    saveMessage.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
