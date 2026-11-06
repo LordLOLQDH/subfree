@@ -16,6 +16,8 @@ const pathInput = document.querySelector("#file-path");
 const contentInput = document.querySelector("#file-content");
 const saveMessage = document.querySelector("#save-message");
 let currentKey = "";
+let currentSite = null;
+let currentFolders = [];
 
 if (year) year.textContent = new Date().getFullYear();
 typeSelect?.addEventListener("change", () => {
@@ -91,14 +93,20 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
   try {
     const result = await api({ action: "load" }, key);
     currentKey = key;
+    currentSite = result.site;
+    currentFolders = result.folders || [];
     editor.hidden = false;
+    document.querySelector("#project-status").textContent = result.site.status === "active" ? "● Online" : "○ Offline";
+    document.querySelector("#offline-project").disabled = result.site.status !== "active";
+    document.querySelector("#offline-project").textContent = result.site.status === "active" ? "Website offline nehmen" : "Bereits offline";
+    document.querySelector("#publish-project").textContent = result.site.status === "active" ? "Änderungen veröffentlichen" : "Website veröffentlichen";
     document.querySelector("#project-title").textContent = result.site.display_name;
     document.querySelector("#project-meta").textContent = "@" + result.site.github_username + " · " + result.site.slug;
     document.querySelector("#project-url").href = "https://lordlolqdh.github.io/subfree/" + result.site.slug + "/";
     const files = result.files || [];
-    renderFiles(files);
+    renderFiles(files, currentFolders);
     const first = files.find(file => file.file_path === "index.html");
-    if (first) contentInput.value = first.content;
+    if (first) { contentInput.value = first.content; document.querySelector("#file-private").checked = false; }
     else contentInput.value = "<!doctype html>\n<html lang=\"de\">\n<head><meta charset=\"utf-8\"><title>Meine Website</title></head>\n<body><h1>Hallo Welt!</h1></body>\n</html>";
     pathInput.value = "index.html";
     manageMessage.textContent = result.githubConfigured ? "Projekt geladen. Änderungen können veröffentlicht werden." : "Projekt geladen. Veröffentlichung wartet noch auf die GitHub-Verbindung.";
@@ -108,27 +116,44 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
   }
 });
 
-function renderFiles(files) {
+function renderFiles(files, folders = []) {
   const list = document.querySelector("#file-list");
   list.replaceChildren();
-  if (!files.length) { list.textContent = "Noch keine Dateien in der Datenbank gespeichert."; return; }
-  const title = document.createElement("strong");
-  title.textContent = "Gespeicherte Dateien";
-  list.append(title);
-  files.forEach(file => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "file-item";
-    button.textContent = file.file_path;
-    button.addEventListener("click", () => {
-      pathInput.value = file.file_path;
-      contentInput.value = file.content;
-    });
-    list.append(button);
+  if (!files.length && !folders.length) { list.textContent = "Noch keine Dateien oder Ordner."; return; }
+  [...folders].sort((a,b)=>a.folder_path.localeCompare(b.folder_path)).forEach(folder => {
+    const row = document.createElement("div"); row.className = "file-tree-row folder-row";
+    const open = document.createElement("button"); open.type = "button"; open.className = "file-item folder-item";
+    open.textContent = "Ordner: " + folder.folder_path + (folder.is_private ? " · Privat" : "");
+    open.addEventListener("click", () => { pathInput.value = folder.folder_path + "/"; });
+    const privacy = document.createElement("button"); privacy.type = "button"; privacy.className = "file-privacy-button";
+    privacy.textContent = folder.is_private ? "Privat" : "Öffentlich";
+    privacy.addEventListener("click", async () => {
+      try { const result = await api({action:"set_folder_privacy",path:folder.folder_path,isPrivate:!folder.is_private},currentKey);
+        saveMessage.textContent = result.message; const refreshed = await api({action:"load"},currentKey);
+        currentFolders = refreshed.folders || []; renderFiles(refreshed.files || [],currentFolders);
+      } catch(error) { saveMessage.textContent = error.message; }
+    }); row.append(open,privacy); list.append(row);
+  });
+  [...files].sort((a,b)=>a.file_path.localeCompare(b.file_path)).forEach(file => {
+    const row = document.createElement("div"); row.className = "file-tree-row";
+    const button = document.createElement("button"); button.type = "button"; button.className = "file-item";
+    const depth = file.file_path.split("/").length - 1; button.style.paddingLeft = (10 + depth * 14) + "px";
+    button.textContent = file.file_path + (file.is_private ? " · Privat" : ""); button.title = file.file_path;
+    button.addEventListener("click", () => { pathInput.value = file.file_path; contentInput.value = file.content; document.querySelector("#file-private").checked = Boolean(file.is_private); });
+    row.append(button); list.append(row);
   });
 }
+document.querySelector("#new-folder")?.addEventListener("click", async () => {
+  const path = prompt("Ordnerpfad, z. B. assets oder privat/notizen:");
+  if (!path) return;
+  const isPrivate = confirm("Soll dieser Ordner privat sein? Private Ordner werden nicht veröffentlicht.");
+  try { const result = await api({action:"create_folder",path:path.trim(),isPrivate},currentKey); saveMessage.textContent = result.message;
+    const refreshed = await api({action:"load"},currentKey); currentFolders = refreshed.folders || []; renderFiles(refreshed.files || [],currentFolders);
+  } catch(error) { saveMessage.textContent = error.message; }
+});
 
 document.querySelector("#new-file")?.addEventListener("click", () => {
+  document.querySelector("#file-private").checked = false;
   pathInput.value = "assets/style.css";
   contentInput.value = "/* Deine CSS-Datei */\nbody { font-family: system-ui, sans-serif; }";
   pathInput.focus();
@@ -142,15 +167,23 @@ document.querySelector("#save-file")?.addEventListener("click", async () => {
   button.disabled = true;
   saveMessage.textContent = "Datei wird gespeichert …";
   try {
-    const result = await api({ action: "save_file", path, content: contentInput.value }, currentKey);
+    const result = await api({ action: "save_file", path, content: contentInput.value, isPrivate: document.querySelector("#file-private").checked }, currentKey);
     saveMessage.textContent = result.message;
     const refreshed = await api({ action: "load" }, currentKey);
-    renderFiles(refreshed.files || []);
+    currentFolders = refreshed.folders || []; renderFiles(refreshed.files || [], currentFolders);
   } catch (error) {
     saveMessage.textContent = error.message;
   } finally {
     button.disabled = false;
   }
+});
+
+document.querySelector("#offline-project")?.addEventListener("click", async () => {
+  if (!currentKey || !confirm("Deine Website wird öffentlich nicht mehr erreichbar sein. Private Dateien bleiben in SubFree gespeichert. Fortfahren?")) return;
+  const button = document.querySelector("#offline-project"); button.disabled = true; saveMessage.textContent = "Website wird offline genommen …";
+  try { const result = await api({action:"offline"},currentKey); saveMessage.textContent = result.message;
+    document.querySelector("#project-status").textContent = "○ Offline"; document.querySelector("#publish-project").textContent = "Website veröffentlichen"; button.textContent = "Bereits offline";
+  } catch(error) { saveMessage.textContent = error.message; button.disabled = false; }
 });
 
 document.querySelector("#publish-project")?.addEventListener("click", async () => {
@@ -160,7 +193,9 @@ document.querySelector("#publish-project")?.addEventListener("click", async () =
   saveMessage.textContent = "Projekt wird veröffentlicht …";
   try {
     const result = await api({ action: "publish" }, currentKey);
-    saveMessage.textContent = result.message + " " + (result.projectUrl || "");
+    saveMessage.textContent = result.message + " " + (result.projectUrl || "") + " Die Bereitstellung kann kurz dauern.";
+    document.querySelector("#project-status").textContent = "● Online"; document.querySelector("#offline-project").disabled = false;
+    document.querySelector("#offline-project").textContent = "Website offline nehmen"; document.querySelector("#publish-project").textContent = "Änderungen veröffentlichen";
   } catch (error) {
     saveMessage.textContent = error.message;
   } finally {
