@@ -4,89 +4,160 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f7f9fc">
-  <meta name="description" content="SubFree – kostenlose Pfad-Weiterleitungen für persönliche Projekte und Entwickler.">
-  <title>SubFree – Deine Weiterleitung. Kostenlos.</title>
+  <meta name="description" content="SubFree: kostenlose Projekt-Websites und Weiterleitungen. Registriere einen Namen, verwalte deine Dateien und veröffentliche dein Projekt.">
+  <title>SubFree – Kostenlose Projekt-Websites</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#" aria-label="SubFree Startseite"><span class="brand-mark">S</span><span>subfree</span></a>
+    <a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a>
     <nav aria-label="Hauptnavigation">
-      <a href="#so-funktionierts">So funktioniert's</a>
+      <a href="#funktionen">Funktionen</a>
+      <a href="#ablauf">Ablauf</a>
       <a href="#regeln">Regeln</a>
-      <a class="nav-cta" href="#anfragen">Weiterleitung anfragen</a>
+      <a class="nav-cta" href="#registrieren">Projekt erstellen</a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-copy">
-        <span class="eyebrow"><span class="status-dot"></span> Kostenloses Community-Projekt</span>
-        <h1>Deine Idee verdient<br><span>eine eigene Adresse.</span></h1>
-        <p class="hero-lead">SubFree soll kostenlose Pfad-Weiterleitungen für persönliche Websites, kleine Projekte und Entwickler bereitstellen. Ohne Preislisten. Ohne komplizierte Pakete.</p>
+        <span class="eyebrow"><span class="status-dot"></span> Kostenloses Hosting für kleine Projekte</span>
+        <h1>Dein Projekt.<br><span>Dein Platz im Web.</span></h1>
+        <p class="hero-lead">SubFree gibt persönlichen Websites, Portfolios und kleinen Entwicklerprojekten eine eigene Adresse. Namen reservieren, Dateien verwalten und Inhalte veröffentlichen. Ohne Benutzerkonto und ohne komplizierte Einrichtung.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#anfragen">Weiterleitung anfragen <span aria-hidden="true">→</span></a>
-          <a class="button button-secondary" href="#so-funktionierts">Mehr erfahren</a>
+          <a class="button button-primary" href="#registrieren">Kostenloses Projekt erstellen <span aria-hidden="true">→</span></a>
+          <a class="button button-secondary" href="#funktionen">So funktioniert es</a>
         </div>
-        <p class="micro-note">Noch in der Aufbauphase. Eine Anfrage wird automatisch verarbeitet. Missbrauch ist verboten.</p>
+        <p class="micro-note">Community-Projekt in Entwicklung. Verfügbarkeit und kostenloser Betrieb können nicht dauerhaft garantiert werden.</p>
       </div>
-      <div class="preview-card" aria-label="Beispiel einer Pfad-Weiterleitung">
-        <div class="preview-top"><span></span><span></span><span></span><small>DEINE NEUE ADRESSE</small></div>
+      <div class="preview-card" aria-label="Beispiel einer SubFree-Projektadresse">
+        <div class="preview-top"><span></span><span></span><span></span><small>DEIN PROJEKT</small></div>
         <div class="preview-content">
           <div class="preview-icon">S</div>
-          <p class="preview-label">Dein Projekt könnte hier liegen</p>
+          <p class="preview-label">Deine Website unter</p>
           <div class="domain-example"><span>subfree.is-a.dev/</span><strong>deinprojekt</strong></div>
-          <span class="preview-tag">BEISPIEL · NOCH NICHT AKTIV</span>
+          <span class="preview-tag">BEISPIELADRESSE</span>
         </div>
       </div>
     </section>
 
-    <section class="trust-strip" aria-label="Projektgrundsätze">
+    <section class="trust-strip" aria-label="Projektmerkmale">
       <div><strong>0 €</strong><span>Geplante Nutzung</span></div>
-      <div><strong>Für Projekte</strong><span>Persönlich & kreativ</span></div>
-      <div><strong>Einfach</strong><span>Klare Anfrage</span></div>
+      <div><strong>Kein Konto</strong><span>Zugang per persönlichem Code</span></div>
+      <div><strong>HTML · CSS · JS</strong><span>Eigene Website-Dateien</span></div>
     </section>
 
-    <section class="section" id="so-funktionierts">
-      <div class="section-heading"><span class="eyebrow">DER ABLAUF</span><h2>In drei Schritten zu deiner Weiterleitung.</h2><p>Das Formular erstellt ein GitHub-Issue. Eine GitHub Action prüft die Angaben und speichert den Eintrag automatisch in der Redirect-Datenbank.</p></div>
-      <div class="steps">
-        <article class="step-card"><span class="step-number">01</span><h3>Namen auswählen</h3><p>Überlege dir einen kurzen Namen, der zu deinem Projekt passt.</p></article>
-        <article class="step-card"><span class="step-number">02</span><h3>Anfrage senden</h3><p>Gib den gewünschten Namen, dein Ziel und eine Kontaktmöglichkeit an.</p></article>
-        <article class="step-card"><span class="step-number">03</span><h3>Automatisch registrieren</h3><p>Die GitHub Action prüft die Angaben, aktualisiert die Redirect-Datenbank und startet das Deployment.</p></article>
+    <section class="section" id="funktionen">
+      <div class="section-heading"><span class="eyebrow">DIE FUNKTIONEN</span><h2>Alles an einem Ort verwalten.</h2><p>SubFree soll die Verwaltung kleiner Webprojekte einfach halten. Du brauchst dafür kein GitHub-Konto-Dashboard und musst keine Dateien direkt im Repository bearbeiten.</p></div>
+      <div class="feature-grid">
+        <article class="step-card"><span class="step-number">01</span><h3>Eigener Projektname</h3><p>Reserviere einen freien Namen und erhalte eine feste Projektadresse unter der SubFree-Domain.</p></article>
+        <article class="step-card"><span class="step-number">02</span><h3>Dateien verwalten</h3><p>Bearbeite HTML-Dateien direkt im SubFree-Editor. CSS, JavaScript und weitere Dateien können über Dateipfade ergänzt werden.</p></article>
+        <article class="step-card"><span class="step-number">03</span><h3>Weiterleitungen</h3><p>Erstelle statt einer Website auch eine HTTPS-Weiterleitung auf ein bestehendes Projekt.</p></article>
+        <article class="step-card"><span class="step-number">04</span><h3>Eigener Zugangscode</h3><p>Kein Benutzerkonto. Ein einmalig angezeigter Zugangscode schützt die Verwaltung deines Projekts.</p></article>
       </div>
     </section>
 
-    <section class="request-section" id="anfragen">
-      <div class="request-intro"><span class="eyebrow">DEIN PROJEKT STARTET HIER</span><h2>Eine Weiterleitung anfragen.</h2><p>Beschreibe kurz, wofür du die Adresse verwenden möchtest. Beim Absenden wird ein GitHub-Issue mit deinen Angaben vorbereitet. Nach dem Erstellen prüft die Automatisierung deine Registrierung.</p><div class="notice"><strong>Hinweis:</strong> SubFree befindet sich im Aufbau. Die gewünschte Domainendung ist noch nicht als verfügbar oder freigegeben bestätigt.</div></div>
-      <form id="request-form" class="request-form">
-        <label for="subdomain">Wunschname</label>
-        <div class="domain-input"><span>subfree.is-a.dev/</span><input id="subdomain" name="subdomain" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
-        <small>Nur Kleinbuchstaben, Zahlen und Bindestriche. Keine Leerzeichen.</small>
-        <label for="target">Wohin soll die Weiterleitung führen?</label>
-        <input id="target" name="target" type="url" placeholder="https://meine-website.example" required>
-        <label for="purpose">Wofür möchtest du sie nutzen?</label>
-        <textarea id="purpose" name="purpose" rows="4" maxlength="600" placeholder="Erkläre kurz dein Projekt und was du veröffentlichen möchtest." required></textarea>
-        <label for="contact">Deine Kontakt-E-Mail</label>
-        <input id="contact" name="contact" type="email" placeholder="name@example.com" required>
-        <label class="checkbox-label"><input type="checkbox" id="rules" required><span>Ich werde die Weiterleitung nur rechtmäßig verwenden und keine Phishing-, Malware- oder Spam-Inhalte veröffentlichen.</span></label>
-        <button class="button button-primary submit-button" type="submit">GitHub-Registrierung öffnen <span aria-hidden="true">→</span></button>
-        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+    <section class="section compact-section" id="ablauf">
+      <div class="section-heading"><span class="eyebrow">DER ABLAUF</span><h2>In wenigen Schritten online.</h2></div>
+      <div class="steps">
+        <article class="step-card"><span class="step-number">01</span><h3>Angaben eintragen</h3><p>Projektname, GitHub-Benutzername und Kontakt-E-Mail angeben.</p></article>
+        <article class="step-card"><span class="step-number">02</span><h3>Code sicher speichern</h3><p>SubFree erstellt einen persönlichen Zugangscode. Bewahre ihn auf, denn er wird nicht erneut angezeigt.</p></article>
+        <article class="step-card"><span class="step-number">03</span><h3>Projekt verwalten</h3><p>Mit dem Code kannst du deine Dateien im Dashboard bearbeiten und veröffentlichen.</p></article>
+      </div>
+    </section>
+
+    <section class="request-section" id="registrieren">
+      <div class="request-intro">
+        <span class="eyebrow">DEIN PROJEKT STARTET HIER</span>
+        <h2>Projekt erstellen.</h2>
+        <p>Kein Login und kein Benutzerkonto. Gib die nötigen Kontaktdaten an und erhalte einen persönlichen Verwaltungscode.</p>
+        <div class="notice"><strong>Wichtig:</strong> Deine E-Mail-Adresse wird für die Verwaltung und Kontaktaufnahme gespeichert, aber aktuell noch nicht per Bestätigungsmail verifiziert. Teile deinen Zugangscode niemals mit anderen.</div>
+      </div>
+      <form id="register-form" class="request-form">
+        <label for="slug">Gewünschter Projektname</label>
+        <div class="domain-input"><span>subfree.is-a.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
+        <small>3–30 Zeichen, nur Kleinbuchstaben, Zahlen und Bindestriche.</small>
+
+        <label for="displayName">Projekt- oder Anzeigename</label>
+        <input id="displayName" name="displayName" type="text" maxlength="70" placeholder="Mein Portfolio" required>
+
+        <label for="githubUsername">GitHub-Benutzername</label>
+        <input id="githubUsername" name="githubUsername" type="text" maxlength="39" placeholder="dein-github-name" required>
+
+        <label for="email">Kontakt-E-Mail</label>
+        <input id="email" name="email" type="email" placeholder="name@example.com" required>
+
+        <label for="description">Was möchtest du veröffentlichen?</label>
+        <textarea id="description" name="description" rows="4" maxlength="600" minlength="10" placeholder="Beschreibe kurz deine Website oder dein Projekt." required></textarea>
+
+        <label for="siteType">Projektart</label>
+        <select id="siteType" name="siteType">
+          <option value="static">Eigene Website (HTML/CSS/JS)</option>
+          <option value="redirect">HTTPS-Weiterleitung</option>
+        </select>
+        <div id="redirect-field" hidden>
+          <label for="redirectUrl">Weiterleitungsziel</label>
+          <input id="redirectUrl" name="redirectUrl" type="url" placeholder="https://example.com">
+        </div>
+
+        <label class="checkbox-label"><input type="checkbox" id="rules" required><span>Ich veröffentliche keine Phishing-, Malware-, Spam-, Betrugs- oder rechtswidrigen Inhalte.</span></label>
+        <button class="button button-primary submit-button" type="submit">Projekt registrieren <span aria-hidden="true">→</span></button>
+        <p id="register-message" class="form-message" role="status" aria-live="polite"></p>
+        <div id="key-result" class="key-result" hidden>
+          <strong>Dein persönlicher Zugangscode</strong>
+          <p>Jetzt kopieren und sicher speichern. Er wird nur dieses eine Mal angezeigt.</p>
+          <code id="new-key"></code>
+          <button type="button" class="button button-secondary" id="copy-key">Zugangscode kopieren</button>
+          <a id="new-project-link" target="_blank" rel="noopener">Projektadresse öffnen</a>
+        </div>
       </form>
     </section>
 
+    <section class="manage-section" id="verwalten">
+      <div class="section-heading"><span class="eyebrow">PROJEKTVERWALTUNG</span><h2>Deine Website bearbeiten.</h2><p>Gib deinen Zugangscode ein. Damit erhältst du Zugriff auf genau das Projekt, für das der Code erstellt wurde.</p></div>
+      <div class="manage-panel">
+        <div class="manage-login">
+          <label for="access-key">Persönlicher Zugangscode</label>
+          <input id="access-key" type="password" placeholder="sf_…" autocomplete="off">
+          <button class="button button-primary" id="load-project" type="button">Projekt laden</button>
+          <p id="manage-message" class="form-message" role="status" aria-live="polite"></p>
+        </div>
+        <div id="editor" class="editor" hidden>
+          <div class="editor-heading"><div><strong id="project-title">Projekt</strong><span id="project-meta"></span></div><a id="project-url" target="_blank" rel="noopener">Website öffnen ↗</a></div>
+          <div class="editor-controls">
+            <label for="file-path">Dateipfad</label>
+            <input id="file-path" value="index.html" spellcheck="false">
+            <button class="button button-secondary" id="new-file" type="button">Neue Datei</button>
+          </div>
+          <label for="file-content">Dateiinhalt</label>
+          <textarea id="file-content" class="code-editor" spellcheck="false" rows="18"><!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meine Website</title></head>
+<body><h1>Hallo Welt!</h1><p>Meine Website mit SubFree.</p></body>
+</html></textarea>
+          <div class="editor-actions">
+            <button class="button button-primary" id="save-file" type="button">Datei speichern</button>
+            <span id="save-message" class="form-message" role="status" aria-live="polite"></span>
+          </div>
+          <div class="file-list" id="file-list"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="section rules-section" id="regeln">
-      <div class="section-heading"><span class="eyebrow">FAIR PLAY</span><h2>Kostenlos heißt nicht regellos.</h2><p>Damit der Dienst für alle nutzbar bleibt, gelten klare Grundregeln.</p></div>
+      <div class="section-heading"><span class="eyebrow">FAIR PLAY</span><h2>Kostenlos heißt nicht regellos.</h2><p>Damit SubFree für alle nutzbar bleibt, gelten klare Grundregeln.</p></div>
       <div class="rules-grid">
-        <div class="rule"><span class="rule-check">✓</span><div><h3>Erlaubte Projekte</h3><p>Persönliche Websites, Portfolios, Lernprojekte und nicht-kommerzielle Softwareprojekte.</p></div></div>
-        <div class="rule"><span class="rule-check">✓</span><div><h3>Keine Kosten</h3><p>Es ist geplant, Pfad-Weiterleitungen ohne Gebühren bereitzustellen. Es gibt keine Garantie für dauerhafte Verfügbarkeit.</p></div></div>
+        <div class="rule"><span class="rule-check">✓</span><div><h3>Erlaubte Projekte</h3><p>Persönliche Websites, Portfolios, Lernprojekte und kleine Softwareprojekte.</p></div></div>
+        <div class="rule"><span class="rule-check">✓</span><div><h3>Keine Gebühren geplant</h3><p>Die Nutzung ist kostenlos geplant. Speicher, Verfügbarkeit und Limits hängen von den verwendeten Free-Tarifen ab.</p></div></div>
         <div class="rule"><span class="rule-cross">×</span><div><h3>Kein Missbrauch</h3><p>Phishing, Schadsoftware, Spam, Betrug und rechtswidrige Inhalte sind verboten.</p></div></div>
-        <div class="rule"><span class="rule-cross">×</span><div><h3>Automatische Verarbeitung</h3><p>Nach dem Erstellen des GitHub-Issues prüft eine Action den Eintrag und startet ein neues Vercel-Deployment.</p></div></div>
+        <div class="rule"><span class="rule-cross">×</span><div><h3>Eigene Verantwortung</h3><p>Du bist für die von dir veröffentlichten Inhalte und die sichere Aufbewahrung deines Zugangscodes verantwortlich.</p></div></div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Community-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="mailto:adam_kraus@icloud.com">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
+  <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Hosting-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="mailto:adam_kraus@icloud.com">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
   <script src="script.js"></script>
 </body>
 </html>
