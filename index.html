@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f7f9fc">
-  <meta name="description" content="SubFree – kostenlose Subdomains für persönliche Projekte und Entwickler.">
-  <title>SubFree – Deine Subdomain. Kostenlos.</title>
+  <meta name="description" content="SubFree – kostenlose Pfad-Weiterleitungen für persönliche Projekte und Entwickler.">
+  <title>SubFree – Deine Weiterleitung. Kostenlos.</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -15,7 +15,7 @@
     <nav aria-label="Hauptnavigation">
       <a href="#so-funktionierts">So funktioniert's</a>
       <a href="#regeln">Regeln</a>
-      <a class="nav-cta" href="#anfragen">Subdomain anfragen</a>
+      <a class="nav-cta" href="#anfragen">Weiterleitung anfragen</a>
     </nav>
   </header>
 
@@ -24,19 +24,19 @@
       <div class="hero-copy">
         <span class="eyebrow"><span class="status-dot"></span> Kostenloses Community-Projekt</span>
         <h1>Deine Idee verdient<br><span>eine eigene Adresse.</span></h1>
-        <p class="hero-lead">SubFree soll kostenlose Subdomains für persönliche Websites, kleine Projekte und Entwickler bereitstellen. Ohne Preislisten. Ohne komplizierte Pakete.</p>
+        <p class="hero-lead">SubFree soll kostenlose Pfad-Weiterleitungen für persönliche Websites, kleine Projekte und Entwickler bereitstellen. Ohne Preislisten. Ohne komplizierte Pakete.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="#anfragen">Subdomain anfragen <span aria-hidden="true">→</span></a>
           <a class="button button-secondary" href="#so-funktionierts">Mehr erfahren</a>
         </div>
-        <p class="micro-note">Noch in der Aufbauphase. Eine Anfrage ist keine automatische Freischaltung.</p>
+        <p class="micro-note">Noch in der Aufbauphase. Eine Anfrage wird automatisch verarbeitet. Missbrauch ist verboten.</p>
       </div>
-      <div class="preview-card" aria-label="Beispiel einer Subdomain">
+      <div class="preview-card" aria-label="Beispiel einer Pfad-Weiterleitung">
         <div class="preview-top"><span></span><span></span><span></span><small>DEINE NEUE ADRESSE</small></div>
         <div class="preview-content">
           <div class="preview-icon">S</div>
           <p class="preview-label">Dein Projekt könnte hier liegen</p>
-          <div class="domain-example"><strong>deinprojekt</strong><span>.subfree.is-a.dev</span></div>
+          <div class="domain-example"><span>subfree.is-a.dev/</span><strong>deinprojekt</strong></div>
           <span class="preview-tag">BEISPIEL · NOCH NICHT AKTIV</span>
         </div>
       </div>
@@ -49,7 +49,7 @@
     </section>
 
     <section class="section" id="so-funktionierts">
-      <div class="section-heading"><span class="eyebrow">DER ABLAUF</span><h2>In drei Schritten zur Wunschadresse.</h2><p>Die Vergabe wird zunächst manuell geprüft. Automatisierung kommt erst, wenn die technische Grundlage sicher steht.</p></div>
+      <div class="section-heading"><span class="eyebrow">DER ABLAUF</span><h2>In drei Schritten zu deiner Weiterleitung.</h2><p>Das Formular erstellt ein GitHub-Issue. Eine GitHub Action prüft die Angaben und speichert den Eintrag automatisch in der Redirect-Datenbank.</p></div>
       <div class="steps">
         <article class="step-card"><span class="step-number">01</span><h3>Namen auswählen</h3><p>Überlege dir einen kurzen Namen, der zu deinem Projekt passt.</p></article>
         <article class="step-card"><span class="step-number">02</span><h3>Anfrage senden</h3><p>Gib den gewünschten Namen, dein Ziel und eine Kontaktmöglichkeit an.</p></article>
@@ -58,18 +58,18 @@
     </section>
 
     <section class="request-section" id="anfragen">
-      <div class="request-intro"><span class="eyebrow">DEIN PROJEKT STARTET HIER</span><h2>Eine Subdomain anfragen.</h2><p>Beschreibe kurz, wofür du die Adresse verwenden möchtest. Beim Absenden wird ein GitHub-Issue mit deinen Angaben vorbereitet. Nach dem Erstellen prüft die Automatisierung deine Registrierung.</p><div class="notice"><strong>Hinweis:</strong> SubFree befindet sich im Aufbau. Die gewünschte Domainendung ist noch nicht als verfügbar oder freigegeben bestätigt.</div></div>
+      <div class="request-intro"><span class="eyebrow">DEIN PROJEKT STARTET HIER</span><h2>Eine Weiterleitung anfragen.</h2><p>Beschreibe kurz, wofür du die Adresse verwenden möchtest. Beim Absenden wird ein GitHub-Issue mit deinen Angaben vorbereitet. Nach dem Erstellen prüft die Automatisierung deine Registrierung.</p><div class="notice"><strong>Hinweis:</strong> SubFree befindet sich im Aufbau. Die gewünschte Domainendung ist noch nicht als verfügbar oder freigegeben bestätigt.</div></div>
       <form id="request-form" class="request-form">
         <label for="subdomain">Wunschname</label>
-        <div class="domain-input"><input id="subdomain" name="subdomain" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"><span>.subfree.is-a.dev</span></div>
+        <div class="domain-input"><span>subfree.is-a.dev/</span><input id="subdomain" name="subdomain" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
         <small>Nur Kleinbuchstaben, Zahlen und Bindestriche. Keine Leerzeichen.</small>
-        <label for="target">Wohin soll die Subdomain zeigen?</label>
+        <label for="target">Wohin soll die Weiterleitung führen?</label>
         <input id="target" name="target" type="url" placeholder="https://meine-website.example" required>
         <label for="purpose">Wofür möchtest du sie nutzen?</label>
         <textarea id="purpose" name="purpose" rows="4" maxlength="600" placeholder="Erkläre kurz dein Projekt und was du veröffentlichen möchtest." required></textarea>
         <label for="contact">Deine Kontakt-E-Mail</label>
         <input id="contact" name="contact" type="email" placeholder="name@example.com" required>
-        <label class="checkbox-label"><input type="checkbox" id="rules" required><span>Ich werde die Subdomain nur rechtmäßig verwenden und keine Phishing-, Malware- oder Spam-Inhalte veröffentlichen.</span></label>
+        <label class="checkbox-label"><input type="checkbox" id="rules" required><span>Ich werde die Weiterleitung nur rechtmäßig verwenden und keine Phishing-, Malware- oder Spam-Inhalte veröffentlichen.</span></label>
         <button class="button button-primary submit-button" type="submit">GitHub-Registrierung öffnen <span aria-hidden="true">→</span></button>
         <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
       </form>
@@ -79,9 +79,9 @@
       <div class="section-heading"><span class="eyebrow">FAIR PLAY</span><h2>Kostenlos heißt nicht regellos.</h2><p>Damit der Dienst für alle nutzbar bleibt, gelten klare Grundregeln.</p></div>
       <div class="rules-grid">
         <div class="rule"><span class="rule-check">✓</span><div><h3>Erlaubte Projekte</h3><p>Persönliche Websites, Portfolios, Lernprojekte und nicht-kommerzielle Softwareprojekte.</p></div></div>
-        <div class="rule"><span class="rule-check">✓</span><div><h3>Keine Kosten</h3><p>Es ist geplant, Subdomains ohne Gebühren bereitzustellen. Es gibt keine Garantie für dauerhafte Verfügbarkeit.</p></div></div>
+        <div class="rule"><span class="rule-check">✓</span><div><h3>Keine Kosten</h3><p>Es ist geplant, Pfad-Weiterleitungen ohne Gebühren bereitzustellen. Es gibt keine Garantie für dauerhafte Verfügbarkeit.</p></div></div>
         <div class="rule"><span class="rule-cross">×</span><div><h3>Kein Missbrauch</h3><p>Phishing, Schadsoftware, Spam, Betrug und rechtswidrige Inhalte sind verboten.</p></div></div>
-        <div class="rule"><span class="rule-cross">×</span><div><h3>Keine Sofortfreigabe</h3><p>Eine Anfrage reserviert keinen Namen. Jede Vergabe muss geprüft und technisch eingerichtet werden.</p></div></div>
+        <div class="rule"><span class="rule-cross">×</span><div><h3>Automatische Verarbeitung</h3><p>Nach dem Erstellen des GitHub-Issues prüft eine Action den Eintrag und startet ein neues Vercel-Deployment.</p></div></div>
       </div>
     </section>
   </main>
