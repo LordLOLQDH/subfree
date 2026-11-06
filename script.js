@@ -36,6 +36,14 @@ document.querySelector("#save-local-settings")?.addEventListener("click",()=>{
  try{localStorage.setItem(localStoreKey,JSON.stringify(settings));document.querySelector("#local-settings-status").textContent="Auf diesem Gerät gespeichert."}
  catch{document.querySelector("#local-settings-status").textContent="Speichern im Browser nicht möglich."}
 });
+document.querySelector("#clear-local-settings")?.addEventListener("click",()=>{
+ try{localStorage.removeItem(localStoreKey);}catch{}
+ if(localName)localName.value="";
+ if(localEmail)localEmail.value="";
+ if(rememberKey)rememberKey.checked=false;
+ if(accessInput)accessInput.value="";
+ document.querySelector("#local-settings-status").textContent="Lokale Profildaten und gespeicherter Zugangscode wurden von diesem Gerät entfernt. Das Online-Projekt bleibt bestehen.";
+});
 accountType?.addEventListener("change",()=>{const hasGithub=accountType.value==="github";githubField.hidden=!hasGithub;githubInput.required=hasGithub;document.querySelector("#no-github-note").hidden=hasGithub;});
 if(accountType){githubInput.required=true;}
 let githubCheckTimer;
@@ -137,6 +145,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#project-meta").textContent = (result.site.github_username && result.site.github_username !== "subfree-user" ? "@" + result.site.github_username : "SubFree-Account ohne GitHub") + " · " + result.site.slug;
     const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"adam_kraus@icloud.com";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:adam_kraus@icloud.com";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
     document.querySelector("#project-url").href = "https://lordlolqdh.github.io/subfree/" + result.site.slug + "/";
+    await refreshApiTokens();
     const files = result.files || [];
     renderFiles(files, currentFolders);
     const first = files.find(file => file.file_path === "index.html");
@@ -310,3 +319,58 @@ tempMailCopy?.addEventListener("click", async () => {
   checkDeployment();
   window.setInterval(checkDeployment,45000);
 })();
+
+async function refreshApiTokens(){
+ const list=document.querySelector("#api-token-list"); if(!list||!currentKey)return;
+ try{
+  const result=await api({action:"list_api_tokens"},currentKey); list.replaceChildren();
+  const heading=document.createElement("strong");heading.textContent="API-Schlüssel";list.append(heading);
+  if(!result.tokens?.length){const empty=document.createElement("p");empty.textContent="Noch keine API-Schlüssel erstellt.";list.append(empty);return;}
+  result.tokens.forEach(token=>{
+   const row=document.createElement("div");row.className="api-token-row";
+   const info=document.createElement("div");const name=document.createElement("strong");name.textContent=token.name;
+   const meta=document.createElement("small");meta.textContent=token.token_prefix+"… · "+(token.revoked_at?"Widerrufen":"Aktiv")+(token.last_used_at?" · zuletzt genutzt "+new Date(token.last_used_at).toLocaleString("de-DE"):" · noch nicht genutzt");
+   info.append(name,meta);row.append(info);
+   if(!token.revoked_at){const revoke=document.createElement("button");revoke.type="button";revoke.className="button button-danger button-small";revoke.textContent="Widerrufen";revoke.addEventListener("click",async()=>{
+    if(!confirm("Diesen API-Schlüssel wirklich widerrufen?"))return;
+    try{await api({action:"revoke_api_token",id:token.id},currentKey);await refreshApiTokens();document.querySelector("#api-token-message").textContent="API-Schlüssel widerrufen."}
+    catch(error){document.querySelector("#api-token-message").textContent=error.message;}
+   });row.append(revoke);}
+   list.append(row);
+  });
+ }catch(error){list.textContent="API-Schlüssel konnten nicht geladen werden: "+error.message;}
+}
+document.querySelector("#create-api-token")?.addEventListener("click",async()=>{
+ if(!currentKey)return;
+ const button=document.querySelector("#create-api-token"),message=document.querySelector("#api-token-message");
+ button.disabled=true;message.textContent="API-Schlüssel wird erstellt …";
+ try{
+  const result=await api({action:"create_api_token",name:document.querySelector("#api-token-name").value.trim()||"ChatGPT"},currentKey);
+  document.querySelector("#api-token-value").textContent=result.token;
+  document.querySelector("#api-token-result").hidden=false;
+  message.textContent=result.message;
+  await refreshApiTokens();
+ }catch(error){message.textContent=error.message;}
+ finally{button.disabled=false;}
+});
+document.querySelector("#copy-api-token")?.addEventListener("click",async()=>{
+ const token=document.querySelector("#api-token-value").textContent;
+ try{await navigator.clipboard.writeText(token);document.querySelector("#copy-api-token").textContent="Kopiert";}
+ catch{document.querySelector("#api-token-message").textContent="Bitte den Schlüssel manuell markieren und kopieren.";}
+});
+document.querySelector("#delete-project")?.addEventListener("click",async()=>{
+ if(!currentKey||!currentSite)return;
+ if(!confirm("ACHTUNG: Das Projekt und alle gespeicherten Daten werden endgültig gelöscht."))return;
+ const typed=prompt("Zur Bestätigung bitte den Projektnamen eingeben: "+currentSite.slug);
+ if(typed!==currentSite.slug){document.querySelector("#delete-project-message").textContent="Löschung abgebrochen. Der Projektname stimmte nicht überein.";return;}
+ const button=document.querySelector("#delete-project"),message=document.querySelector("#delete-project-message");
+ button.disabled=true;message.textContent="Projekt und Daten werden gelöscht …";
+ try{
+  const deletedKey=currentKey;const result=await api({action:"delete_project"},currentKey);
+  editor.hidden=true;currentKey="";currentSite=null;currentFolders=[];
+  accessInput.value="";
+  try{const settings=JSON.parse(localStorage.getItem(localStoreKey)||"{}");if(settings.accessKey===deletedKey){settings.accessKey="";settings.rememberKey=false;localStorage.setItem(localStoreKey,JSON.stringify(settings));}}catch{}
+  message.textContent=result.message;manageMessage.textContent="Projekt gelöscht. Du kannst jetzt ein neues Projekt registrieren.";
+ }catch(error){message.textContent="Löschung fehlgeschlagen: "+error.message;}
+ finally{button.disabled=false;}
+});
