@@ -22,7 +22,7 @@ form?.addEventListener("submit", (event) => {
   const subject = encodeURIComponent("SubFree-Anfrage: " + subdomain);
   const body = encodeURIComponent(
     "Hallo SubFree-Team,\n\n" +
-    "ich möchte folgende Subdomain anfragen: " + subdomain + ".admin-coding.is-a.dev\n" +
+    "ich möchte folgende Subdomain anfragen: " + subdomain + ".subfree.is-a.dev\n" +
     "Zieladresse: " + target + "\n" +
     "Projektbeschreibung: " + purpose + "\n" +
     "Kontakt-E-Mail: " + contact + "\n\n" +
