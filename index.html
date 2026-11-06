@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261106-13">
+  <link rel="stylesheet" href="styles.css?v=20261106-14">
 </head>
 <body>
   <header class="site-header">
@@ -73,6 +73,26 @@
     </section>
 
     
+
+
+    <section class="deploy-status-section" id="deploy-status" aria-labelledby="deploy-status-title">
+      <div class="deploy-status-card">
+        <div class="deploy-status-copy">
+          <span class="eyebrow">GITHUB PAGES // LIVE MONITOR</span>
+          <h2 id="deploy-status-title">Website-Status in Echtzeit.</h2>
+          <p id="deploy-status-detail" aria-live="polite">Deployment-Status wird abgefragt …</p>
+        </div>
+        <div class="deploy-status-indicator" id="deploy-status-indicator" data-state="checking">
+          <span class="deploy-status-light" aria-hidden="true"></span>
+          <strong id="deploy-status-label">WIRD GEPRÜFT</strong>
+        </div>
+        <div class="deploy-status-meta">
+          <span>Letzte Prüfung: <strong id="deploy-checked-at">–</strong></span>
+          <span>Letztes Deployment: <strong id="deploy-updated-at">–</strong></span>
+          <a id="deploy-run-link" href="https://github.com/LordLOLQDH/subfree/actions" target="_blank" rel="noopener">GitHub Actions öffnen ↗</a>
+        </div>
+      </div>
+    </section>
 
     <section class="section" id="funktionen">
       <div class="section-heading"><span class="eyebrow">DIE FUNKTIONEN</span><h2>Alles an einem Ort verwalten.</h2><p>SubFree soll die Verwaltung kleiner Webprojekte einfach halten. Du brauchst dafür kein GitHub-Konto-Dashboard und musst keine Dateien direkt im Repository bearbeiten.</p></div>
@@ -197,6 +217,6 @@
   </main>
 
   <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Hosting-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="datenschutz.html">Datenschutz</a><a href="impressum.html">Impressum</a><a href="kontakt.html">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
-  <script src="script.js?v=20261106-9" defer></script>
+  <script src="script.js?v=20261106-10" defer></script>
 </body>
 </html>
