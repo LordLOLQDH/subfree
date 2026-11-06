@@ -50,7 +50,7 @@ Nach dem Hinzufügen muss die Edge Function ggf. erneut deployed werden, damit s
 - E-Mail-Adressen werden aktuell nicht verifiziert.
 - Der öffentliche Dienst benötigt Schutz vor Spam und automatisierten Massenregistrierungen, bevor er breit beworben wird.
 - GitHub Pages ist statisches Hosting. Backend-Funktionen, Uploads und die Veröffentlichung benötigen zusätzliche serverseitige Verarbeitung.
-- Nutzerinhalte müssen isoliert ausgeliefert werden. JavaScript von Nutzern darf nicht direkt im Sicherheitskontext der SubFree-Verwaltungsseite laufen.
+- Nutzerinhalte werden in einem sandboxed iframe ausgeliefert. Nur `index.html` wird als HTML-Dokument ausgeführt; weitere HTML-/HTM- und SVG-Dateien sind vorerst gesperrt, damit Nutzer-JavaScript nicht im Sicherheitskontext der SubFree-Verwaltungsseite läuft. CSS- und JS-Dateien können als Ressourcen eingebunden werden.
 - Die Domain `subfree.is-a.dev` ist nicht automatisch mit GitHub Pages verbunden.
 - Free-Tarife haben Limits; dauerhafte kostenlose Verfügbarkeit kann nicht zugesichert werden.
 
