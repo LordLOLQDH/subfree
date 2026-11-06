@@ -18,7 +18,7 @@ SubFree ist ein unabhängiges Community-Projekt im Aufbau. Ziel ist es, ausgewä
 
 Die Website ist eine statische HTML-, CSS- und JavaScript-Seite und kann über GitHub Pages veröffentlicht werden. Das Anfrageformular öffnet eine vorbereitete E-Mail. Es speichert keine Anfragen auf einem Server und verschickt sie nicht automatisch.
 
-Die aktuell im Frontend gezeigte Beispiel-Endung `admin-coding.is-a.dev` ist **nicht als verfügbar oder für die Weitergabe freigegeben bestätigt**. Vor einem öffentlichen Start müssen die Regeln des Domainanbieters geprüft und die Nutzung ausdrücklich erlaubt sein.
+Die im Frontend gezeigte Beispiel-Endung `subfree.is-a.dev` ist **nicht als verfügbar oder für die Weitergabe freigegeben bestätigt**. Vor einem öffentlichen Start müssen die Regeln des Domainanbieters geprüft und die Nutzung ausdrücklich erlaubt sein.
 
 ## Lokal testen
 
