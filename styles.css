@@ -292,3 +292,38 @@ a{color:inherit}
 .contact-terminal a{font-size:14px;overflow-wrap:anywhere}
 .contact-terminal small{display:block;color:#82958a;margin-top:12px;font-size:11px;line-height:1.7}
 @media(max-width:600px){.legal-page .section{padding:55px 20px 80px}.legal-page .section h1{letter-spacing:-1.5px}.legal-page .section h2{margin-top:30px}}
+
+
+/* PIXEL CONSOLE // 32-bit inspired interface */
+:root{--pixel-green:#00ff88;--pixel-grid:rgba(0,255,136,.055)}
+body{font-family:"VT323","SFMono-Regular",Consolas,monospace;font-size:19px;letter-spacing:.15px;background-color:#000;background-image:linear-gradient(var(--pixel-grid) 1px,transparent 1px),linear-gradient(90deg,var(--pixel-grid) 1px,transparent 1px);background-size:16px 16px}
+body:after{content:"";position:fixed;inset:0;z-index:10;pointer-events:none;opacity:.12;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,255,136,.12) 4px)}
+h1,h2,h3,.eyebrow,.button,.site-header nav,.preview-top small,.preview-terminal small,.step-number,.brand,.nav-cta,.site-footer small,.hero-contact-line{font-family:"Press Start 2P","VT323",monospace}
+h1{font-size:clamp(22px,3vw,38px)!important;line-height:1.65!important;letter-spacing:0!important}
+h2{font-size:clamp(15px,2vw,22px)!important;line-height:1.7!important;letter-spacing:0!important}
+h3{font-size:13px!important;line-height:1.8!important;letter-spacing:0!important}
+.eyebrow{font-size:8px!important;line-height:1.9;letter-spacing:0!important}
+.site-header{box-shadow:0 3px 0 #12351f}
+.brand-mark,.preview-icon,.button,.nav-cta,.preview-card,.trust-strip,.step-card,.temp-mail-panel,.request-form,.manage-panel,.file-sidebar,.file-workspace,.site-footer,.local-account-panel,.quick-access,.quick-card,.contact-terminal{border-radius:0!important;box-shadow:4px 4px 0 #092013!important}
+.button{font-size:8px!important;line-height:2.1;padding:13px 15px}
+.button:hover{transform:translate(-1px,-1px);box-shadow:2px 2px 0 #00ff88!important}
+.hero{gap:44px}
+.hero-contact-line{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:20px;color:#83a18e;font-size:8px;line-height:2.2;overflow-wrap:anywhere}
+.hero-contact-line a{color:#00ff88;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+.hero-contact-line a:hover{color:#c5ffdb}
+.pixel-cursor{color:#00ff88;text-shadow:0 0 8px #00ff88;font-size:13px}
+.contact-divider{color:#42614d}
+.preview-top>span{width:8px;height:8px}
+.preview-card{outline:1px solid #00ff8833}
+.preview-terminal,.domain-example,.notice,.deploy-notice,.key-result,.file-item,.file-privacy-button,.domain-input,.temp-mail-address{border-radius:0!important}
+input,textarea,select,button{font-family:"VT323",monospace}
+input,select{font-size:19px!important}
+textarea,.code-editor{font-size:17px!important;line-height:1.45}
+table{display:block;width:100%;max-width:100%;overflow-x:auto;border-collapse:collapse;border:1px solid #28523a;background:#030604;color:#dfffea;scrollbar-width:thin;scrollbar-color:#00a957 #050806}
+thead,tbody,tfoot{width:100%}
+th,td{min-width:105px;padding:12px 14px;border:1px solid #1d4930;text-align:left;vertical-align:top;line-height:1.5;overflow-wrap:anywhere}
+th{background:#082012;color:#00ff88;font-family:"Press Start 2P",monospace;font-size:8px;line-height:1.8}
+td{font-size:17px;color:#c7dfce}
+tr:nth-child(even) td{background:#06100a}
+table caption{padding:10px;text-align:left;color:#00ff88}
+@media(max-width:760px){.hero-contact-line{font-size:7px;gap:7px}.hero{padding-left:18px;padding-right:18px}.hero h1{font-size:clamp(20px,6vw,30px)!important}.section-heading h2,.request-intro h2{font-size:15px!important}th{font-size:7px;min-width:95px}th,td{padding:9px 10px}.site-header .brand{font-size:10px}}
