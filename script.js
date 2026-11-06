@@ -10,6 +10,11 @@ const keyOutput = document.querySelector("#new-key");
 const copyKeyButton = document.querySelector("#copy-key");
 const newProjectLink = document.querySelector("#new-project-link");
 const accessInput = document.querySelector("#access-key");
+const accountType = document.querySelector("#accountType");
+const githubField = document.querySelector("#github-field");
+const githubInput = document.querySelector("#githubUsername");
+const githubCheck = document.querySelector("#github-check");
+const localStoreKey = "subfree.local.settings.v1";
 const manageMessage = document.querySelector("#manage-message");
 const editor = document.querySelector("#editor");
 const pathInput = document.querySelector("#file-path");
@@ -20,6 +25,30 @@ let currentSite = null;
 let currentFolders = [];
 
 if (year) year.textContent = new Date().getFullYear();
+const localSettings = (()=>{try{return JSON.parse(localStorage.getItem(localStoreKey)||"{}")}catch{return {}}})();
+const localName=document.querySelector("#local-name"),localEmail=document.querySelector("#local-email"),rememberKey=document.querySelector("#remember-key");
+if(localName)localName.value=localSettings.name||"";
+if(localEmail)localEmail.value=localSettings.email||"";
+if(rememberKey)rememberKey.checked=Boolean(localSettings.rememberKey);
+if(localSettings.rememberKey&&localSettings.accessKey){accessInput.value=localSettings.accessKey}
+document.querySelector("#save-local-settings")?.addEventListener("click",()=>{
+ const settings={name:localName.value.trim(),email:localEmail.value.trim(),rememberKey:rememberKey.checked,accessKey:rememberKey.checked?(accessInput.value.trim()||localSettings.accessKey||""):""};
+ try{localStorage.setItem(localStoreKey,JSON.stringify(settings));document.querySelector("#local-settings-status").textContent="Auf diesem Gerät gespeichert."}
+ catch{document.querySelector("#local-settings-status").textContent="Speichern im Browser nicht möglich."}
+});
+accountType?.addEventListener("change",()=>{const hasGithub=accountType.value==="github";githubField.hidden=!hasGithub;githubInput.required=hasGithub;document.querySelector("#no-github-note").hidden=hasGithub;});
+if(accountType){githubInput.required=true;}
+let githubCheckTimer;
+githubInput?.addEventListener("input",()=>{
+ clearTimeout(githubCheckTimer);githubCheck.textContent="GitHub-Account wird geprüft …";githubCheck.style.color="#90a5bf";
+ githubCheckTimer=setTimeout(async()=>{
+  const username=githubInput.value.trim().replace(/^@/,"");
+  if(!username){githubCheck.textContent="GitHub-Benutzernamen eingeben.";return}
+  if(!/^[A-Za-z0-9-]{1,39}$/.test(username)){githubCheck.textContent="Ungültiges GitHub-Format.";githubCheck.style.color="#ff8585";return}
+  try{const r=await fetch("https://api.github.com/users/"+encodeURIComponent(username),{headers:{Accept:"application/vnd.github+json"}});if(r.ok){const u=await r.json();githubCheck.textContent="✓ GitHub-Account gefunden: "+u.login;githubCheck.style.color="#65dba7"}else if(r.status===404){githubCheck.textContent="✕ Dieser GitHub-Account existiert nicht.";githubCheck.style.color="#ff8585"}else{githubCheck.textContent="GitHub-Prüfung gerade nicht verfügbar.";}}
+  catch{githubCheck.textContent="GitHub konnte nicht erreicht werden. Später erneut versuchen."}
+ },450);
+});
 typeSelect?.addEventListener("change", () => {
   redirectField.hidden = typeSelect.value !== "redirect";
   document.querySelector("#redirectUrl").required = typeSelect.value === "redirect";
@@ -42,12 +71,14 @@ form?.addEventListener("submit", async (event) => {
     action: "register",
     slug: String(data.get("slug") || "").trim().toLowerCase(),
     displayName: String(data.get("displayName") || "").trim(),
-    githubUsername: String(data.get("githubUsername") || "").trim().replace(/^@/, ""),
+    githubUsername: accountType?.value === "subfree" ? "" : String(data.get("githubUsername") || "").trim().replace(/^@/, ""),
+    accountType: accountType?.value || "github",
     email: String(data.get("email") || "").trim(),
     description: String(data.get("description") || "").trim(),
     siteType: String(data.get("siteType") || "static"),
     redirectUrl: String(data.get("redirectUrl") || "").trim()
   };
+  if (payload.accountType === "github" && !payload.githubUsername) { message.textContent = "Bitte gib einen GitHub-Benutzernamen ein."; return; }
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(payload.slug) || payload.slug.length < 3 || payload.slug.length > 30) {
     message.textContent = "Der Projektname muss 3 bis 30 Zeichen lang sein und darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten.";
     return;
@@ -59,6 +90,7 @@ form?.addEventListener("submit", async (event) => {
   try {
     const result = await api(payload);
     currentKey = result.accessKey;
+    if(rememberKey?.checked){try{localStorage.setItem(localStoreKey,JSON.stringify({name:localName?.value||"",email:localEmail?.value||"",rememberKey:true,accessKey:currentKey}))}catch{}}
     keyOutput.textContent = currentKey;
     keyResult.hidden = false;
     newProjectLink.href = result.projectUrl;
@@ -89,6 +121,7 @@ copyKeyButton?.addEventListener("click", async () => {
 document.querySelector("#load-project")?.addEventListener("click", async () => {
   const key = accessInput.value.trim();
   if (!key) { manageMessage.textContent = "Bitte gib deinen Zugangscode ein."; return; }
+  if(rememberKey?.checked){try{localStorage.setItem(localStoreKey,JSON.stringify({name:localName?.value||"",email:localEmail?.value||"",rememberKey:true,accessKey:key}))}catch{}}
   manageMessage.textContent = "Projekt wird geladen …";
   try {
     const result = await api({ action: "load" }, key);
@@ -101,7 +134,8 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#offline-project").textContent = result.site.status === "active" ? "Website offline nehmen" : "Bereits offline";
     document.querySelector("#publish-project").textContent = result.site.status === "active" ? "Änderungen veröffentlichen" : "Website veröffentlichen";
     document.querySelector("#project-title").textContent = result.site.display_name;
-    document.querySelector("#project-meta").textContent = "@" + result.site.github_username + " · " + result.site.slug;
+    document.querySelector("#project-meta").textContent = (result.site.github_username && result.site.github_username !== "subfree-user" ? "@" + result.site.github_username : "SubFree-Account ohne GitHub") + " · " + result.site.slug;
+    const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:kraus-digital@proton.me";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
     document.querySelector("#project-url").href = "https://lordlolqdh.github.io/subfree/" + result.site.slug + "/";
     const files = result.files || [];
     renderFiles(files, currentFolders);
