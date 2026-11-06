@@ -136,6 +136,15 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentKey = key;
     currentSite = result.site;
     currentFolders = result.folders || [];
+    const redirectPanel = document.querySelector("#redirect-settings");
+    if (redirectPanel) {
+      redirectPanel.hidden = result.site.site_type !== "redirect";
+      const targetInput = document.querySelector("#redirect-target");
+      const targetLink = document.querySelector("#open-redirect-target");
+      if (targetInput) targetInput.value = result.site.redirect_url || "";
+      if (targetLink) { targetLink.href = result.site.redirect_url || "#"; targetLink.hidden = !result.site.redirect_url; }
+    }
+
     editor.hidden = false;
     document.querySelector("#project-status").textContent = result.site.status === "active" ? "● Online" : "○ Offline";
     document.querySelector("#offline-project").disabled = result.site.status !== "active";
@@ -357,6 +366,24 @@ document.querySelector("#copy-api-token")?.addEventListener("click",async()=>{
  const token=document.querySelector("#api-token-value").textContent;
  try{await navigator.clipboard.writeText(token);document.querySelector("#copy-api-token").textContent="Kopiert";}
  catch{document.querySelector("#api-token-message").textContent="Bitte den Schlüssel manuell markieren und kopieren.";}
+});
+
+document.querySelector("#save-redirect-target")?.addEventListener("click",async()=>{
+ if(!currentKey||!currentSite||currentSite.site_type!=="redirect")return;
+ const input=document.querySelector("#redirect-target"),button=document.querySelector("#save-redirect-target"),message=document.querySelector("#redirect-settings-message");
+ const target=input.value.trim();
+ let parsed;try{parsed=new URL(target)}catch{message.textContent="Bitte gib eine gültige HTTPS-Adresse ein.";return;}
+ if(parsed.protocol!=="https:"||parsed.username||parsed.password||(parsed.port&&parsed.port!=="443")){message.textContent="Nur gültige HTTPS-Adressen auf Port 443 sind erlaubt.";return;}
+ button.disabled=true;message.textContent="Weiterleitungsziel wird gespeichert …";
+ try{
+  const result=await api({action:"update_redirect",redirectUrl:target},currentKey);
+  currentSite.redirect_url=result.redirectUrl;
+  input.value=result.redirectUrl;
+  const link=document.querySelector("#open-redirect-target");link.href=result.redirectUrl;link.hidden=false;
+  message.textContent=result.message;
+  saveMessage.textContent="Weiterleitungsziel aktualisiert. Die öffentliche Seite verwendet ab jetzt die neue Adresse.";
+ }catch(error){message.textContent="Speichern fehlgeschlagen: "+error.message;}
+ finally{button.disabled=false;}
 });
 document.querySelector("#delete-project")?.addEventListener("click",async()=>{
  if(!currentKey||!currentSite)return;
