@@ -398,7 +398,7 @@ Deno.serve(async (req: Request) => {
     if (action === "public_site") {
       const slug = String(body.slug ?? "").toLowerCase();
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return json({ error: "Ungültiger Projektname." }, 400);
-      const rows = await db(`subfree_sites?slug=eq.${encodeURIComponent(slug)}&status=eq.active&select=id,slug,display_name,description,site_type,redirect_url`);
+      const rows = await db(`subfree_sites?slug=eq.${encodeURIComponent(slug)}&status=eq.active&select=id,slug,display_name,description,site_type,redirect_url,github_username`);
       const site = rows[0];
       if (!site) return json({ error: "Projekt nicht gefunden oder noch nicht veröffentlicht." }, 404);
       const files = await db(`subfree_site_files?site_id=eq.${site.id}&file_path=eq.index.html&select=content,is_private`);
