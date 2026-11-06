@@ -589,6 +589,29 @@ Deno.serve(async (req: Request) => {
       return json({ success: true, site, files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
     }
 
+    if (action === "update_redirect") {
+      if (site.site_type !== "redirect") return json({ error: "Dieses Projekt ist keine Weiterleitung." }, 400);
+      const target = String(body.redirectUrl ?? "").trim();
+      if (!target || target.length > 2048) return json({ error: "Bitte gib eine gültige HTTPS-Zieladresse ein." }, 400);
+      let parsed: URL;
+      try { parsed = new URL(target); } catch { return json({ error: "Die Zieladresse ist ungültig." }, 400); }
+      if (parsed.protocol !== "https:" || parsed.username || parsed.password || (parsed.port && parsed.port !== "443") || !parsed.hostname) {
+        return json({ error: "Nur gültige HTTPS-Zieladressen auf Port 443 sind erlaubt." }, 400);
+      }
+      const redirectUrl = parsed.toString();
+      await db(`subfree_sites?id=eq.${site.id}`, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ redirect_url: redirectUrl, updated_at: new Date().toISOString() })
+      });
+      let registryUpdated = true;
+      if (GITHUB_TOKEN && site.status === "active") {
+        try { await updatePublicRegistry({ ...site, redirect_url: redirectUrl }); }
+        catch (error) { registryUpdated = false; console.error("SubFree redirect registry update failed", String(error)); }
+      }
+      return json({ success: true, redirectUrl, registryUpdated,
+        message: registryUpdated ? "Weiterleitungsziel gespeichert. Die Änderung ist sofort aktiv." : "Ziel gespeichert. Die öffentliche Projektliste konnte noch nicht aktualisiert werden." });
+    }
+
     if (action === "list_api_tokens") {
       const tokens = await db(`subfree_api_tokens?site_id=eq.${site.id}&select=id,name,token_prefix,scopes,created_at,last_used_at,revoked_at&order=created_at.desc`);
       return json({ success: true, tokens });
