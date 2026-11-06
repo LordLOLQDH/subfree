@@ -179,6 +179,14 @@
         <div id="editor" class="editor" hidden>
           <div class="editor-heading"><div><strong id="project-title">Projekt</strong><span id="project-meta"></span><span id="project-status" class="project-status">Status wird geladen</span></div><div class="editor-heading-actions"><a id="project-url" target="_blank" rel="noopener">Website öffnen ↗</a><a id="email-shortcut" href="mailto:adam_kraus@icloud.com">E-Mail-Schnellzugriff ↗</a><button class="button button-secondary" id="offline-project" type="button">Website offline nehmen</button></div></div>
           <p class="deploy-notice">Nach dem Veröffentlichen kann es einen Moment dauern, bis GitHub Pages die Änderungen bereitstellt und die Website erreichbar ist.</p>
+          <section class="redirect-settings-panel" id="redirect-settings" hidden>
+            <div class="redirect-settings-heading"><span class="eyebrow">REDIRECT.EXE // CONFIG</span><h3>Weiterleitungsziel ändern</h3></div>
+            <p>Ändere die HTTPS-Adresse, zu der deine SubFree-Seite weiterleiten soll. Die Änderung wird direkt gespeichert und benötigt keine neue Registrierung.</p>
+            <label for="redirect-target">Neue Zieladresse</label>
+            <input id="redirect-target" type="url" inputmode="url" placeholder="https://example.com" autocomplete="url">
+            <div class="redirect-settings-actions"><button class="button button-primary" id="save-redirect-target" type="button">Weiterleitungsziel speichern</button><a id="open-redirect-target" href="#" target="_blank" rel="noopener">Aktuelles Ziel öffnen ↗</a></div>
+            <p id="redirect-settings-message" class="form-message" role="status" aria-live="polite"></p>
+          </section>
           <section class="api-access-panel" id="api-access">
             <div class="api-panel-heading"><span class="eyebrow">SUBFREE API // AI ACCESS</span><h3>ChatGPT und andere Tools verbinden.</h3></div>
             <p>Erstelle einen eigenen API-Schlüssel für dieses Projekt. Damit können autorisierte Tools Dateien direkt in SubFree speichern und veröffentlichen. Der Schlüssel wird nur bei der Erstellung vollständig angezeigt.</p>
