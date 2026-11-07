@@ -261,8 +261,8 @@ async function reviewDomainApplicationWithAI(purpose: string, websiteUrl: string
     throw new Error("KI-Prüfung lieferte ein ungültiges Ergebnis. Antrag bleibt gesperrt.");
   }
   const combinedText = (purpose + " " + sample.text).toLowerCase();
-  const controlledDrugMention = /\\b(drogen|betäubungsmittel|marihuana|marijuana|cannabis|hash|hasch|crack|opium|kokain|cocaine|heroin|fentanyl)\\b/i.test(combinedText);
-  const salesIntent = /\\b(verkauf|verkaufe|verkaufen|verkauft|handel|deal|bestell|liefer|shop|preise|sell|selling|buy|order|delivery)\\w*\\b/i.test(combinedText);
+  const controlledDrugMention = /\b(drogen|betäubungsmittel|marihuana|marijuana|cannabis|hash|hasch|crack|opium|kokain|cocaine|heroin|fentanyl)\b/i.test(combinedText);
+  const salesIntent = /\b(verkauf|verkaufe|verkaufen|verkauft|handel|deal|bestell|liefer|shop|preise|sell|selling|buy|order|delivery)\w*\b/i.test(combinedText);
   if (controlledDrugMention && salesIntent) {
     result.decision = "rejected";
     result.category = "illegal-drug-sales";
