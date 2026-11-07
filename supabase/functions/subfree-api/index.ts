@@ -232,7 +232,7 @@ async function reviewDomainApplicationWithAI(purpose: string, websiteUrl: string
     headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
     signal: AbortSignal.timeout(18000),
     body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-120b",
       temperature: 0,
       max_tokens: 500,
       response_format: { type: "json_object" },
@@ -277,7 +277,7 @@ async function reviewDomainApplicationWithAI(purpose: string, websiteUrl: string
   }
   return {
     provider: "Groq",
-    model: "llama-3.3-70b-versatile",
+    model: "openai/gpt-oss-120b",
     decision: result.decision,
     category: String(result.category || "unspecified").slice(0, 80),
     summary: String(result.summary).slice(0, 180),
@@ -309,60 +309,78 @@ async function openDomainApplicationPullRequest(application: any) {
   const baseRef = await githubApi("/git/ref/heads/" + encodeURIComponent(BRANCH));
   const branch = "domain-request/" + application.slug + "-" + application.id.slice(0, 8);
   await githubApi("/git/refs", "POST", { ref: "refs/heads/" + branch, sha: baseRef.object.sha });
-  const ai = application.check_results.aiReview;
+  // Public PR file intentionally contains only a compact, human-readable application summary.
+  // Private contact details, access credentials, technical scan output and AI payload stay in Supabase.
   const publicApplication = {
-    schemaVersion: 2, slug: application.slug, websiteUrl: application.website_url,
-    purpose: application.purpose, termsVersion: application.terms_version,
-    requestedAt: application.created_at, termsAccepted: true, termsAcceptedAt: application.terms_accepted_at,
-    checks: application.check_results, aiReview: ai,
-    note: "Private applicant contact data and access credentials are excluded."
+    schemaVersion: 2,
+    slug: application.slug,
+    applicantName: application.applicant_name,
+    websiteUrl: application.website_url,
+    purpose: application.purpose,
+    requestedAt: application.created_at
   };
   await githubApi("/contents/domain-requests/" + application.slug + ".json", "PUT", {
-    message: "SubFree: review domain path request " + application.slug,
-    content: b64(JSON.stringify(publicApplication, null, 2) + "\n"), branch
+    message: "SubFree: domain request " + application.slug,
+    content: b64(JSON.stringify(publicApplication, null, 2) + "\n"),
+    branch
   });
-  const decisionText = ai.decision === "rejected" ? "ABGELEHNT" : ai.decision === "manual_review" ? "MANUELLE PRÜFUNG" : "ERSTPRÜFUNG UNAUFFÄLLIG";
-  const technical = application.check_results;
   const body = [
     "## SubFree Domain-Antrag", "",
-    "**Pfad:** https://subfree.pntr.dev/" + application.slug + "/",
-    "**Zielwebsite:** " + application.website_url, "",
-    "### Verwendungszweck", application.purpose, "",
-    "### KI-Inhaltsprüfung", "**Ergebnis:** " + decisionText,
-    ai.summary, "",
-    "**Begründung:** " + ai.reason,
-    "**Prüfmodell:** " + ai.model + " · " + new Date(ai.reviewedAt).toLocaleString("de-DE", { timeZone: "UTC" }) + " UTC", "",
-    "### Technischer Website-Check",
-    "HTTP " + (technical.httpStatus ?? "unbekannt") + " · " + technical.testCount + " Prüfungen · " + technical.passCount + " bestanden · " + technical.warningCount + " Hinweise",
-    technical.redirected ? "Weiterleitung erkannt: " + (technical.redirectHost || "unbekanntes Ziel") : "Keine Weiterleitung erkannt.",
-    "Technische Erreichbarkeit ist keine Inhalts- oder Rechtsfreigabe.", "",
-    "### Freigabe",
-    ai.decision === "rejected"
-      ? "**Nicht freigeben.** Der Antrag wurde wegen eines Richtlinienverstoßes abgelehnt und geschlossen."
-      : ai.decision === "manual_review"
-      ? "Manuelle Prüfung erforderlich. Erst nach eigener Prüfung darfst du diese PR bewusst mergen."
-      : "KI-Erstprüfung unauffällig. Eine eigene manuelle Prüfung bleibt vor dem Merge verpflichtend.",
+    "**Name:** " + (application.applicant_name || "Nicht angegeben"),
+    "**Gewünschter Pfad:** https://subfree.pntr.dev/" + application.slug + "/",
+    "**Website:** " + application.website_url, "",
+    "### Zweck",
+    application.purpose, "",
+    "_Prüfungen starten direkt nach Erstellung dieser Pull Request. Ergebnisse folgen als Kommentare._",
+    "",
     "**Kein automatischer Merge.**"
   ].join("\n");
-  const pr = await githubApi("/pulls", "POST", { title: (ai.decision === "rejected" ? "[ABGELEHNT] " : "") + "Domain-Antrag: /" + application.slug, head: branch, base: BRANCH, body });
-  const comment = [
-    "## SubFree KI-Inhaltsprüfung: " + decisionText, "",
-    ai.summary, "",
-    "**Begründung:** " + ai.reason, "",
-    "**Ziel geprüft:** " + ai.websiteSample.finalUrl + " (HTTP " + ai.websiteSample.httpStatus + ")",
-    "**Modell:** " + ai.model + " · Konfidenz " + Math.round(ai.confidence * 100) + "%", "",
-    ai.decision === "rejected"
-      ? "Dieser Antrag verstößt gegen die SubFree-Inhaltsrichtlinien. Die PR wurde geschlossen. Eine manuelle Freigabe kann diese Ablehnung nicht umgehen."
-      : ai.decision === "manual_review"
-      ? "Die KI kann den Antrag nicht sicher freigeben. Eine menschliche Prüfung ist erforderlich. Es erfolgt keine automatische Aktivierung."
-      : "Die KI-Erstprüfung hat keine eindeutigen Richtlinienverstöße erkannt. Die PR bleibt bis zur manuellen Betreiberentscheidung inaktiv."
-  ].join("\n");
-  await githubApi("/issues/" + pr.number + "/comments", "POST", { body: comment });
-  await addDomainReviewLabels(pr.number, ai.decision);
-  if (ai.decision === "rejected") await githubApi("/pulls/" + pr.number, "PATCH", { state: "closed" });
-  return { number: pr.number, url: pr.html_url, branch, decision: ai.decision };
+  const pr = await githubApi("/pulls", "POST", {
+    title: "Domain-Antrag: /" + application.slug,
+    head: branch,
+    base: BRANCH,
+    body
+  });
+  return { number: pr.number, url: pr.html_url, branch };
 }
 
+async function finalizeDomainApplicationPullRequest(pr: any, application: any, aiReview: any, technical: any) {
+  const decisionText = aiReview.decision === "rejected" ? "ABGELEHNT"
+    : aiReview.decision === "manual_review" ? "MANUELLE PRÜFUNG"
+    : aiReview.decision === "approved" ? "ERSTPRÜFUNG UNAUFFÄLLIG"
+    : "KI-PRÜFUNG FEHLGESCHLAGEN";
+  const technicalSummary = technical?.testCount !== undefined
+    ? "HTTP " + (technical.httpStatus ?? "unbekannt") + " · " + technical.testCount + " Prüfungen · " +
+      (technical.passCount ?? 0) + " bestanden · " + (technical.warningCount ?? 0) + " Hinweise"
+    : "Technischer Website-Check konnte nicht vollständig ausgeführt werden.";
+  const comment = [
+    "## SubFree-Prüfergebnis: " + decisionText, "",
+    "**KI-Inhaltsprüfung:** " + (aiReview.summary || "Keine KI-Entscheidung verfügbar."),
+    aiReview.reason ? "**Begründung:** " + aiReview.reason : "",
+    aiReview.model ? "**Modell:** " + aiReview.model + " · Konfidenz " + Math.round((aiReview.confidence || 0) * 100) + "%" : "",
+    aiReview.websiteSample?.finalUrl ? "**Geprüfte Zielseite:** " + aiReview.websiteSample.finalUrl + " (HTTP " + aiReview.websiteSample.httpStatus + ")" : "",
+    "",
+    "**Technischer Website-Check:** " + technicalSummary,
+    technical?.redirected ? "Weiterleitung erkannt: " + (technical.redirectHost || "unbekanntes Ziel") : "",
+    "",
+    aiReview.decision === "rejected"
+      ? "Der Antrag verstößt gegen die SubFree-Inhaltsrichtlinien. Die PR wird geschlossen und nicht aktiviert."
+      : aiReview.decision === "manual_review"
+      ? "Die KI konnte keine sichere Freigabe erteilen. Eine menschliche Prüfung ist erforderlich. Die Website bleibt inaktiv."
+      : aiReview.decision === "approved"
+      ? "Die KI-Erstprüfung ist unauffällig. Eine eigene manuelle Betreiberentscheidung und ein manueller Merge bleiben erforderlich."
+      : "Die KI-Prüfung ist technisch fehlgeschlagen. Der Antrag bleibt gesperrt, bis die Prüfung erfolgreich wiederholt wurde. Ein Merge aktiviert ihn nicht.",
+    "",
+    "Technische Erreichbarkeit ist keine Inhalts- oder Rechtsfreigabe. Kein automatischer Merge."
+  ].filter(Boolean).join("\n");
+  await githubApi("/issues/" + pr.number + "/comments", "POST", { body: comment });
+  const decision = aiReview.decision || "error";
+  await addDomainReviewLabels(pr.number, decision === "error" ? "manual_review" : decision);
+  if (decision === "rejected") {
+    await githubApi("/pulls/" + pr.number, "PATCH", { title: "[ABGELEHNT] Domain-Antrag: /" + application.slug, state: "closed" });
+  }
+  return { decision };
+}
 async function writeGitHubFile(path: string, content: string) {
   let sha: string | undefined;
   try {
@@ -804,27 +822,85 @@ Deno.serve(async (req: Request) => {
       if (recent.length >= 2) return json({ error: "Du hast bereits zwei offene Domain-Anträge gestellt. Bitte warte auf die Prüfung." }, 429);
       const existing = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&status=in.(pending,pr_open)&select=id");
       if (existing.length) return json({ error: "Für diesen Projektordner gibt es bereits einen offenen Antrag." }, 409);
-      let checkResults: any;
-      try { checkResults = await runWebsiteCheck(target.toString(), req); }
-      catch (error) { return json({ error: "Die angegebene Website konnte nicht geprüft werden: " + String(error instanceof Error ? error.message : error).slice(0, 160) }, 400); }
-      let aiReview: any;
-      try { aiReview = await reviewDomainApplicationWithAI(purpose, target.toString()); }
-      catch (error) { return json({ error: String(error instanceof Error ? error.message : error).slice(0, 240) }, 503); }
-      checkResults.aiReview = aiReview;
       const inserted = await db("subfree_domain_applications", {
         method: "POST", headers: { Prefer: "return=representation" },
-        body: JSON.stringify({ slug, applicant_name: applicantName, applicant_email: applicantEmail, website_url: target.toString(), purpose, terms_version: "2026-11-07", status: "pending", request_ip_hash: ipHash, check_results: checkResults })
+        body: JSON.stringify({
+          slug, applicant_name: applicantName, applicant_email: applicantEmail,
+          website_url: target.toString(), purpose, terms_version: "2026-11-07",
+          status: "pending", request_ip_hash: ipHash, check_results: {}
+        })
       });
       const application = inserted[0];
+      let pr: any;
       try {
-        const pr = await openDomainApplicationPullRequest({ id: application.id, slug, website_url: target.toString(), purpose, terms_version: "2026-11-07", created_at: application.created_at, terms_accepted_at: application.terms_accepted_at, check_results: checkResults });
-        const rejected = pr.decision === "rejected";
-        await db("subfree_domain_applications?id=eq." + application.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: rejected ? "rejected" : "pr_open", github_pr_number: pr.number, github_pr_url: pr.url, check_results: checkResults, updated_at: new Date().toISOString() }) });
-        return json({ success: true, decision: pr.decision, prUrl: pr.url, prNumber: pr.number, message: rejected ? "Die KI hat den Antrag abgelehnt. Die PR wurde geschlossen und nicht aktiviert." : pr.decision === "manual_review" ? "Die KI verlangt eine manuelle Prüfung. Der Pfad bleibt inaktiv." : "KI-Erstprüfung abgeschlossen. Der Pfad bleibt bis zur manuellen Betreiberfreigabe inaktiv." }, 201);
+        // Create the PR first. All website and content checks happen only afterwards.
+        pr = await openDomainApplicationPullRequest({
+          id: application.id, slug, applicant_name: applicantName,
+          website_url: target.toString(), purpose,
+          created_at: application.created_at
+        });
+        await db("subfree_domain_applications?id=eq." + application.id, {
+          method: "PATCH", headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({
+            status: "pr_open", github_pr_number: pr.number,
+            github_pr_url: pr.url, updated_at: new Date().toISOString()
+          })
+        });
       } catch (error) {
-        await db("subfree_domain_applications?id=eq." + application.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "error", updated_at: new Date().toISOString() }) });
-        return json({ error: "Antrag gespeichert, aber GitHub konnte die Pull-Request nicht erstellen: " + String(error instanceof Error ? error.message : error).slice(0, 180) }, 502);
+        await db("subfree_domain_applications?id=eq." + application.id, {
+          method: "PATCH", headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({ status: "error", updated_at: new Date().toISOString() })
+        });
+        return json({ error: "Antrag gespeichert, aber die Pull Request konnte nicht erstellt werden: " + String(error instanceof Error ? error.message : error).slice(0, 180) }, 502);
       }
+
+      let checkResults: any = {};
+      try {
+        checkResults = await runWebsiteCheck(target.toString(), req);
+      } catch (error) {
+        checkResults = {
+          httpStatus: null, testCount: 0, passCount: 0, warningCount: 1,
+          checks: [], technicalError: String(error instanceof Error ? error.message : error).slice(0, 240)
+        };
+      }
+
+      let aiReview: any;
+      try {
+        aiReview = await reviewDomainApplicationWithAI(purpose, target.toString());
+      } catch (error) {
+        aiReview = {
+          provider: "Groq", model: "openai/gpt-oss-120b", decision: "error",
+          category: "ai-provider-error",
+          summary: "Die KI-Prüfung konnte technisch nicht abgeschlossen werden.",
+          reason: String(error instanceof Error ? error.message : error).slice(0, 500),
+          confidence: 0, reviewedAt: new Date().toISOString()
+        };
+      }
+      checkResults.aiReview = aiReview;
+      await db("subfree_domain_applications?id=eq." + application.id, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({
+          status: aiReview.decision === "rejected" ? "rejected" : "pr_open",
+          check_results: checkResults, updated_at: new Date().toISOString()
+        })
+      });
+      try {
+        await finalizeDomainApplicationPullRequest(pr, application, aiReview, checkResults);
+      } catch (error) {
+        console.error("SubFree PR result publishing failed:", error);
+      }
+      const rejected = aiReview.decision === "rejected";
+      return json({
+        success: true, decision: aiReview.decision,
+        prUrl: pr.url, prNumber: pr.number,
+        message: rejected
+          ? "Die KI hat den Antrag abgelehnt. Die Pull Request wurde geschlossen und der Pfad nicht aktiviert."
+          : aiReview.decision === "manual_review"
+          ? "Die Pull Request wurde erstellt. Eine manuelle Prüfung ist erforderlich; der Pfad bleibt inaktiv."
+          : aiReview.decision === "error"
+          ? "Die Pull Request wurde erstellt, aber die KI-Prüfung ist fehlgeschlagen. Der Antrag bleibt gesperrt."
+          : "Die Pull Request wurde erstellt und geprüft. Der Pfad bleibt bis zum manuellen Merge inaktiv."
+      }, 201);
     }
 
     if (action === "sync_domain_approval") {
