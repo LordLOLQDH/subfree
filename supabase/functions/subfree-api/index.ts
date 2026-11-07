@@ -301,7 +301,7 @@ const base="<base href=\\""+location.pathname.replace(/[^/]*$/,"")+"\\">";
 if(/<head[^>]*>/i.test(html))html=html.replace(/<head[^>]*>/i,m=>m+base);else html="<!doctype html><head>"+base+"</head>"+html;
 const frame=document.createElement("iframe");frame.setAttribute("sandbox","allow-scripts allow-forms allow-popups");frame.title="SubFree-Projekt "+slug;frame.srcdoc=html;
 const badge=document.createElement("footer");badge.className="subfree-ad";badge.setAttribute("aria-label","Hinweis auf SubFree");
-badge.innerHTML='<div class="subfree-ad-copy"><div class="subfree-ad-kicker">HOSTED ON SUBFREE</div><strong>Diese Website läuft mit SubFree.</strong><p>Erstelle deine eigene Website. Kostenlos und unkompliziert.</p></div><a href="https://lordlolqdh.github.io/subfree/" target="_top" rel="noopener">Eigene Website starten</a>';
+badge.innerHTML='<div class="subfree-ad-copy"><div class="subfree-ad-kicker">HOSTED ON SUBFREE</div><strong>Diese Website läuft mit SubFree.</strong><p>Erstelle deine eigene Website. Kostenlos und unkompliziert.</p></div><a href="https://subfree.pntr.dev/" target="_top" rel="noopener">Eigene Website starten</a>';
 document.body.replaceChildren(frame,badge);
 }catch(error){document.getElementById("status").textContent="Diese Website ist derzeit nicht verfügbar: "+error.message;}
 async function renderRedirect(target,username,security){
