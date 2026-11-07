@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050805"><title>Website-Prüfung | SubFree</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg"><link rel="stylesheet" href="styles.css?v=20261107-check">
+<style>
+.checker{width:min(100% - 36px,900px);margin:70px auto 100px}.checker h1{font:clamp(22px,5vw,38px)/1.5 "Press Start 2P",monospace;color:#fff}.checker h1 span{color:#00ff66}.checker p{font-size:23px;line-height:1.4;color:#9ab19d}.check-form{display:flex;gap:12px;margin:28px 0}.check-form input{flex:1;min-width:0}.report{margin-top:24px;padding:22px;background:#090e0a;border:1px solid #24512e;box-shadow:5px 5px 0 #102b19}.report[hidden]{display:none}.report h2{font:13px/1.8 "Press Start 2P",monospace;color:#00ff66}.check-row{padding:13px 0;border-top:1px solid #244d2d}.check-row strong{display:block;color:#effff1}.check-row small{display:block;color:#9ab19d;font-size:17px}.pass{color:#00ff66}.warn{color:#ffcb66}.info{color:#9ab19d}.disclaimer{font-size:17px!important}.top-link{color:#00ff66}
+@media(max-width:600px){.check-form{flex-direction:column}.checker{margin-top:42px}}
+</style></head><body>
+<header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">S</span><span>subfree</span></a><nav><a href="index.html">Startseite</a><a href="index.html#verwalten">Verwalten</a></nav></header>
+<main class="checker"><span class="eyebrow">SUBFREE // SECURITY TOOLS</span><h1>WEBSITE <span>CHECK</span></h1>
+<p>Prüfe HTTPS, Serverantwort und wichtige Sicherheitsheader einer öffentlichen Website. Die Zielseite wird dabei nicht geöffnet und es wird keiner ihrer Links gefolgt.</p>
+<form class="check-form" id="check-form"><input id="check-url" type="url" placeholder="https://example.com" required autocomplete="url"><button class="button button-primary" id="check-submit">Website prüfen →</button></form>
+<p id="check-status" role="status" aria-live="polite"></p>
+<section class="report" id="report" hidden><h2 id="verdict"></h2><p id="summary"></p><div id="checks"></div><p class="disclaimer">Hinweis: Diese Prüfung ist kein Malware- oder Phishing-Scan und keine Sicherheitsgarantie. Sie prüft nur öffentlich sichtbare Verbindungs- und HTTP-Merkmale. Weiterleitungen werden erkannt, aber niemals verfolgt.</p></section>
+</main><script>
+const API="https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api";
+const form=document.querySelector("#check-form"),input=document.querySelector("#check-url"),status=document.querySelector("#check-status"),report=document.querySelector("#report"),button=document.querySelector("#check-submit");
+form.addEventListener("submit",async e=>{e.preventDefault();report.hidden=true;button.disabled=true;status.textContent="Prüfung läuft. Die eingegebene Website wird nicht geöffnet …";
+try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"site_check",url:input.value.trim()})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Prüfung fehlgeschlagen.");
+document.querySelector("#verdict").textContent=d.verdict==="good"?"[ KEINE OFFENSICHTLICHEN PROBLEME ]":d.verdict==="review"?"[ EINIGE HINWEISE ]":"[ WARNUNG ]";
+document.querySelector("#summary").textContent=d.hostname+" · HTTP "+d.httpStatus+" · "+d.responseTimeMs+" ms"+(d.redirected?" · Weiterleitung erkannt, nicht geöffnet":"");
+const list=document.querySelector("#checks");list.replaceChildren();for(const c of d.checks){const row=document.createElement("div");row.className="check-row";const title=document.createElement("strong");title.className=c.status;title.textContent=(c.status==="pass"?"✓ ":c.status==="warn"?"! ":"i ")+c.label;const detail=document.createElement("small");detail.textContent=c.detail;row.append(title,detail);list.append(row);}
+report.hidden=false;status.textContent="Prüfung abgeschlossen. Es wurde keine Zielseite geöffnet.";
+}catch(err){status.textContent=err.message;}finally{button.disabled=false;}});
+</script></body></html>
