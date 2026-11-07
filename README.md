@@ -6,7 +6,7 @@ SubFree ist ein Community-Projekt für persönliche Websites, Portfolios, Lernpr
 
 ## Öffentliche Website
 
-- Gewünschte Domain: https://subfree.is-a.dev
+- Gewünschte Domain: https://subfree.pntr.dev
 - GitHub Pages (aktuelle technische Adresse): https://lordlolqdh.github.io/subfree
 
 Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und DNS-Konfiguration abgeschlossen sind.
@@ -18,14 +18,22 @@ Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und D
 - SubFree erzeugt einen persönlichen Verwaltungscode. Dieser Code ist ein Geheimnis und erlaubt den Zugriff auf das jeweilige Projekt.
 - Registrierungsdaten und Projektdateien werden in eigenen SubFree-Tabellen im bestehenden Supabase-Projekt gespeichert.
 - Projektdateien werden später in einen Ordner `/<projektname>/` im GitHub-Repository veröffentlicht.
-- Beispieladresse: `https://subfree.is-a.dev/meinprojekt/`.
+- Beispieladresse: `https://subfree.pntr.dev/meinprojekt/`.
+
+## Website Check und Pfad-Anträge
+
+- Öffentlicher Website Check: `check.html`. Er prüft DNS-/IP-Schutz, HTTPS/TLS-Verbindung, HTTP-Status, Weiterleitungen, Sicherheitsheader, CORS, Cookies und weitere sichtbare Merkmale. Zielseiten werden nicht im Browser geöffnet und HTTP-Weiterleitungen nicht verfolgt. Es ist kein vollständiger Malware- oder Phishing-Scan.
+- Bestehende Projektinhaber können unter `#domain-antrag` einen Pfad-Antrag mit Zugangscode, HTTPS-Ziel, Verwendungszweck und Nutzungsbedingungen stellen.
+- Anträge werden privat in `subfree_domain_applications` gespeichert. GitHub-PRs enthalten keine Namen, E-Mail-Adressen, Zugangscodes oder IP-Hashes.
+- GitHub Actions validiert die PR. Eine optionale KI-Prüfung benötigt das Repository-Secret `OPENAI_API_KEY`; ohne dieses Secret wird sie übersprungen und als Warnung markiert.
+- Ein genehmigter Pfad wird erst nach manuellem Merge synchronisiert. Der Merge löst die Aktivierung aus. Frühere Projekteinstellungen bleiben gespeichert und werden im Domain-Modus schreibgeschützt.
 
 ## Backend
 
 Supabase-Projekt: `KDS-AI-v1`
 
 - Edge Function: `subfree-api`
-- Datenbanktabellen: `subfree_sites`, `subfree_site_files`
+- Datenbanktabellen: `subfree_sites`, `subfree_site_files`, `subfree_domain_applications`
 - Die Tabellen sind mit Row Level Security geschützt. Direkter Zugriff durch Browserrollen ist gesperrt. Die Edge Function verwendet den serverseitigen Service-Key.
 - Es werden keine KDS-AI-Tabellen oder bestehenden Edge Functions für SubFree benötigt.
 
@@ -51,7 +59,7 @@ Nach dem Hinzufügen muss die Edge Function ggf. erneut deployed werden, damit s
 - Der öffentliche Dienst benötigt Schutz vor Spam und automatisierten Massenregistrierungen, bevor er breit beworben wird.
 - GitHub Pages ist statisches Hosting. Backend-Funktionen, Uploads und die Veröffentlichung benötigen zusätzliche serverseitige Verarbeitung.
 - Nutzerinhalte werden in einem sandboxed iframe ausgeliefert. Nur `index.html` wird als HTML-Dokument ausgeführt; weitere HTML-/HTM- und SVG-Dateien sind vorerst gesperrt, damit Nutzer-JavaScript nicht im Sicherheitskontext der SubFree-Verwaltungsseite läuft. CSS- und JS-Dateien können als Ressourcen eingebunden werden.
-- Die Domain `subfree.is-a.dev` ist nicht automatisch mit GitHub Pages verbunden.
+- Die Domain `subfree.pntr.dev` ist nicht automatisch mit GitHub Pages verbunden.
 - Free-Tarife haben Limits; dauerhafte kostenlose Verfügbarkeit kann nicht zugesichert werden.
 
 ## Verzeichnisstruktur
@@ -72,6 +80,6 @@ Die SubFree-Startseite bleibt im Repository-Root.
 
 - `GITHUB_TOKEN` als Supabase Edge Function Secret hinterlegen.
 - GitHub-Pages-Bereitstellung nach dem ersten echten Test prüfen.
-- Die gewünschte Domain `subfree.is-a.dev` ist noch nicht als aktiv verbunden bestätigt.
+- Die gewünschte Domain `subfree.pntr.dev` ist noch nicht als aktiv verbunden bestätigt.
 - `impressum.html` und `datenschutz.html` enthalten Platzhalter. Betreiberanschrift und Kontaktangaben müssen ergänzt und die Datenschutzhinweise geprüft werden.
 - E-Mail-Verifizierung, Datei-Upload/ZIP-Import, Projektlöschung und zusätzliche Missbrauchsprüfung sind noch nicht umgesetzt.
