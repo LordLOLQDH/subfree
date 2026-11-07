@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "slug": "weiterleitung",
+  "websiteUrl": "https://subfree.pntr.dev/",
+  "purpose": "Drogen verkaufen. Ch verkaufe marihuana, Koks, Hash und mehr!",
+  "termsVersion": "2026-11-07",
+  "requestedAt": "2026-11-07T20:17:41.273836+00:00",
+  "termsAccepted": true,
+  "termsAcceptedAt": "2026-11-07T20:17:41.273836+00:00",
+  "checks": {
+    "success": true,
+    "url": "https://subfree.pntr.dev/",
+    "hostname": "subfree.pntr.dev",
+    "httpStatus": 200,
+    "responseTimeMs": 248,
+    "redirected": false,
+    "redirectHost": "",
+    "checkedAt": "2026-11-07T20:17:41.211Z",
+    "testCount": 20,
+    "passCount": 9,
+    "warningCount": 7,
+    "infoCount": 4,
+    "verdict": "review",
+    "checks": [
+      {
+        "id": "dns",
+        "label": "DNS / öffentliche IP",
+        "status": "pass",
+        "detail": "Hostname wurde aufgelöst und private bzw. reservierte IP-Adressen wurden blockiert."
+      },
+      {
+        "id": "https",
+        "label": "HTTPS / TLS",
+        "status": "pass",
+        "detail": "HTTPS-Verbindung und TLS-Zertifikatsprüfung erfolgreich."
+      },
+      {
+        "id": "http",
+        "label": "HTTP-Status",
+        "status": "pass",
+        "detail": "Serverantwort: HTTP 200."
+      },
+      {
+        "id": "redirect",
+        "label": "Weiterleitungsverhalten",
+        "status": "pass",
+        "detail": "Keine Weiterleitung in der ersten Antwort erkannt."
+      },
+      {
+        "id": "hsts",
+        "label": "HSTS",
+        "status": "warn",
+        "detail": "Strict-Transport-Security fehlt."
+      },
+      {
+        "id": "csp",
+        "label": "Content Security Policy",
+        "status": "warn",
+        "detail": "Content-Security-Policy fehlt."
+      },
+      {
+        "id": "nosniff",
+        "label": "MIME-Sniffing-Schutz",
+        "status": "warn",
+        "detail": "X-Content-Type-Options: nosniff fehlt."
+      },
+      {
+        "id": "referrer",
+        "label": "Referrer-Policy",
+        "status": "warn",
+        "detail": "Referrer-Policy fehlt."
+      },
+      {
+        "id": "permissions",
+        "label": "Permissions-Policy",
+        "status": "info",
+        "detail": "Permissions-Policy fehlt."
+      },
+      {
+        "id": "frame",
+        "label": "Clickjacking-Schutz",
+        "status": "warn",
+        "detail": "X-Frame-Options und CSP frame-ancestors fehlen."
+      },
+      {
+        "id": "content-type",
+        "label": "Content-Type",
+        "status": "pass",
+        "detail": "text/html; charset=utf-8"
+      },
+      {
+        "id": "cors",
+        "label": "CORS-Freigabe",
+        "status": "warn",
+        "detail": "CORS erlaubt jeder Website den Zugriff."
+      },
+      {
+        "id": "server",
+        "label": "Server-Informationen",
+        "status": "info",
+        "detail": "Server-Header: cloudflare"
+      },
+      {
+        "id": "powered",
+        "label": "Technologie-Offenlegung",
+        "status": "pass",
+        "detail": "Kein X-Powered-By-Header erkannt."
+      },
+      {
+        "id": "cookies",
+        "label": "Cookie-Sicherheit",
+        "status": "info",
+        "detail": "Keine Set-Cookie-Header sichtbar."
+      },
+      {
+        "id": "cache",
+        "label": "Cache-Control",
+        "status": "pass",
+        "detail": "max-age=600"
+      },
+      {
+        "id": "html-sample",
+        "label": "HTML-Stichprobe",
+        "status": "info",
+        "detail": "Bis zu 32 KB HTML wurden geprüft; kein Browser wurde gestartet."
+      },
+      {
+        "id": "mixed-content",
+        "label": "Gemischte Inhalte",
+        "status": "pass",
+        "detail": "Keine offensichtlichen HTTP-Ressourcen in src-/href-Attributen gefunden."
+      },
+      {
+        "id": "insecure-forms",
+        "label": "Formular-Übertragung",
+        "status": "pass",
+        "detail": "Keine offensichtliche unverschlüsselte Formularaktion gefunden."
+      },
+      {
+        "id": "password-autocomplete",
+        "label": "Passwortfeld-Konfiguration",
+        "status": "warn",
+        "detail": "Passwortfeld ohne erkennbaren autocomplete-Hinweis gefunden."
+      }
+    ]
+  },
+  "note": "Applicant name, email, access key and IP data are intentionally excluded."
+}
