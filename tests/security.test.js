@@ -43,3 +43,59 @@ test("legacy direct mode keeps the previous safety defaults", () => {
   assert.match(edge, /direct: \{ checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true \}/);
   assert.match(edge, /mode === "direct" \? site\.registration_data\?\.redirectSecurity/);
 });
+
+test("website checker runs a broader non-following security test suite", () => {
+  for (const header of ["strict-transport-security","content-security-policy","x-content-type-options","referrer-policy","permissions-policy","x-frame-options","access-control-allow-origin","set-cookie"]) assert.ok(edge.toLowerCase().includes(header));
+  assert.match(edge, /testCount:/);
+  assert.match(edge, /redirect:\s*"manual"/);
+  assert.doesNotMatch(checker, /window\.open\s*\(|location\.(assign|replace)\s*\(/);
+});
+test("domain application requires project ownership, HTTPS target, purpose and terms", () => {
+  const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
+  assert.match(block, /accessKey/);
+  assert.match(block, /termsAccepted/);
+  assert.match(block, /purpose\.length < 30/);
+  assert.match(block, /target\.protocol !== "https:"/);
+  assert.match(block, /runWebsiteCheck/);
+  assert.match(block, /openDomainApplicationPullRequest/);
+});
+test("public pull request excludes applicant private information", () => {
+  const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));
+  assert.match(block, /Applicant name, email, access key and IP data are intentionally excluded/);
+  assert.doesNotMatch(block, /applicantEmail|applicantName|accessKey/);
+  assert.match(block, /Not automatically merge|Nicht automatisch mergen/);
+});
+test("approved path only activates after a merged GitHub pull request", () => {
+  const block = edge.slice(edge.indexOf('if (action === "sync_domain_approval")'), edge.indexOf('if (action === "site_check")'));
+  assert.match(block, /pr\.merged_at/);
+  assert.match(block, /domain-requests\//);
+  assert.match(block, /domainMode: "active"/);
+  assert.match(block, /domainPrevious:/);
+  assert.match(block, /site_type: "redirect"/);
+});
+test("approved domain mode keeps old project data and blocks writes", () => {
+  assert.match(edge, /domainWriteActions/);
+  assert.match(edge, /domainMode === "active"/);
+  assert.match(edge, /registration_data: registrationData/);
+  assert.match(edge, /apiSite\.registration_data\?\.domainMode === "active"/);
+});
+test("domain application form requests terms and purpose and links to the correct path base", () => {
+  const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(page, /subfree\.pntr\.dev\//);
+  assert.match(page, /id="domain-request-form"/);
+  assert.match(page, /id="domain-terms"/);
+  assert.match(page, /id="domain-purpose"/);
+  assert.match(page, /href="agb\.html"/);
+});
+test("domain request workflow never merges automatically", () => {
+  const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
+  assert.match(workflow, /Optional AI review/);
+  assert.match(workflow, /gh pr comment/);
+  assert.match(workflow, /sync_domain_approval/);
+  assert.doesNotMatch(workflow, /gh pr merge/);
+});
+test("redirect mode selection persists and rolls back on save failure", () => {
+  const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
+  assert.match(script, /const previousMode=activeRedirectMode/);
+  assert.match(script, /if\(!saved\)\{activeRedirectMode=previousMode/);
+});
