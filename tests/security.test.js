@@ -15,7 +15,6 @@ test("redirect target is never embedded in meta refresh", () => {
 test("website checker does not open or navigate to the submitted URL", () => {
   assert.match(checker, /action:"site_check"/);
   assert.doesNotMatch(checker, /location\.(assign|replace)\s*\(/);
-  assert.match(checker, /redirect:"manual"/) === false; // scanner behavior belongs to backend
   assert.match(edge, /redirect:\s*"manual"/);
 });
 test("scanner rejects private/local destinations before requesting them", () => {
