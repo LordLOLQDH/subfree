@@ -63,7 +63,7 @@ test("public pull request excludes applicant private information", () => {
   const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));
   assert.match(block, /Private applicant contact data and access credentials are excluded/);
   assert.doesNotMatch(block, /applicantEmail|applicantName|accessKey/);
-  assert.match(block, /Not automatically merge|Nicht automatisch mergen/);
+  assert.match(block, /Kein automatischer Merge/);
 });
 test("domain application requires a real Groq review and blocks explicit illegal drug sales", () => {
   assert.match(edge, /Deno\.env\.get\("GROQ_SUBFREE"\)/);
