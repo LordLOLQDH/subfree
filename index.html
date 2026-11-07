@@ -21,7 +21,7 @@
   <header class="site-header">
     <a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a>
     <nav aria-label="Hauptnavigation">
-      <a href="#funktionen">Funktionen</a>
+      <a href="#funktionen">Funktionen</a>\n      <a href="check.html">Website prüfen</a>
       <a class="nav-manage" href="#verwalten">Verwalten</a>
       <a href="#temp-mail">Temp-Mail</a>
       <a href="mailto:adam_kraus@icloud.com">E-Mail ↗</a>
@@ -192,7 +192,17 @@
             <div class="redirect-settings-actions"><button class="button button-primary" id="save-redirect-target" type="button">Weiterleitungsziel speichern</button><a id="open-redirect-target" href="#" target="_blank" rel="noopener">Aktuelles Ziel öffnen ↗</a></div>
             <p id="redirect-settings-message" class="form-message" role="status" aria-live="polite"></p>
           </section>
-          <section class="api-access-panel" id="api-access">
+          <section class="redirect-settings-panel" id="redirect-security-settings" hidden>
+<div class="redirect-settings-heading"><span class="eyebrow">SECURITY.EXE // RULES</span><h3>Weiterleitungs-Sicherheit</h3></div>
+<p>DNS-/IP-Schutz, HTTPS und manuelle Bestätigung bleiben immer aktiv. Diese Optionen steuern zusätzliche Prüfungen und Besucherhinweise.</p>
+<div class="security-options">
+<label class="setting-toggle"><input type="checkbox" id="sec-check-status" checked> HTTP-Statuscode prüfen</label>
+<label class="setting-toggle"><input type="checkbox" id="sec-check-headers" checked> Sicherheitsheader (HSTS, CSP, nosniff) prüfen</label>
+<label class="setting-toggle"><input type="checkbox" id="sec-check-redirect" checked> Server-Weiterleitungen erkennen</label>
+<label class="setting-toggle"><input type="checkbox" id="sec-domain-ack" checked> Besucher muss Zieldomain bestätigen</label>
+<label class="setting-toggle"><input type="checkbox" id="sec-external-ack" checked> Besucher muss externes Zielrisiko bestätigen</label>
+<button class="button button-primary" id="save-redirect-security" type="button">Sicherheitsregeln speichern</button>
+<p id="redirect-security-message" class="form-message" role="status"></p></div></section>\n          <section class="api-access-panel" id="api-access">
             <div class="api-panel-heading"><span class="eyebrow">SUBFREE API // AI ACCESS</span><h3>ChatGPT und andere Tools verbinden.</h3></div>
             <p>Erstelle einen eigenen API-Schlüssel für dieses Projekt. Damit können autorisierte Tools Dateien direkt in SubFree speichern und veröffentlichen. Der Schlüssel wird nur bei der Erstellung vollständig angezeigt.</p>
             <div class="api-token-create"><label for="api-token-name">Bezeichnung</label><input id="api-token-name" maxlength="80" value="ChatGPT"><button class="button button-primary" id="create-api-token" type="button">API-Schlüssel erstellen</button></div>
