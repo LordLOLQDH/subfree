@@ -514,6 +514,7 @@ async function runWebsiteCheck(rawUrl: string, request: Request) {
   if (redirected) { try { redirectHost = new URL(locationValue, target).hostname; } catch {} }
   const checks: any[] = [];
   const add = (id: string, label: string, state: string, detail: string) => checks.push({ id, label, status: state, detail });
+  add("dns", "DNS / öffentliche IP", "pass", "Hostname wurde aufgelöst und private bzw. reservierte IP-Adressen wurden blockiert.");
   add("https", "HTTPS / TLS", target.protocol === "https:" ? "pass" : "warn", target.protocol === "https:" ? "HTTPS-Verbindung und TLS-Zertifikatsprüfung erfolgreich." : "Die Website verwendet unverschlüsseltes HTTP.");
   add("http", "HTTP-Status", status >= 200 && status < 400 ? "pass" : "warn", "Serverantwort: HTTP " + status + (redirected ? " (Weiterleitung erkannt, nicht verfolgt)." : "."));
   add("redirect", "Weiterleitungsverhalten", redirected ? "warn" : "pass", redirected ? "Weiterleitung auf " + (redirectHost || "unbekanntes Ziel") + " erkannt. Nicht verfolgt." : "Keine Weiterleitung in der ersten Antwort erkannt.");
@@ -542,6 +543,44 @@ async function runWebsiteCheck(rawUrl: string, request: Request) {
   const cache = headers.get("cache-control") || "";
   add("cache", "Cache-Control", cache ? "pass" : "info", cache || "Cache-Control fehlt; sensible Inhalte sollten Caching explizit steuern.");
   if (redirected && redirectHost && redirectHost !== host) add("redirect-host", "Externes Weiterleitungsziel", "warn", "Die Website leitet auf einen anderen Hostnamen weiter: " + redirectHost + ". Das Ziel wurde nicht aufgerufen.");
+  if (!redirected && status >= 200 && status < 300 && /text\/html|application\/xhtml\+xml/i.test(contentType)) {
+    try {
+      const sampleResponse = await fetch(target.toString(), {
+        method: "GET", redirect: "manual", cache: "no-store",
+        signal: AbortSignal.timeout(4500),
+        headers: { "Range": "bytes=0-32767", "User-Agent": "SubFree-Site-Check/2.0" }
+      });
+      if (sampleResponse.status >= 300 && sampleResponse.status < 400) {
+        add("get-redirect", "GET-Weiterleitung", "warn", "GET leitet weiter. Das Ziel wurde nicht verfolgt.");
+      } else if (sampleResponse.body) {
+        const reader = sampleResponse.body.getReader();
+        const decoder = new TextDecoder();
+        let sample = "", total = 0;
+        while (total < 32768) {
+          const chunk = await reader.read();
+          if (chunk.done) break;
+          const data = chunk.value.subarray(0, 32768 - total);
+          sample += decoder.decode(data, { stream: true });
+          total += data.length;
+          if (data.length < chunk.value.length) break;
+        }
+        try { await reader.cancel(); } catch {}
+        add("html-sample", "HTML-Stichprobe", "info", "Bis zu 32 KB HTML wurden geprüft; kein Browser wurde gestartet.");
+        const mixed = (sample.match(/(?:src|href)=["']http:\/\//gi) || []).length;
+        add("mixed-content", "Gemischte Inhalte", mixed ? "warn" : "pass", mixed ? mixed + " unverschlüsselte HTTP-Ressourcen gefunden." : "Keine offensichtlichen HTTP-Ressourcen in src-/href-Attributen gefunden.");
+        const insecureForms = (sample.match(/<form[^>]+action=["']http:\/\//gi) || []).length;
+        add("insecure-forms", "Formular-Übertragung", insecureForms ? "warn" : "pass", insecureForms ? "Mindestens ein Formular sendet an eine unverschlüsselte HTTP-Adresse." : "Keine offensichtliche unverschlüsselte Formularaktion gefunden.");
+        const password = /<input[^>]+type=["']password["']/i.test(sample);
+        add("password-autocomplete", "Passwortfeld-Konfiguration", !password ? "info" : /autocomplete=["'](current-password|new-password)["']/i.test(sample) ? "pass" : "warn",
+          !password ? "Kein Passwortfeld in der Stichprobe gefunden." : /autocomplete=["'](current-password|new-password)["']/i.test(sample) ? "Passwortfeld mit autocomplete-Hinweis gefunden." : "Passwortfeld ohne erkennbaren autocomplete-Hinweis gefunden.");
+      }
+      try { await sampleResponse.body?.cancel(); } catch {}
+    } catch {
+      add("html-sample", "HTML-Stichprobe", "info", "Die begrenzte HTML-Stichprobe war nicht verfügbar; Header- und Verbindungstests wurden dennoch durchgeführt.");
+    }
+  } else {
+    add("html-sample", "HTML-Stichprobe", "info", "Keine HTML-Stichprobe möglich (Weiterleitung, Fehlerstatus oder kein HTML-Inhalt).");
+  }
   try { await response.body?.cancel(); } catch {}
   const warnings = checks.filter(c => c.status === "warn").length;
   const errors = status >= 400 || checks.some(c => c.id === "https" && c.status === "warn");
