@@ -757,9 +757,10 @@ Deno.serve(async (req: Request) => {
       const token = tokenRows[0];
       if (!token) return json({ error: "API-Schlüssel ist ungültig oder wurde widerrufen." }, 401);
       if (!(token.scopes || []).includes("files:write")) return json({ error: "Dem API-Schlüssel fehlt files:write." }, 403);
-      const owned = await db("subfree_sites?id=eq." + token.site_id + "&select=id,slug,status,github_folder_created");
+      const owned = await db("subfree_sites?id=eq." + token.site_id + "&select=id,slug,status,github_folder_created,registration_data");
       const apiSite = owned[0];
       if (!apiSite) return json({ error: "Zugehöriges Projekt wurde nicht gefunden." }, 404);
+      if (apiSite.registration_data?.domainMode === "active") return json({ error: "Dieser Projektpfad ist im genehmigten Domain-Modus schreibgeschützt." }, 423);
       const path = safePath(String(body.path ?? "index.html"));
       const content = String(body.content ?? "");
       const isPrivate = path === "index.html" ? false : Boolean(body.isPrivate);
