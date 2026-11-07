@@ -71,17 +71,12 @@ jobs:
           if [ "$VALIDATION_STATUS" = "success" ]; then
             result="**Ergebnis:** Formal gültig. Der gewünschte Pfad war zum Prüfzeitpunkt frei."
           else
-            result="**Ergebnis:** Prüfung fehlgeschlagen. Die PR bleibt offen und wurde nicht automatisch geschlossen oder zusammengeführt. Details stehen im fehlgeschlagenen Check.
-
-Dies ist keine Ablehnung der PR-Erstellung. Die PR wurde absichtlich vor dieser Prüfung angelegt."
+            result="**Ergebnis:** Prüfung fehlgeschlagen. Die PR bleibt offen und wurde nicht automatisch geschlossen oder zusammengeführt. Details stehen im fehlgeschlagenen Check."
           fi
+          body="$(printf '%s\\n\\n%s\\n\\n- Private Kontakt- und Zugangsdaten gehören nicht in die öffentliche PR-Datei.\\n- KI- und technische Prüfungen werden separat durchgeführt.\\n- Kein automatischer Merge.' "$result" "Dies ist keine Ablehnung der PR-Erstellung. Die PR wurde absichtlich vor dieser Prüfung angelegt.")"
           gh pr comment "$PR_NUMBER" --body "## SubFree: Prüfung nach PR-Erstellung
 
-          $result
-
-          - Private Kontakt- und Zugangsdaten gehören nicht in die öffentliche PR-Datei.
-          - KI- und technische Prüfungen werden separat durchgeführt.
-          - Kein automatischer Merge."
+          $body"
 
   sync-approved-request:
     if: github.event_name == 'push'
