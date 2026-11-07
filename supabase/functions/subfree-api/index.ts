@@ -214,7 +214,11 @@ async function fetchWebsiteReviewSample(rawUrl: string) {
 async function reviewDomainApplicationWithAI(purpose: string, websiteUrl: string) {
   const apiKey = Deno.env.get("GROQ_SUBFREE") || "";
   if (!apiKey) throw new Error("KI-Prüfung ist nicht konfiguriert (GROQ_SUBFREE fehlt). Antrag wird sicherheitshalber nicht freigegeben.");
-  const sample = await fetchWebsiteReviewSample(websiteUrl);
+  let sample: any;
+  try { sample = await fetchWebsiteReviewSample(websiteUrl); }
+  catch (error) {
+    sample = { finalUrl: websiteUrl, status: 0, text: "", note: "Website-Inhalt konnte nicht sicher abgerufen werden: " + String(error instanceof Error ? error.message : error).slice(0, 180) };
+  }
   const prompt = {
     purpose: purpose.slice(0, 1600),
     submittedUrl: websiteUrl,
