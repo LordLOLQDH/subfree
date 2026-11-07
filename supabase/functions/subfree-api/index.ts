@@ -155,17 +155,6 @@ async function githubApi(path: string, method = "GET", body?: unknown) {
 
 // Fetch a small, safe text sample for the content review. Redirects are followed manually
 // and every hop is DNS-checked to prevent obvious SSRF/private-network targets.
-async function domainRequestPathIsFree(slug: string) {
-  const path = "/contents/domain-requests/" + encodeURIComponent(slug) + ".json?ref=" + encodeURIComponent(BRANCH);
-  try {
-    await githubApi(path);
-    return false;
-  } catch (error) {
-    if (String(error).includes("GitHub API (404)")) return true;
-    throw error;
-  }
-}
-
 async function fetchWebsiteReviewSample(rawUrl: string) {
   let current = new URL(rawUrl);
   let response: Response | null = null;
@@ -317,48 +306,34 @@ async function addDomainReviewLabels(prNumber: number, decision: string) {
 }
 
 async function openDomainApplicationPullRequest(application: any) {
-  if (!(await domainRequestPathIsFree(application.slug))) {
-    throw new Error("Dieser Pfad besitzt bereits eine öffentliche Domain-Anfrage. Bitte verwende einen anderen Pfad oder kontaktiere den Betreiber.");
-  }
   const baseRef = await githubApi("/git/ref/heads/" + encodeURIComponent(BRANCH));
   const branch = "domain-request/" + application.slug + "-" + application.id.slice(0, 8);
   let branchCreated = false;
   try {
     await githubApi("/git/refs", "POST", { ref: "refs/heads/" + branch, sha: baseRef.object.sha });
     branchCreated = true;
-    // Public PR file intentionally contains only a compact, human-readable application summary.
-    // Private contact details, access credentials, technical scan output and AI payload stay in Supabase.
+    // Unique pending file: duplicate slugs never overwrite an existing request.
+    // The PR is created first; path availability is checked afterwards by GitHub Actions.
+    const pendingPath = "domain-requests/pending/" + application.slug + "-" + application.id + ".json";
     const publicApplication = {
-      schemaVersion: 2,
-      slug: application.slug,
-      applicantName: application.applicant_name,
-      websiteUrl: application.website_url,
-      purpose: application.purpose,
-      requestedAt: application.created_at
+      schemaVersion: 2, applicationId: application.id, slug: application.slug,
+      applicantName: application.applicant_name, websiteUrl: application.website_url,
+      purpose: application.purpose, requestedAt: application.created_at
     };
-    await githubApi("/contents/domain-requests/" + application.slug + ".json", "PUT", {
+    await githubApi("/contents/" + pendingPath, "PUT", {
       message: "SubFree: domain request " + application.slug,
-      content: b64(JSON.stringify(publicApplication, null, 2) + "\n"),
-      branch
+      content: b64(JSON.stringify(publicApplication, null, 2) + "\n"), branch
     });
     const body = [
       "## SubFree Domain-Antrag", "",
       "**Name:** " + (application.applicant_name || "Nicht angegeben"),
       "**Gewünschter Pfad:** https://subfree.pntr.dev/" + application.slug + "/",
-      "**Website:** " + application.website_url, "",
-      "### Zweck",
-      application.purpose, "",
-      "_Prüfungen starten direkt nach Erstellung dieser Pull Request. Ergebnisse folgen als Kommentare._",
-      "",
-      "**Kein automatischer Merge.**"
+      "**Website:** " + application.website_url, "", "### Zweck", application.purpose, "",
+      "_Die Pull Request wird zuerst erstellt. Alle formalen, technischen und inhaltlichen Prüfungen starten anschließend._",
+      "", "**Kein automatischer Merge.**"
     ].join("\n");
-    const pr = await githubApi("/pulls", "POST", {
-      title: "Domain-Antrag: /" + application.slug,
-      head: branch,
-      base: BRANCH,
-      body
-    });
-    return { number: pr.number, url: pr.html_url, branch };
+    const pr = await githubApi("/pulls", "POST", { title: "Domain-Antrag: /" + application.slug, head: branch, base: BRANCH, body });
+    return { number: pr.number, url: pr.html_url, branch, pendingPath };
   } catch (error) {
     if (branchCreated) {
       try { await githubApi("/git/refs/heads/" + encodeURIComponent(branch), "DELETE"); }
@@ -844,9 +819,6 @@ Deno.serve(async (req: Request) => {
       const recent = await db("subfree_domain_applications?request_ip_hash=eq." + ipHash + "&status=in.(pending,pr_open)&select=id&created_at=gt." + encodeURIComponent(new Date(Date.now()-86400000).toISOString()));
       if (recent.length >= 2) return json({ error: "Du hast bereits zwei offene Domain-Anträge gestellt. Bitte warte auf die Prüfung." }, 429);
       const existing = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&status=in.(pending,pr_open)&select=id");
-      if (!(await domainRequestPathIsFree(slug))) {
-        return json({ error: "Dieser öffentliche Pfad ist bereits vergeben. Bitte wähle einen anderen Pfad." }, 409);
-      }
       if (existing.length) return json({ error: "Für diesen Projektordner gibt es bereits einen offenen Antrag." }, 409);
       const inserted = await db("subfree_domain_applications", {
         method: "POST", headers: { Prefer: "return=representation" },
@@ -935,7 +907,21 @@ Deno.serve(async (req: Request) => {
       const pr = await githubApi("/pulls/" + prNumber);
       if (pr.state !== "closed" || !pr.merged_at || pr.base?.ref !== BRANCH) return json({ error: "Die Pull-Request wurde noch nicht durch einen manuellen Merge genehmigt." }, 409);
       const files = await githubApi("/pulls/" + prNumber + "/files?per_page=100");
-      if (!files.some((file: any) => file.filename === "domain-requests/" + slug + ".json" && file.status !== "removed")) return json({ error: "Die Pull-Request enthält keinen passenden Domain-Antrag." }, 403);
+      const pendingFile = files.find((file: any) => file.filename.startsWith("domain-requests/pending/") && file.filename.endsWith(".json") && file.status !== "removed");
+      if (!pendingFile) return json({ error: "Die Pull-Request enthält keinen passenden Domain-Antrag." }, 403);
+      const pendingContent = await githubApi("/contents/" + pendingFile.filename + "?ref=" + encodeURIComponent(BRANCH));
+      const decodedPending = atob(String(pendingContent.content || "").replace(/\\s/g, ""));
+      const pendingBytes = Uint8Array.from(decodedPending, (c: string) => c.charCodeAt(0));
+      const pendingData = parseJsonPayload(new TextDecoder().decode(pendingBytes), "Domain-Antrag");
+      if (pendingData.slug !== slug) return json({ error: "Der PR-Pfad stimmt nicht mit dem Antrag überein." }, 403);
+      let existingDomainFile = false;
+      try { await githubApi("/contents/domain-requests/" + slug + ".json?ref=" + encodeURIComponent(BRANCH)); existingDomainFile = true; }
+      catch (error) { if (!String(error).includes("GitHub API (404)")) throw error; }
+      if (existingDomainFile) return json({ error: "Der gewünschte öffentliche Pfad wurde inzwischen vergeben. Der Antrag bleibt inaktiv." }, 409);
+      await githubApi("/contents/domain-requests/" + slug + ".json", "PUT", {
+        message: "SubFree: activate approved domain request " + slug,
+        content: String(pendingContent.content || ""), branch: BRANCH
+      });
       const apps = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&github_pr_number=eq." + prNumber + "&status=eq.pr_open&select=*");
       const application = apps[0];
       if (!application) return json({ error: "Kein passender offener Domain-Antrag gefunden." }, 404);
