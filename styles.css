@@ -47,7 +47,7 @@
 .temp-mail-info p,.temp-mail-info small{color:var(--muted);font-size:13px;line-height:1.65;margin:0}
 .temp-mail-info a{font-size:13px;font-weight:700;color:var(--ink);text-decoration:underline}
 .temp-mail-info small{font-size:11px}
-@media(max-width:760px){.temp-mail-panel{grid-template-columns:1fr;padding:20px 16px}.temp-mail-address span{font-size:10px;padding-right:8px}.temp-mail-address input{padding:12px 8px}}
+@media(max-width:760px){.temp-mail-panel{grid-template-columns:1fr;padding:20px 16px}}
 
 
 /* Zentraler Schnellzugriff */
@@ -120,9 +120,7 @@ body{background:#090d14;color:#e6edf7}
 .preview-terminal code{color:#a7d5ff;font-size:12px}.preview-terminal small{font-size:9px;letter-spacing:1px}.preview-terminal b{color:#5bd7a0}
 .trust-strip{color:#e6edf7}.trust-strip span,.step-card p,.temp-mail-info p,.temp-mail-info small{color:#93a3b9}
 .trust-strip div+div{border-color:#29394e}
-.step-card{background:#101a27}.step-card h3{color:#e6edf7}
-.temp-mail-address{background:#0a111b;border-color:#2a3a50}.temp-mail-address input,.request-form input,.request-form textarea,.request-form select,.manage-panel input,.file-workspace input,.file-workspace textarea{background:#0a111b!important;color:#e6edf7!important;border-color:#2a3a50!important}
-.temp-mail-result{color:#e6edf7}.temp-mail-info a{color:#b9d9ff}
+.step-card{background:#101a27}.step-card h3{color:#e6edf7}.request-form input,.request-form textarea,.request-form select,.manage-panel input,.file-workspace input,.file-workspace textarea{background:#0a111b!important;color:#e6edf7!important;border-color:#2a3a50!important}.temp-mail-info a{color:#b9d9ff}
 .request-section{background:#0b121d;border-color:#25364b}
 .notice,.deploy-notice{background:#111f30;border-color:#2c4767;color:#b4c5dc}
 .request-form label,.manage-login label,.file-workspace label{color:#c5d2e2}
@@ -213,7 +211,7 @@ a{color:inherit}
 .notice strong{color:#00ff88}
 .request-form,.manage-panel{border-radius:3px}
 .request-form label,.manage-login label,.file-workspace label,.local-account-fields label{font-family:inherit;color:#c6d8cb}
-.request-form input:not([type=checkbox]),.request-form textarea,.request-form select,.manage-panel input,.file-workspace input,.temp-mail-address,.temp-mail-address input,.local-account-fields input{background:#000!important;color:#e8f5ec!important;border:1px solid #294433!important;border-radius:3px!important;font-family:inherit!important}
+.request-form input:not([type=checkbox]),.request-form textarea,.request-form select,.manage-panel input,.file-workspace input,.local-account-fields input{background:#000!important;color:#e8f5ec!important;border:1px solid #294433!important;border-radius:3px!important;font-family:inherit!important}
 .request-form input:focus,.request-form textarea:focus,.request-form select:focus,.manage-panel input:focus,.local-account-fields input:focus{border-color:#00ff88!important;box-shadow:0 0 0 2px #00ff8818!important}
 .domain-input{background:#000;border:1px solid #294433;border-radius:3px}
 .domain-input:focus-within{border-color:#00ff88;box-shadow:0 0 0 2px #00ff8818}
@@ -240,9 +238,6 @@ a{color:inherit}
 .file-privacy-button{background:#000;border:1px solid #294433;color:#9aada1;border-radius:2px}
 .file-list{color:#91a397}
 .temp-mail-panel{background:#030604;border:1px solid #1d3325;border-radius:3px}
-.temp-mail-address{background:#000;border:1px solid #294433;border-radius:3px}
-.temp-mail-address span{color:#00ff88;font-family:inherit}
-.temp-mail-result{color:#00ff88;font-family:inherit}
 .temp-mail-info a{color:#00ff88}
 .quick-access{background:#030604;border:1px solid #1d3325;border-radius:3px;box-shadow:none}
 .quick-access-heading h2{font-family:inherit;text-transform:uppercase}
@@ -311,7 +306,7 @@ h3{font-size:13px!important;line-height:1.8!important;letter-spacing:0!important
 .contact-divider{color:#42614d}
 .preview-top>span{width:8px;height:8px}
 .preview-card{outline:1px solid #00ff8833}
-.preview-terminal,.domain-example,.notice,.deploy-notice,.key-result,.file-item,.file-privacy-button,.domain-input,.temp-mail-address{border-radius:0!important}
+.preview-terminal,.domain-example,.notice,.deploy-notice,.key-result,.file-item,.file-privacy-button,.domain-input{border-radius:0!important}
 input,textarea,select,button{font-family:"VT323",monospace}
 input,select{font-size:19px!important}
 textarea,.code-editor{font-size:17px!important;line-height:1.45}
@@ -330,17 +325,13 @@ table caption{padding:10px;text-align:left;color:#00ff88}
 .temp-mail-status{margin-left:auto;color:#ffca70;font:7px/1.8 "Press Start 2P","VT323",monospace}
 .hero-temp-mail .temp-mail-generator{gap:9px}
 .hero-temp-mail .temp-mail-generator label{color:#a9c8b3;font:8px/1.8 "Press Start 2P","VT323",monospace}
-.hero-temp-mail .temp-mail-address{display:flex;flex-wrap:wrap;min-height:42px}
-.hero-temp-mail .temp-mail-address input{min-width:90px;font-size:18px!important}
-.hero-temp-mail .temp-mail-address span{font-size:13px}
-.hero-temp-mail .temp-mail-result{font-size:16px;overflow-wrap:anywhere}
 .hero-temp-mail .button{align-self:flex-start}
 .temp-mail-disclaimer{color:#91a397;font-size:14px;line-height:1.4}
 .hero-temp-mail .temp-mail-info{gap:6px;border-top:1px solid #1d3325;padding-top:10px}
 .hero-temp-mail .temp-mail-info strong{color:#00ff88;font:8px/1.8 "Press Start 2P","VT323",monospace}
 .hero-temp-mail .temp-mail-info p,.hero-temp-mail .temp-mail-info small{font-size:14px;line-height:1.45}
 .hero-temp-mail .temp-mail-info a{font-size:14px}
-@media(max-width:760px){.hero-temp-mail{width:100%;padding:12px}.temp-mail-terminal-heading{font-size:7px}.temp-mail-status{width:100%;margin-left:22px}.hero-temp-mail .temp-mail-address span{font-size:11px;padding:0 7px}.temp-mail-disclaimer{font-size:13px}}
+@media(max-width:760px){.hero-temp-mail{width:100%;padding:12px}.temp-mail-terminal-heading{font-size:7px}.temp-mail-status{width:100%;margin-left:22px}.temp-mail-disclaimer{font-size:13px}}
 
 /* LARGE WORKSPACE EDITOR: customer files remain untouched until the user saves them */
 .manage-section{max-width:1500px}
@@ -365,8 +356,7 @@ textarea{white-space:pre-wrap;overflow-wrap:anywhere}
 .feature-grid,.steps,.rules-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
 .trust-strip{grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
 .hero>*{min-width:0}
-.preview-card,.preview-content,.preview-terminal,.domain-example,.temp-mail-panel,.temp-mail-address,.key-result,.request-form,.manage-panel{max-width:100%;min-width:0}
-.temp-mail-address span,.domain-input span{overflow-wrap:anywhere;min-width:0}
+.preview-card,.preview-content,.preview-terminal,.domain-example,.temp-mail-panel,.key-result,.request-form,.manage-panel{max-width:100%;min-width:0}.domain-input span{overflow-wrap:anywhere;min-width:0}
 .file-manager{grid-template-columns:minmax(0,260px) minmax(0,1fr)}
 .file-sidebar,.file-workspace,.file-list,.file-tree-row{min-width:0;max-width:100%}
 .file-item{max-width:100%;white-space:normal;overflow-wrap:anywhere}
@@ -440,8 +430,6 @@ textarea{white-space:pre-wrap;overflow-wrap:anywhere}
  .site-header nav a{font-size:11px}
  .hero h1{font-size:clamp(18px,7vw,26px)!important}
  .button{padding:11px 10px}
- .temp-mail-address{display:grid;grid-template-columns:minmax(0,1fr)}
- .temp-mail-address span{padding:8px}
 }
 
 /* SubFree API access and permanent deletion */
