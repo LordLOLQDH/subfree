@@ -116,6 +116,35 @@ form?.addEventListener("submit", async (event) => {
   }
 });
 
+const domainRequestForm=document.querySelector("#domain-request-form");
+domainRequestForm?.addEventListener("submit",async(event)=>{
+ event.preventDefault();
+ if(!domainRequestForm.reportValidity())return;
+ const data=new FormData(domainRequestForm);
+ const button=domainRequestForm.querySelector("button[type=submit]");
+ const message=document.querySelector("#domain-request-message");
+ const resultPanel=document.querySelector("#domain-request-result");
+ button.disabled=true;message.textContent="Website wird geprüft und GitHub-Pull-Request wird erstellt …";resultPanel.hidden=true;
+ try{
+  const result=await api({
+   action:"domain_application",
+   slug:String(data.get("slug")||"").trim().toLowerCase(),
+   accessKey:String(data.get("accessKey")||""),
+   applicantName:String(data.get("applicantName")||"").trim(),
+   applicantEmail:String(data.get("applicantEmail")||"").trim(),
+   websiteUrl:String(data.get("websiteUrl")||"").trim(),
+   purpose:String(data.get("purpose")||"").trim(),
+   termsAccepted:data.get("termsAccepted")==="on",
+   termsVersion:"2026-11-07"
+  });
+  message.textContent=result.message;
+  const link=document.querySelector("#domain-request-pr");
+  link.href=result.prUrl;link.textContent="Pull-Request #"+result.prNumber+" auf GitHub öffnen ↗";
+  resultPanel.hidden=false;
+ }catch(error){message.textContent=error.message||"Der Antrag konnte nicht eingereicht werden.";}
+ finally{button.disabled=false;}
+});
+
 copyKeyButton?.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(currentKey);
@@ -136,6 +165,16 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentKey = key;
     currentSite = result.site;
     currentFolders = result.folders || [];
+    const domainActive = result.site.registration_data?.domainMode === "active";
+    const domainBanner = document.querySelector("#domain-active-status");
+    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://subfree.pntr.dev/"+result.site.slug+"/";domainLink.textContent="https://subfree.pntr.dev/"+result.site.slug+"/ ↗";}}
+    if(domainActive){
+      for(const selector of ["#redirect-settings","#redirect-security-settings","#api-access","#delete-project-zone",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=true;}
+    }else{
+      for(const selector of ["#api-access","#delete-project-zone",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=false;}
+    }
+    document.querySelector("#offline-project").disabled=domainActive;
+    document.querySelector("#publish-project").disabled=domainActive;
     const redirectPanel = document.querySelector("#redirect-settings");
     const securityPanel = document.querySelector("#redirect-security-settings");
     if(securityPanel){ securityPanel.hidden=result.site.site_type!=="redirect"; redirectModes=result.redirectModes||defaultRedirectModes(); activeRedirectMode=result.activeRedirectMode||"direct"; document.querySelector("#redirect-mode-select").value=activeRedirectMode; applyRedirectMode(activeRedirectMode); }
@@ -375,7 +414,7 @@ function defaultRedirectModes(){return {direct:{checkStatus:true,checkHeaders:tr
 const redirectModeDescriptions={direct:"Bisheriges SubFree-Verhalten: technische Prüfungen und manuelle Bestätigung.",simple:"HTTP-Status prüfen und Zieldomain mit einer Bestätigung anzeigen.",secure:"Status, Sicherheitsheader und Server-Weiterleitungen prüfen; Zieldomain bestätigen.",strict:"Alle verfügbaren Prüfungen und beide ausdrücklichen Besucherbestätigungen."};
 function readRedirectModeSettings(){return {checkStatus:document.querySelector("#sec-check-status").checked,checkHeaders:document.querySelector("#sec-check-headers").checked,checkRedirect:document.querySelector("#sec-check-redirect").checked,requireDomainAck:document.querySelector("#sec-domain-ack").checked,requireExternalAck:document.querySelector("#sec-external-ack").checked};}
 function applyRedirectMode(mode){const cfg=redirectModes?.[mode]||defaultRedirectModes()[mode]||defaultRedirectModes().direct;for(const [id,key] of [["sec-check-status","checkStatus"],["sec-check-headers","checkHeaders"],["sec-check-redirect","checkRedirect"],["sec-domain-ack","requireDomainAck"],["sec-external-ack","requireExternalAck"]])document.querySelector("#"+id).checked=cfg[key]!==false;document.querySelector("#redirect-mode-description").textContent=redirectModeDescriptions[mode]||"";}
-async function saveRedirectModes(){if(!currentKey||!currentSite||currentSite.site_type!=="redirect")return;const button=document.querySelector("#save-redirect-security"),message=document.querySelector("#redirect-security-message");redirectModes[activeRedirectMode]=readRedirectModeSettings();button.disabled=true;message.textContent="Modus-Einstellungen werden gespeichert …";try{const result=await api({action:"update_redirect_modes",activeMode:activeRedirectMode,modes:redirectModes},currentKey);message.textContent=result.message;}catch(error){message.textContent="Speichern fehlgeschlagen: "+error.message;}finally{button.disabled=false;}}
+async function saveRedirectModes(){if(!currentKey||!currentSite||currentSite.site_type!=="redirect")return false;const button=document.querySelector("#save-redirect-security"),message=document.querySelector("#redirect-security-message");redirectModes[activeRedirectMode]=readRedirectModeSettings();button.disabled=true;message.textContent="Modus-Einstellungen werden gespeichert …";try{const result=await api({action:"update_redirect_modes",activeMode:activeRedirectMode,modes:redirectModes},currentKey);message.textContent=result.message;return true;}catch(error){message.textContent="Speichern fehlgeschlagen: "+error.message;return false;}finally{button.disabled=false;}}
 document.querySelector("#save-redirect-target")?.addEventListener("click",async()=>{
  if(!currentKey||!currentSite||currentSite.site_type!=="redirect")return;
  const input=document.querySelector("#redirect-target"),button=document.querySelector("#save-redirect-target"),message=document.querySelector("#redirect-settings-message");
@@ -410,7 +449,14 @@ document.querySelector("#delete-project")?.addEventListener("click",async()=>{
  finally{button.disabled=false;}
 });
 
-document.querySelector("#redirect-mode-select")?.addEventListener("change",async(event)=>{activeRedirectMode=event.target.value;applyRedirectMode(activeRedirectMode);await saveRedirectModes();});
+document.querySelector("#redirect-mode-select")?.addEventListener("change",async(event)=>{
+ const previousMode=activeRedirectMode;
+ if(redirectModes?.[previousMode])redirectModes[previousMode]=readRedirectModeSettings();
+ activeRedirectMode=event.target.value;
+ applyRedirectMode(activeRedirectMode);
+ const saved=await saveRedirectModes();
+ if(!saved){activeRedirectMode=previousMode;event.target.value=previousMode;applyRedirectMode(previousMode);}
+});
 for(const id of ["sec-check-status","sec-check-headers","sec-check-redirect","sec-domain-ack","sec-external-ack"])document.querySelector("#"+id)?.addEventListener("change",()=>{if(redirectModes?.[activeRedirectMode])redirectModes[activeRedirectMode]=readRedirectModeSettings();});
 document.querySelector("#save-redirect-security")?.addEventListener("click",saveRedirectModes);
 
