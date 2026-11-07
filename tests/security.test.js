@@ -23,7 +23,7 @@ test("scanner rejects private/local destinations before requesting them", () => 
   assert.match(edge, /\.internal/);
 });
 test("redirect security settings cannot disable DNS and HTTPS protection", () => {
-  assert.match(edge, /DNS\/IP-Schutz und HTTPS bleiben immer aktiv/);
+  assert.match(edge, /DNS-\/IP-Schutz und HTTPS bleiben immer aktiv/);
   assert.match(edge, /requireDomainAck/);
   assert.match(edge, /requireExternalAck/);
 });
