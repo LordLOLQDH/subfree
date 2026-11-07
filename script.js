@@ -432,6 +432,18 @@ document.querySelector("#save-redirect-target")?.addEventListener("click",async(
  }catch(error){message.textContent="Speichern fehlgeschlagen: "+error.message;}
  finally{button.disabled=false;}
 });
+document.querySelector("#restore-domain-mode")?.addEventListener("click",async()=>{
+ if(!currentKey||!confirm("Domain-Modus beenden und die vorherige Projektart sowie Einstellungen wiederherstellen? Die bisherigen Domain-Antragsdaten bleiben erhalten."))return;
+ const button=document.querySelector("#restore-domain-mode");
+ button.disabled=true;manageMessage.textContent="Vorherige Projekteinstellungen werden wiederhergestellt …";
+ try{
+  const result=await api({action:"restore_domain_mode"},currentKey);
+  manageMessage.textContent=result.message;
+  document.querySelector("#load-project")?.click();
+ }catch(error){manageMessage.textContent="Wiederherstellung fehlgeschlagen: "+error.message;}
+ finally{button.disabled=false;}
+});
+
 document.querySelector("#delete-project")?.addEventListener("click",async()=>{
  if(!currentKey||!currentSite)return;
  if(!confirm("ACHTUNG: Das Projekt und alle gespeicherten Daten werden endgültig gelöscht."))return;
