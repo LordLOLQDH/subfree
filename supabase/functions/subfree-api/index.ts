@@ -159,7 +159,7 @@ async function openDomainApplicationPullRequest(application: any) {
   const publicApplication = {
     schemaVersion: 1, slug: application.slug, websiteUrl: application.website_url,
     purpose: application.purpose, termsVersion: application.terms_version,
-    requestedAt: application.created_at, checks: application.check_results,
+    requestedAt: application.created_at, termsAccepted: true, termsAcceptedAt: application.terms_accepted_at, checks: application.check_results,
     note: "Applicant name, email, access key and IP data are intentionally excluded."
   };
   await githubApi("/contents/domain-requests/" + application.slug + ".json", "PUT", {
@@ -634,7 +634,7 @@ Deno.serve(async (req: Request) => {
       });
       const application = inserted[0];
       try {
-        const pr = await openDomainApplicationPullRequest({ id: application.id, slug, website_url: target.toString(), purpose, terms_version: "2026-11-07", created_at: application.created_at, check_results: checkResults });
+        const pr = await openDomainApplicationPullRequest({ id: application.id, slug, website_url: target.toString(), purpose, terms_version: "2026-11-07", created_at: application.created_at, terms_accepted_at: application.terms_accepted_at, check_results: checkResults });
         await db("subfree_domain_applications?id=eq." + application.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "pr_open", github_pr_number: pr.number, github_pr_url: pr.url, updated_at: new Date().toISOString() }) });
         return json({ success: true, prUrl: pr.url, prNumber: pr.number, message: "Antrag eingereicht. Die GitHub-Pull-Request wurde erstellt. Die Veröffentlichung bleibt bis zu deiner manuellen Genehmigung deaktiviert." }, 201);
       } catch (error) {
