@@ -71,7 +71,9 @@ jobs:
           if [ "$VALIDATION_STATUS" = "success" ]; then
             result="**Ergebnis:** Formal gültig. Der gewünschte Pfad war zum Prüfzeitpunkt frei."
           else
-            result="**Ergebnis:** Prüfung fehlgeschlagen. Die PR bleibt offen und wurde nicht automatisch geschlossen oder zusammengeführt. Details stehen im fehlgeschlagenen Check."
+            result="**Ergebnis:** Prüfung fehlgeschlagen. Die PR bleibt offen und wurde nicht automatisch geschlossen oder zusammengeführt. Details stehen im fehlgeschlagenen Check.
+
+Dies ist keine Ablehnung der PR-Erstellung. Die PR wurde absichtlich vor dieser Prüfung angelegt."
           fi
           gh pr comment "$PR_NUMBER" --body "## SubFree: Prüfung nach PR-Erstellung
 
@@ -97,7 +99,9 @@ jobs:
           while IFS= read -r file; do
             [ -n "$file" ] || continue
             slug="$(node -e 'const d=require("./"+process.argv[1]);process.stdout.write(d.slug)' "$file")"
-            pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
+            app_id="$(node -e 'const d=require("./"+process.argv[1]);process.stdout.write(d.applicationId)' "$file")"
+            head_branch="domain-request/$slug-${app_id:0:8}"
+            pr="$(gh pr list --state merged --base main --head "$head_branch" --json number --jq '.[0].number')"
             [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
             curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
           done <<< "$files"
