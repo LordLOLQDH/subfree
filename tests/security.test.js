@@ -150,7 +150,7 @@ test("domain request cannot overwrite an existing public request file", () => {
   assert.ok(helper.includes("GitHub API (404)"));
   const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
   assert.ok(block.includes("domainRequestPathIsFree(slug)"));
-  assert.ok(block.includes("status: 409"));
+  assert.ok(block.includes("}, 409);"));
   const pr = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function finalizeDomainApplicationPullRequest"));
   assert.ok(pr.includes("branchCreated"));
   assert.ok(pr.includes('"DELETE"'));
