@@ -109,7 +109,7 @@ test("domain application form requests terms and purpose and links to the correc
 });
 test("domain request workflow never merges automatically", () => {
   const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
-  assert.match(workflow, /Post formal validation result/);
+  assert.match(workflow, /Post validation result/);
   assert.match(workflow, /KEINE Inhaltsfreigabe/);
   assert.doesNotMatch(workflow, /OPENAI_API_KEY|api.openai.com/);
   assert.match(workflow, /gh pr comment/);
@@ -175,7 +175,7 @@ test("duplicate domain slugs are allowed to create independent PRs before checks
   assert.ok(pr.includes("application.id"));
   const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
   assert.ok(!block.includes("domainRequestPathIsFree"));
-  assert.ok(!block.includes("status=in.(pending,pr_open)"));
+  assert.ok(block.includes("const recent = await db("));
   assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("runWebsiteCheck"));
 });
 
