@@ -818,8 +818,6 @@ Deno.serve(async (req: Request) => {
       const ipHash = await sha256("subfree-domain:" + ip);
       const recent = await db("subfree_domain_applications?request_ip_hash=eq." + ipHash + "&status=in.(pending,pr_open)&select=id&created_at=gt." + encodeURIComponent(new Date(Date.now()-86400000).toISOString()));
       if (recent.length >= 2) return json({ error: "Du hast bereits zwei offene Domain-Anträge gestellt. Bitte warte auf die Prüfung." }, 429);
-      const existing = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&status=in.(pending,pr_open)&select=id");
-      if (existing.length) return json({ error: "Für diesen Projektordner gibt es bereits einen offenen Antrag." }, 409);
       const inserted = await db("subfree_domain_applications", {
         method: "POST", headers: { Prefer: "return=representation" },
         body: JSON.stringify({
