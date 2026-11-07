@@ -20,17 +20,22 @@ Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und D
 - Projektdateien werden später in einen Ordner `/<projektname>/` im GitHub-Repository veröffentlicht.
 - Beispieladresse: `https://subfree.pntr.dev/meinprojekt/`.
 
+## Temp-Mail
+
+- Der Adressgenerator verwendet `temp-admin-001.pntr.dev`. Beliebige Empfänger vor dem `@` landen im gemeinsamen PNTR-Posteingang.
+- Öffentlicher, schreibgeschützter Postfach-Link: [PNTR-Posteingang öffnen](https://pntr.dev/inbox/7a217ed95d05e478cdc25e4f978cdb1d4386892b9274a2dc55f7eb14dbd9aa06). Jeder mit diesem Link kann Nachrichten lesen. Nur für Testkonten verwenden, niemals für private oder vertrauliche Nachrichten. PNTR löscht Nachrichten im kostenlosen Tarif nach 48 Stunden.
+
 ## Website Check und Pfad-Anträge
 
 - Öffentlicher Website Check: `check.html`. Er prüft DNS-/IP-Schutz, HTTPS/TLS-Verbindung, HTTP-Status, Weiterleitungen, Sicherheitsheader, CORS, Cookies und weitere sichtbare Merkmale. Zielseiten werden nicht im Browser geöffnet und HTTP-Weiterleitungen nicht verfolgt. Es ist kein vollständiger Malware- oder Phishing-Scan.
 - Bestehende Projektinhaber können unter `#domain-antrag` einen Pfad-Antrag mit Zugangscode, HTTPS-Ziel, Verwendungszweck und Nutzungsbedingungen stellen.
 - Anträge werden privat in `subfree_domain_applications` gespeichert. GitHub-PRs enthalten keine Namen, E-Mail-Adressen, Zugangscodes oder IP-Hashes.
-- GitHub Actions prüft die PR mit festen Regeln und kommentiert das Ergebnis. Es wird keine KI-API verwendet und es entstehen dafür keine KI-API-Kosten. Diese Prüfung ersetzt keine manuelle Prüfung auf Phishing oder Betrug.
+- GitHub Actions prüft die PR mit festen Regeln und kommentiert das Ergebnis. Eine KI-Inhaltsprüfung ist derzeit noch nicht in den Antragsablauf integriert. Die formalen Prüfungen ersetzen keine manuelle Prüfung auf Phishing oder Betrug.
 - Ein genehmigter Pfad wird erst nach manuellem Merge synchronisiert. Der Merge löst die Aktivierung aus. Frühere Projekteinstellungen bleiben gespeichert und werden im Domain-Modus schreibgeschützt.
 
 ## Backend
 
-Supabase-Projekt: `KDS-AI-v1`
+Supabase-Projekt: `KDS-AI`
 
 - Edge Function: `subfree-api`
 - Datenbanktabellen: `subfree_sites`, `subfree_site_files`, `subfree_domain_applications`
@@ -82,4 +87,4 @@ Die SubFree-Startseite bleibt im Repository-Root.
 - GitHub-Pages-Bereitstellung nach dem ersten echten Test prüfen.
 - Die gewünschte Domain `subfree.pntr.dev` ist noch nicht als aktiv verbunden bestätigt.
 - `impressum.html` und `datenschutz.html` enthalten Platzhalter. Betreiberanschrift und Kontaktangaben müssen ergänzt und die Datenschutzhinweise geprüft werden.
-- E-Mail-Verifizierung, Datei-Upload/ZIP-Import, Projektlöschung und zusätzliche Missbrauchsprüfung sind noch nicht umgesetzt.
+- E-Mail-Verifizierung und ZIP-Import sind noch nicht umgesetzt. Die Projektlöschung ist im Dashboard vorhanden; sie entfernt die projektbezogenen Daten aus Supabase und die zugehörigen öffentlichen Projektdateien aus GitHub.
