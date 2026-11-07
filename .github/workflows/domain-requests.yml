@@ -41,10 +41,10 @@ jobs:
           if (url.protocol !== 'https:' || url.username || url.password || url.port) throw new Error('Website URL must be public HTTPS on the default port');
           if (typeof data.purpose !== 'string' || data.purpose.trim().length < 30 || data.purpose.length > 1600) throw new Error('Purpose is missing or outside allowed length');
           if (!data.checks || !Array.isArray(data.checks.checks) || data.checks.checks.length < 5) throw new Error('Missing technical check results');
-          for (const forbidden of ['applicantEmail','applicantName','accessKey','requestIp','request_ip_hash']) {
+          for (const forbidden of ['applicantEmail','accessKey','requestIp','request_ip_hash','check_results','aiReview']) {
             if (Object.hasOwn(data, forbidden)) throw new Error('Private field found in public PR: ' + forbidden);
           }
-          console.log('Validated ' + file + ' with ' + data.checks.checks.length + ' checks');
+          console.log('Validated compact public application summary: ' + file);
           NODE
           done <<< "$files"
       - name: Post automatic validation result
@@ -66,9 +66,9 @@ jobs:
           - Pfadname und HTTPS-Ziel formal gültig
           - Nutzungsbedingungen bestätigt
           - Private Antragsdaten nicht in der öffentlichen PR
-          - Technische Prüfergebnisse vorhanden ($count Einzelprüfungen)
+          - Öffentliche PR-Datei enthält nur die kurze Antragsübersicht
 
-          **Wichtig:** Dies ist ausdrücklich KEINE Inhaltsfreigabe. Die KI-Inhaltsprüfung steht separat in der PR-Beschreibung und im SubFree-KI-Kommentar. Bei Ablehnung bleibt die PR geschlossen. Ein technischer Website-Check beweist keine Rechtmäßigkeit. Kein automatischer Merge."
+          **Wichtig:** Dies ist nur eine formale Dateiprüfung und ausdrücklich KEINE Inhaltsfreigabe. KI- und technische Prüfergebnisse werden separat als PR-Kommentar veröffentlicht. Kein automatischer Merge."
   sync-approved-request:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
