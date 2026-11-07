@@ -174,7 +174,7 @@
         <span class="eyebrow">SUBFREE PATH REGISTRY</span>
         <h2>Eigenen Projektpfad beantragen.</h2>
         <p>Beantrage die Freigabe deines bestehenden Projektordners als eigene SubFree-Adresse. Die Adresse bleibt ein Pfad unter subfree.pntr.dev, keine separate DNS-Domain. Nach der Freigabe wird dieser Pfad als Weiterleitung auf die angegebene HTTPS-Website verwendet.</p>
-        <div class="notice"><strong>Prüfung statt Blindflug:</strong> Dein Antrag wird technisch geprüft, als GitHub-Pull-Request eingereicht und erst nach KI-Prüfung sowie deiner manuellen Freigabe durch den Betreiber aktiviert.</div>
+        <div class="notice"><strong>Mehrstufige Prüfung:</strong> Groq-KI prüft deinen Verwendungszweck und einen begrenzten Textauszug der Zielwebsite. Das Ergebnis ist „unauffällig“, „manuelle Prüfung“ oder „abgelehnt“. Auch bei unauffälligem Ergebnis ist eine manuelle Betreiberfreigabe nötig. Technische Erreichbarkeit ist keine Inhaltsfreigabe.</div>
       </div>
       <form id="domain-request-form" class="request-form">
         <label for="domain-slug">Dein bestehender Projektordner</label>
@@ -191,9 +191,10 @@
         <label for="domain-purpose">Wofür benötigst du den Pfad und was wird auf der Website angeboten?</label>
         <textarea id="domain-purpose" name="purpose" rows="5" minlength="30" maxlength="1600" required placeholder="Beschreibe den Zweck, die Inhalte, die Zielgruppe und warum du diesen SubFree-Pfad benötigst."></textarea>
         <label class="checkbox-label"><input id="domain-terms" name="termsAccepted" type="checkbox" required><span>Ich stimme den <a href="agb.html" target="_blank" rel="noopener">Nutzungsbedingungen für SubFree-Pfade</a> zu und bestätige, dass ich die Website betreiben darf.</span></label>
+        <small class="form-note">Für die KI-Prüfung werden Verwendungszweck, Ziel-URL und ein begrenzter öffentlicher Website-Textauszug an Groq übermittelt. Name, E-Mail und Zugangscode werden nicht an Groq gesendet.</small>
         <button class="button button-primary submit-button" type="submit">Domain-Antrag einreichen →</button>
         <p id="domain-request-message" class="form-message" role="status" aria-live="polite"></p>
-        <div id="domain-request-result" class="key-result" hidden><strong>GitHub-Pull-Request erstellt</strong><p>Dein Antrag ist eingereicht. Die Adresse wird erst nach Prüfung und manuellem Merge aktiviert.</p><a id="domain-request-pr" target="_blank" rel="noopener">Pull-Request auf GitHub öffnen ↗</a></div>
+        <div id="domain-request-result" class="key-result" hidden><strong id="domain-request-result-title">Prüfung abgeschlossen</strong><p id="domain-request-result-text">Dein Antrag wurde geprüft.</p><a id="domain-request-pr" target="_blank" rel="noopener">Prüfbericht auf GitHub öffnen ↗</a></div>
       </form>
     </section>
 
