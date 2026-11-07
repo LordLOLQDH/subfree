@@ -73,7 +73,7 @@ jobs:
           else
             result="**Ergebnis:** Prüfung fehlgeschlagen. Die PR bleibt offen und wurde nicht automatisch geschlossen oder zusammengeführt. Details stehen im fehlgeschlagenen Check."
           fi
-          body="$(printf '%s\\n\\n%s\\n\\n- Private Kontakt- und Zugangsdaten gehören nicht in die öffentliche PR-Datei.\\n- KI- und technische Prüfungen werden separat durchgeführt.\\n- Kein automatischer Merge.' "$result" "Dies ist keine Ablehnung der PR-Erstellung. Die PR wurde absichtlich vor dieser Prüfung angelegt.")"
+          body="$(printf '%s\\n\\n%s\\n\\n- Private Kontakt- und Zugangsdaten gehören nicht in die öffentliche PR-Datei.\\n- KI- und technische Prüfungen werden separat durchgeführt.\\n- Dies ist ausdrücklich KEINE Inhaltsfreigabe. Kein automatischer Merge.' "$result" "Dies ist keine Ablehnung der PR-Erstellung. Die PR wurde absichtlich vor dieser Prüfung angelegt.")"
           gh pr comment "$PR_NUMBER" --body "## SubFree: Prüfung nach PR-Erstellung
 
           $body"
