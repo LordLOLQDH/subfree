@@ -69,6 +69,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Synchronize manually merged requests
         env:
+          GH_TOKEN: ${{ github.token }}
           API_URL: https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api
           BEFORE_SHA: ${{ github.event.before }}
         run: |
