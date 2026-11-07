@@ -58,12 +58,17 @@ test("domain application requires project ownership, HTTPS target, purpose and t
   assert.match(block, /target\.protocol !== "https:"/);
   assert.match(block, /runWebsiteCheck/);
   assert.match(block, /openDomainApplicationPullRequest/);
+  assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("runWebsiteCheck"), "PR must be created before technical checks");
+  assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("reviewDomainApplicationWithAI"), "PR must be created before AI review");
 });
 test("public pull request excludes applicant private information", () => {
   const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));
-  assert.match(block, /Private applicant contact data and access credentials are excluded/);
-  assert.doesNotMatch(block, /applicantEmail|applicantName|accessKey/);
+  assert.match(block, /applicantName: application\.applicant_name/);
+  assert.match(block, /websiteUrl: application\.website_url/);
+  assert.match(block, /purpose: application\.purpose/);
+  assert.doesNotMatch(block, /applicant_email|accessKey|check_results: ai|checks: application/);
   assert.match(block, /Kein automatischer Merge/);
+  assert.match(block, /Prüfungen starten direkt nach Erstellung/);
 });
 test("domain application requires a real Groq review and blocks explicit illegal drug sales", () => {
   assert.match(edge, /Deno\.env\.get\("GROQ_SUBFREE"\)/);
@@ -74,7 +79,7 @@ test("domain application requires a real Groq review and blocks explicit illegal
 });
 test("domain PR summarizes AI and technical checks without dumping the JSON payload", () => {
   const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));
-  assert.match(block, /KI-Inhaltsprüfung/);
+  assert.match(block, /SubFree-Prüfergebnis/);
   assert.match(block, /Technischer Website-Check/);
   assert.doesNotMatch(block, /JSON\.stringify\(application\.check_results, null, 2\)/);
 });
