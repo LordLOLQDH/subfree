@@ -1,17 +1,20 @@
 name: SubFree domain request review
+
 on:
   pull_request:
     branches: [main]
     paths:
-      - "domain-requests/*.json"
+      - "domain-requests/pending/*.json"
   push:
     branches: [main]
     paths:
-      - "domain-requests/*.json"
+      - "domain-requests/pending/*.json"
+
 permissions:
   contents: read
   pull-requests: write
   issues: write
+
 jobs:
   validate-request:
     if: github.event_name == 'pull_request'
@@ -21,19 +24,19 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - name: Validate compact public request summary
+
+      - name: Validate request after pull request creation
+        id: validate
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          GH_TOKEN: ${{ github.token }}
         run: |
           git fetch origin "$BASE_REF"
           files="$(git diff --name-only "origin/$BASE_REF...HEAD" -- 'domain-requests/pending/*.json')"
-          test -n "$files" || { echo "No pending domain request JSON found"; exit 1; }
+          test -n "$files" || { echo "No pending request file found"; exit 1; }
           count="$(printf '%s\\n' "$files" | grep -c . || true)"
           test "$count" -eq 1 || { echo "Exactly one pending request file is required"; exit 1; }
-          while IFS= read -r file; do
-            node - "$file" <<'NODE'
+          file="$(printf '%s\\n' "$files" | head -n 1)"
+          node - "$file" <<'NODE'
           const fs = require('node:fs');
           const file = process.argv[2];
           const data = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -49,34 +52,35 @@ jobs:
           for (const forbidden of ['applicantEmail','accessKey','requestIp','request_ip_hash','check_results','aiReview']) {
             if (Object.hasOwn(data, forbidden)) throw new Error('Private or internal field found in public PR: ' + forbidden);
           }
-          console.log('Validated compact public application summary: ' + file);
+          console.log('Validated request summary: ' + file);
           NODE
-            slug="$(basename "$file" | sed -E 's/-[0-9a-f-]{36}\\.json$//')"
-            if git cat-file -e "origin/$BASE_REF:domain-requests/$slug.json" 2>/dev/null; then
-              echo "::error title=Domain path already occupied::The requested path /$slug/ already has a public request file. PR remains open for manual review."
-              exit 1
-            fi
-          done <<< "$files"
-      - name: Post formal validation result
+          slug="$(node -e 'const d=require("./"+process.argv[1]);process.stdout.write(d.slug)' "$file")"
+          if git cat-file -e "origin/$BASE_REF:domain-requests/$slug.json" 2>/dev/null; then
+            echo "::error title=Domain path already occupied::The requested path /$slug/ is already registered. The PR was created and remains open, but cannot be merged."
+            exit 1
+          fi
+          echo "Request file is valid and the public path is currently free."
+
+      - name: Post validation result
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_REF: ${{ github.event.pull_request.base.ref }}
           VALIDATION_STATUS: ${{ job.status }}
         run: |
-          files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/pending/.*\.json$' || true)"
-          count="$(printf '%s\n' "$files" | grep -c . || true)"
-          gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
+          if [ "$VALIDATION_STATUS" = "success" ]; then
+            result="**Ergebnis:** Formal gültig. Der gewünschte Pfad war zum Prüfzeitpunkt frei."
+          else
+            result="**Ergebnis:** Prüfung fehlgeschlagen. Die PR bleibt offen und wurde nicht automatisch geschlossen oder zusammengeführt. Details stehen im fehlgeschlagenen Check."
+          fi
+          gh pr comment "$PR_NUMBER" --body "## SubFree: Prüfung nach PR-Erstellung
 
-          - JSON-Struktur und Pflichtfelder gültig
-          - Pfadname und HTTPS-Ziel formal gültig
-          - Nur die kurze öffentliche Antragsübersicht ist enthalten
-          - Private Kontakt- und Zugangsdaten sind ausgeschlossen
+          $result
 
-          **Automatische Prüfungen:** $VALIDATION_STATUS
+          - Private Kontakt- und Zugangsdaten gehören nicht in die öffentliche PR-Datei.
+          - KI- und technische Prüfungen werden separat durchgeführt.
+          - Kein automatischer Merge."
 
-          **Wichtig:** Dies ist ausdrücklich KEINE Inhaltsfreigabe. KI- und technische Prüfergebnisse werden separat als PR-Kommentar veröffentlicht. Kein automatischer Merge."
   sync-approved-request:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -89,48 +93,10 @@ jobs:
           BEFORE_SHA: ${{ github.event.before }}
         run: |
           git fetch origin main
-          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\.json$' || true)"
+          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\\.json$' || true)"
           while IFS= read -r file; do
             [ -n "$file" ] || continue
-            slug="$(basename "$file" .json)"
-            pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
-            [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
-            curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
-          done <<< "$files"
- || true)"
-          count="$(printf '%s\n' "$files" | grep -c . || true)"
-          gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
-
-          - JSON-Struktur und Pflichtfelder gültig
-          - Pfadname und HTTPS-Ziel formal gültig
-          - Nur die kurze öffentliche Antragsübersicht ist enthalten
-          - Private Kontakt- und Zugangsdaten sind ausgeschlossen
-
-          **Wichtig:** Dies ist ausdrücklich KEINE Inhaltsfreigabe. KI- und technische Prüfergebnisse werden separat als PR-Kommentar veröffentlicht. Kein automatischer Merge."
-  sync-approved-request:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Synchronize manually merged requests
-        env:
-          GH_TOKEN: ${{ github.token }}
-          API_URL: https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api
-          BEFORE_SHA: ${{ github.event.before }}
-        run: |
-          git fetch origin main
-          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\.json$' || true)"
-          while IFS= read -r file; do
-            [ -n "$file" ] || continue
-            slug="$(basename "$file" .json)"
-            pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
-            [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
-            curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
-          done <<< "$files"
- || true)"
-          while IFS= read -r file; do
-            [ -n "$file" ] || continue
-            slug="$(basename "$file" .json)"
+            slug="$(node -e 'const d=require("./"+process.argv[1]);process.stdout.write(d.slug)' "$file")"
             pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
             [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
             curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
