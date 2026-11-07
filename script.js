@@ -194,7 +194,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#project-title").textContent = result.site.display_name;
     document.querySelector("#project-meta").textContent = (result.site.github_username && result.site.github_username !== "subfree-user" ? "@" + result.site.github_username : "SubFree-Account ohne GitHub") + " · " + result.site.slug;
     const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"adam_kraus@icloud.com";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:adam_kraus@icloud.com";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
-    document.querySelector("#project-url").href = "https://lordlolqdh.github.io/subfree/" + result.site.slug + "/";
+    document.querySelector("#project-url").href = "https://subfree.pntr.dev/" + result.site.slug + "/";
     await refreshApiTokens();
     const files = result.files || [];
     renderFiles(files, currentFolders);
