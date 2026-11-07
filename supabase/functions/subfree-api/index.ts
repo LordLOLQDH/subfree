@@ -612,7 +612,7 @@ Deno.serve(async (req: Request) => {
       if (!applicantName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicantEmail) || purpose.length < 30 || !body.termsAccepted || body.termsVersion !== "2026-11-07") return json({ error: "Bitte fülle Kontakt, Verwendungszweck (mindestens 30 Zeichen) und AGB-Zustimmung vollständig aus." }, 400);
       let target: URL;
       try { target = new URL(websiteUrl); } catch { return json({ error: "Bitte gib eine vollständige Website-Adresse an." }, 400); }
-      if (target.protocol !== "https:" || target.username || target.password || target.port) return json({ error: "Die Ziel-Website muss eine öffentliche HTTPS-Adresse ohne Zugangsdaten sein." }, 400);
+      if (target.protocol !== "https:" || target.username || target.password || target.port || target.search || target.hash) return json({ error: "Die Ziel-Website muss eine öffentliche HTTPS-Adresse ohne Zugangsdaten, URL-Parameter oder Fragmente sein." }, 400);
       if (!accessKey.startsWith("sf_")) return json({ error: "Bitte bestätige den Besitz des Projektordners mit deinem Zugangscode." }, 401);
       const projectRows = await db("subfree_sites?slug=eq." + encodeURIComponent(slug) + "&select=id,slug,site_type,status,registration_data,access_key_hash");
       const project = projectRows[0];
