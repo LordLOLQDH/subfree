@@ -844,6 +844,17 @@ Deno.serve(async (req: Request) => {
       return json({ success: true, site, redirectModes, activeRedirectMode, redirectSecurity: redirectModes[activeRedirectMode], files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
     }
 
+    if (action === "restore_domain_mode") {
+      if (site.registration_data?.domainMode !== "active" || !site.registration_data?.domainPrevious) return json({ error: "Für dieses Projekt ist kein wiederherstellbarer Domain-Modus aktiv." }, 409);
+      const previous = site.registration_data.domainPrevious;
+      const registrationData = { ...(previous.registrationData || {}), lastDomainApplication: { id: site.registration_data.domainApplicationId, pr: site.registration_data.domainPullRequest, restoredAt: new Date().toISOString() } };
+      await db("subfree_sites?id=eq." + site.id, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ site_type: previous.siteType || "static", redirect_url: previous.redirectUrl || null, registration_data: registrationData, updated_at: new Date().toISOString() })
+      });
+      return json({ success: true, message: "Domain-Modus beendet. Die vorherige Projektart und alle gespeicherten Einstellungen wurden wiederhergestellt." });
+    }
+
     if (action === "update_redirect_modes") {
       if (site.site_type !== "redirect") return json({ error: "Dieses Projekt ist keine Weiterleitung." }, 400);
       const allowedModes = ["direct", "simple", "secure", "strict"];
