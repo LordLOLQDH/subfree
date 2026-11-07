@@ -65,7 +65,7 @@ jobs:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           VALIDATION_STATUS: ${{ job.status }}
         run: |
-          files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/pending/.*\\.json || true)"
+          files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/pending/.*\.json$' || true)"
           count="$(printf '%s\n' "$files" | grep -c . || true)"
           gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
 
@@ -89,7 +89,7 @@ jobs:
           BEFORE_SHA: ${{ github.event.before }}
         run: |
           git fetch origin main
-          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/[^/]*\.json$' || true)"
+          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\.json$' || true)"
           while IFS= read -r file; do
             [ -n "$file" ] || continue
             slug="$(basename "$file" .json)"
@@ -119,7 +119,7 @@ jobs:
           BEFORE_SHA: ${{ github.event.before }}
         run: |
           git fetch origin main
-          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\\.json || true)"
+          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\.json$' || true)"
           while IFS= read -r file; do
             [ -n "$file" ] || continue
             slug="$(basename "$file" .json)"
