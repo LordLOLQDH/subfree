@@ -292,8 +292,8 @@ await minimumWait;done=true;percent.textContent="100%";bar.textContent="#".repea
 if(result.reachable){status.textContent=result.ok?"[ STATUS ] TARGET ONLINE":"[ STATUS ] SERVER RESPONSE // HTTP ERROR";
 log.textContent="> DNS: "+result.dnsStatus+" | HTTP: "+result.httpStatus+" | RTT: "+result.responseTimeMs+" ms";
 button.hidden=false;button.textContent=result.ok?"[ OPEN DESTINATION ]":"[ OPEN ANYWAY ]";
-if(result.ok){log.textContent+=" | CONNECTION SUCCESSFUL";setTimeout(()=>window.location.assign(target),450);}
-else{status.classList.add("redirect-error");log.textContent+=" | Server antwortet, meldet aber einen HTTP-Fehler. Manuelle Öffnung möglich.";}}
+if(result.ok){log.textContent+=" | CONNECTION SUCCESSFUL | MANUELLE BESTÄTIGUNG ERFORDERLICH";button.hidden=false;button.textContent="[ ICH HABE DAS ZIEL GEPRÜFT – WEITER ]";button.target="_self";button.rel="noopener noreferrer";}
+else{status.classList.add("redirect-error");log.textContent+=" | Server antwortet, meldet aber einen HTTP-Fehler. Öffnen nur nach eigener Entscheidung.";button.hidden=false;button.textContent="[ TROTZDEM MANUELL ÖFFNEN ]";button.target="_blank";button.rel="noopener noreferrer";}}
 else{status.textContent="[ STATUS ] TARGET UNREACHABLE";status.classList.add("redirect-error");panel.classList.add("redirect-error-border");
 log.textContent="> DNS: "+(result.dnsStatus||"UNKNOWN")+" | ERROR: "+(result.error||"No response");
 const retry=el("button","redirect-button","[ RETRY DIAGNOSTIC ]");retry.type="button";retry.addEventListener("click",runTest);panel.append(retry);}
