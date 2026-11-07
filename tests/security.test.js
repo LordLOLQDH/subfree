@@ -143,3 +143,28 @@ test("approved domain mode can restore the original project settings without del
   assert.match(page, /id="restore-domain-mode"/);
   assert.match(script, /restore_domain_mode/);
 });
+
+
+test("domain request cannot overwrite an existing public request file", () => {
+  const helper = edge.slice(edge.indexOf("async function domainRequestPathIsFree"), edge.indexOf("async function fetchWebsiteReviewSample"));
+  assert.ok(helper.includes("GitHub API (404)"));
+  const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
+  assert.ok(block.includes("domainRequestPathIsFree(slug)"));
+  assert.ok(block.includes("status: 409"));
+  const pr = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function finalizeDomainApplicationPullRequest"));
+  assert.ok(pr.includes("branchCreated"));
+  assert.ok(pr.includes('"DELETE"'));
+});
+
+test("domain request workflow only accepts newly added request files", () => {
+  const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
+  assert.ok(workflow.includes("git diff --name-status"));
+  assert.ok(workflow.includes("$1 != \"A\""));
+  assert.ok(workflow.includes("Only new request files may be added"));
+});
+
+test("Vercel automatic deployments and GitHub bot comments are disabled", () => {
+  const config = JSON.parse(readFileSync(new URL("../vercel.json", import.meta.url), "utf8"));
+  assert.equal(config.git.deploymentEnabled, false);
+  assert.equal(config.github.silent, true);
+});

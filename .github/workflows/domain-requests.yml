@@ -26,8 +26,12 @@ jobs:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           git fetch origin "$BASE_REF"
-          files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/[^/]*\.json$' || true)"
-          test -n "$files" || { echo "No domain request JSON found"; exit 1; }
+          changes="$(git diff --name-status "origin/$BASE_REF...HEAD" -- 'domain-requests/*.json')"
+          test -n "$changes" || { echo "No domain request JSON found"; exit 1; }
+          invalid="$(printf '%s\\n' "$changes" | awk '$1 != "A" { print }')"
+          test -z "$invalid" || { echo "Only new request files may be added; existing request files cannot be edited or replaced."; printf '%s\\n' "$invalid"; exit 1; }
+          files="$(printf '%s\\n' "$changes" | awk '$1 == "A" { print $2 }')"
+          test -n "$files" || { echo "No new domain request JSON found"; exit 1; }
           while IFS= read -r file; do
             node - "$file" <<'NODE'
           const fs = require('node:fs');

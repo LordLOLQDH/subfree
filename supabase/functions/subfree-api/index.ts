@@ -155,6 +155,17 @@ async function githubApi(path: string, method = "GET", body?: unknown) {
 
 // Fetch a small, safe text sample for the content review. Redirects are followed manually
 // and every hop is DNS-checked to prevent obvious SSRF/private-network targets.
+async function domainRequestPathIsFree(slug: string) {
+  const path = "/contents/domain-requests/" + encodeURIComponent(slug) + ".json?ref=" + encodeURIComponent(BRANCH);
+  try {
+    await githubApi(path);
+    return false;
+  } catch (error) {
+    if (String(error).includes("GitHub API (404)")) return true;
+    throw error;
+  }
+}
+
 async function fetchWebsiteReviewSample(rawUrl: string) {
   let current = new URL(rawUrl);
   let response: Response | null = null;
@@ -306,44 +317,56 @@ async function addDomainReviewLabels(prNumber: number, decision: string) {
 }
 
 async function openDomainApplicationPullRequest(application: any) {
+  if (!(await domainRequestPathIsFree(application.slug))) {
+    throw new Error("Dieser Pfad besitzt bereits eine öffentliche Domain-Anfrage. Bitte verwende einen anderen Pfad oder kontaktiere den Betreiber.");
+  }
   const baseRef = await githubApi("/git/ref/heads/" + encodeURIComponent(BRANCH));
   const branch = "domain-request/" + application.slug + "-" + application.id.slice(0, 8);
-  await githubApi("/git/refs", "POST", { ref: "refs/heads/" + branch, sha: baseRef.object.sha });
-  // Public PR file intentionally contains only a compact, human-readable application summary.
-  // Private contact details, access credentials, technical scan output and AI payload stay in Supabase.
-  const publicApplication = {
-    schemaVersion: 2,
-    slug: application.slug,
-    applicantName: application.applicant_name,
-    websiteUrl: application.website_url,
-    purpose: application.purpose,
-    requestedAt: application.created_at
-  };
-  await githubApi("/contents/domain-requests/" + application.slug + ".json", "PUT", {
-    message: "SubFree: domain request " + application.slug,
-    content: b64(JSON.stringify(publicApplication, null, 2) + "\n"),
-    branch
-  });
-  const body = [
-    "## SubFree Domain-Antrag", "",
-    "**Name:** " + (application.applicant_name || "Nicht angegeben"),
-    "**Gewünschter Pfad:** https://subfree.pntr.dev/" + application.slug + "/",
-    "**Website:** " + application.website_url, "",
-    "### Zweck",
-    application.purpose, "",
-    "_Prüfungen starten direkt nach Erstellung dieser Pull Request. Ergebnisse folgen als Kommentare._",
-    "",
-    "**Kein automatischer Merge.**"
-  ].join("\n");
-  const pr = await githubApi("/pulls", "POST", {
-    title: "Domain-Antrag: /" + application.slug,
-    head: branch,
-    base: BRANCH,
-    body
-  });
-  return { number: pr.number, url: pr.html_url, branch };
+  let branchCreated = false;
+  try {
+    await githubApi("/git/refs", "POST", { ref: "refs/heads/" + branch, sha: baseRef.object.sha });
+    branchCreated = true;
+    // Public PR file intentionally contains only a compact, human-readable application summary.
+    // Private contact details, access credentials, technical scan output and AI payload stay in Supabase.
+    const publicApplication = {
+      schemaVersion: 2,
+      slug: application.slug,
+      applicantName: application.applicant_name,
+      websiteUrl: application.website_url,
+      purpose: application.purpose,
+      requestedAt: application.created_at
+    };
+    await githubApi("/contents/domain-requests/" + application.slug + ".json", "PUT", {
+      message: "SubFree: domain request " + application.slug,
+      content: b64(JSON.stringify(publicApplication, null, 2) + "\n"),
+      branch
+    });
+    const body = [
+      "## SubFree Domain-Antrag", "",
+      "**Name:** " + (application.applicant_name || "Nicht angegeben"),
+      "**Gewünschter Pfad:** https://subfree.pntr.dev/" + application.slug + "/",
+      "**Website:** " + application.website_url, "",
+      "### Zweck",
+      application.purpose, "",
+      "_Prüfungen starten direkt nach Erstellung dieser Pull Request. Ergebnisse folgen als Kommentare._",
+      "",
+      "**Kein automatischer Merge.**"
+    ].join("\n");
+    const pr = await githubApi("/pulls", "POST", {
+      title: "Domain-Antrag: /" + application.slug,
+      head: branch,
+      base: BRANCH,
+      body
+    });
+    return { number: pr.number, url: pr.html_url, branch };
+  } catch (error) {
+    if (branchCreated) {
+      try { await githubApi("/git/refs/heads/" + encodeURIComponent(branch), "DELETE"); }
+      catch (cleanupError) { console.error("SubFree request branch cleanup failed:", cleanupError); }
+    }
+    throw error;
+  }
 }
-
 async function finalizeDomainApplicationPullRequest(pr: any, application: any, aiReview: any, technical: any) {
   const decisionText = aiReview.decision === "rejected" ? "ABGELEHNT"
     : aiReview.decision === "manual_review" ? "MANUELLE PRÜFUNG"
@@ -821,6 +844,9 @@ Deno.serve(async (req: Request) => {
       const recent = await db("subfree_domain_applications?request_ip_hash=eq." + ipHash + "&status=in.(pending,pr_open)&select=id&created_at=gt." + encodeURIComponent(new Date(Date.now()-86400000).toISOString()));
       if (recent.length >= 2) return json({ error: "Du hast bereits zwei offene Domain-Anträge gestellt. Bitte warte auf die Prüfung." }, 429);
       const existing = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&status=in.(pending,pr_open)&select=id");
+      if (!(await domainRequestPathIsFree(slug))) {
+        return json({ error: "Dieser öffentliche Pfad ist bereits vergeben. Bitte wähle einen anderen Pfad." }, 409);
+      }
       if (existing.length) return json({ error: "Für diesen Projektordner gibt es bereits einen offenen Antrag." }, 409);
       const inserted = await db("subfree_domain_applications", {
         method: "POST", headers: { Prefer: "return=representation" },
