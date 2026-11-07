@@ -65,9 +65,24 @@ test("public pull request excludes applicant private information", () => {
   assert.doesNotMatch(block, /applicantEmail|applicantName|accessKey/);
   assert.match(block, /Not automatically merge|Nicht automatisch mergen/);
 });
-test("domain application requires a real Groq review and blocks explicit illegal drug sales", () => {\n  assert.match(edge, /Deno\.env\.get\("GROQ_SUBFREE"\)/);\n  assert.match(edge, /reviewDomainApplicationWithAI\(purpose, target\.toString\(\)\)/);\n  assert.match(edge, /controlledDrugMention && salesIntent/);\n  assert.match(edge, /decision = "rejected"/);\n  assert.match(edge, /KI-Prüfung fehlgeschlagen/);\n});\ntest("domain PR summarizes AI and technical checks without dumping the JSON payload", () => {\n  const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));\n  assert.match(block, /KI-Inhaltsprüfung/);\n  assert.match(block, /Technischer Website-Check/);\n  assert.doesNotMatch(block, /JSON\.stringify\(application\.check_results, null, 2\)/);\n});\ntest("approved path only activates after a merged GitHub pull request", () => {
+test("domain application requires a real Groq review and blocks explicit illegal drug sales", () => {
+  assert.match(edge, /Deno\.env\.get\("GROQ_SUBFREE"\)/);
+  assert.match(edge, /reviewDomainApplicationWithAI\(purpose, target\.toString\(\)\)/);
+  assert.match(edge, /controlledDrugMention && salesIntent/);
+  assert.match(edge, /decision = "rejected"/);
+  assert.match(edge, /KI-Prüfung fehlgeschlagen/);
+});
+test("domain PR summarizes AI and technical checks without dumping the JSON payload", () => {
+  const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));
+  assert.match(block, /KI-Inhaltsprüfung/);
+  assert.match(block, /Technischer Website-Check/);
+  assert.doesNotMatch(block, /JSON\.stringify\(application\.check_results, null, 2\)/);
+});
+test("approved path only activates after a merged GitHub pull request", () => {
   const block = edge.slice(edge.indexOf('if (action === "sync_domain_approval")'), edge.indexOf('if (action === "site_check")'));
-  assert.match(block, /pr\.merged_at/);\n  assert.match(block, /aiDecision/);\n  assert.match(block, /approved.*manual_review/);
+  assert.match(block, /pr\.merged_at/);
+  assert.match(block, /aiDecision/);
+  assert.match(block, /approved.*manual_review/);
   assert.match(block, /domain-requests\//);
   assert.match(block, /domainMode: "active"/);
   assert.match(block, /domainPrevious:/);
