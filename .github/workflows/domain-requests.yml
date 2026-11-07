@@ -37,6 +37,7 @@ jobs:
           const data = JSON.parse(fs.readFileSync(file, 'utf8'));
           const slug = file.split('/').pop().replace(/\.json$/, '');
           if (data.schemaVersion !== 1) throw new Error('Unsupported schemaVersion');
+          if (data.termsAccepted !== true || typeof data.termsAcceptedAt !== 'string') throw new Error('Terms acceptance evidence is missing');
           if (data.slug !== slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error('Invalid slug');
           const url = new URL(data.websiteUrl);
           if (url.protocol !== 'https:' || url.username || url.password || url.port) throw new Error('Website URL must be public HTTPS on the default port');
