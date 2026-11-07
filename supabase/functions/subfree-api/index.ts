@@ -141,6 +141,49 @@ async function github(path: string, method = "GET", content?: string, sha?: stri
   if (!raw.trim()) return null;
   return parseJsonPayload(raw, `GitHub API HTTP ${response.status}`);
 }
+async function githubApi(path: string, method = "GET", body?: unknown) {
+  if (!GITHUB_TOKEN) throw new Error("GitHub ist für Domain-Anträge nicht konfiguriert.");
+  const response = await fetch("https://api.github.com/repos/" + OWNER + "/" + REPO + path, {
+    method,
+    headers: { Authorization: "Bearer " + GITHUB_TOKEN, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json", "User-Agent": "SubFree-Domain-Registry" },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+  });
+  const raw = await response.text();
+  if (!response.ok) throw new Error("GitHub API (" + response.status + "): " + raw.slice(0, 300));
+  return raw ? JSON.parse(raw) : null;
+}
+async function openDomainApplicationPullRequest(application: any) {
+  const baseRef = await githubApi("/git/ref/heads/" + encodeURIComponent(BRANCH));
+  const branch = "domain-request/" + application.slug + "-" + application.id.slice(0, 8);
+  await githubApi("/git/refs", "POST", { ref: "refs/heads/" + branch, sha: baseRef.object.sha });
+  const publicApplication = {
+    schemaVersion: 1, slug: application.slug, websiteUrl: application.website_url,
+    purpose: application.purpose, termsVersion: application.terms_version,
+    requestedAt: application.created_at, checks: application.check_results,
+    note: "Applicant name, email, access key and IP data are intentionally excluded."
+  };
+  await githubApi("/contents/domain-requests/" + application.slug + ".json", "PUT", {
+    message: "SubFree: review domain path request " + application.slug,
+    content: b64(JSON.stringify(publicApplication, null, 2) + "\n"), branch
+  });
+  const body = [
+    "## SubFree Domain-Antrag", "",
+    "**Pfad:** https://subfree.pntr.dev/" + application.slug + "/",
+    "**Website:** " + application.website_url, "",
+    "### Verwendungszweck", application.purpose, "",
+    "### Automatische Website-Prüfung", "Prüfergebnis (JSON):",
+    JSON.stringify(application.check_results, null, 2), "",
+    "### Freigabeprozess",
+    "- [ ] Automatische Registry- und Sicherheitsprüfungen bestanden",
+    "- [ ] KI-Prüfung durchgeführt und kommentiert (falls KI-API konfiguriert)",
+    "- [ ] Betreiber hat Inhalt und Antrag manuell geprüft",
+    "- [ ] Betreiber genehmigt den Merge", "",
+    "Diese PR enthält keine privaten Kontaktdaten. **Nicht automatisch mergen.**"
+  ].join("\n");
+  const pr = await githubApi("/pulls", "POST", { title: "Domain-Antrag: /" + application.slug, head: branch, base: BRANCH, body });
+  return { number: pr.number, url: pr.html_url, branch };
+}
+
 async function writeGitHubFile(path: string, content: string) {
   let sha: string | undefined;
   try {
@@ -445,62 +488,69 @@ async function runWebsiteCheck(rawUrl: string, request: Request) {
   try { target = new URL(rawUrl); } catch { throw new Error("Bitte gib eine vollständige URL mit https:// oder http:// ein."); }
   if (!["https:", "http:"].includes(target.protocol) || target.username || target.password ||
       (target.port && !((target.protocol === "https:" && target.port === "443") || (target.protocol === "http:" && target.port === "80"))) ||
-      !target.hostname || target.hostname.includes("%")) {
-    throw new Error("Nur öffentliche HTTP-/HTTPS-Websites auf Standardports sind erlaubt. Zugangsdaten in URLs sind verboten.");
-  }
+      !target.hostname || target.hostname.includes("%")) throw new Error("Nur öffentliche HTTP-/HTTPS-Websites auf Standardports sind erlaubt. Zugangsdaten in URLs sind verboten.");
   const host = target.hostname.replace(/^\[|\]$/g, "").toLowerCase();
   await resolvePublicHost(host);
   const clientIp = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const key = clientIp + ":" + host;
-  const now = Date.now(), previous = scanRate.get(key) || 0;
+  const key = clientIp + ":" + host, now = Date.now(), previous = scanRate.get(key) || 0;
   if (now - previous < 5000) throw new Error("Bitte warte fünf Sekunden zwischen Website-Prüfungen.");
   scanRate.set(key, now);
   if (scanRate.size > 5000) for (const [k, stamp] of scanRate) if (now - stamp > 60000) scanRate.delete(k);
-
   const started = performance.now();
   let response: Response;
   try {
-    response = await fetch(target.toString(), {
-      method: "HEAD", redirect: "manual", cache: "no-store",
-      signal: AbortSignal.timeout(5000),
-      headers: { "User-Agent": "SubFree-Site-Check/1.0" }
-    });
+    response = await fetch(target.toString(), { method: "HEAD", redirect: "manual", cache: "no-store", signal: AbortSignal.timeout(5000), headers: { "User-Agent": "SubFree-Site-Check/2.0" } });
+    if (response.status === 405 || response.status === 501) {
+      try { await response.body?.cancel(); } catch {}
+      response = await fetch(target.toString(), { method: "GET", redirect: "manual", cache: "no-store", signal: AbortSignal.timeout(5000), headers: { "Range": "bytes=0-32767", "User-Agent": "SubFree-Site-Check/2.0" } });
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     throw new Error(/timed out|abort/i.test(msg) ? "Zeitüberschreitung beim Verbindungsaufbau." : "Verbindung fehlgeschlagen. TLS-Zertifikat oder Server prüfen.");
   }
-  const status = response.status;
-  const headers = response.headers;
-  const redirected = status >= 300 && status < 400;
-  const checks = [
-    { id: "https", label: "HTTPS / TLS", status: target.protocol === "https:" ? "pass" : "warn",
-      detail: target.protocol === "https:" ? "HTTPS-Verbindung wurde aufgebaut. Zertifikatsprüfung durch den Verbindungsaufbau bestanden." : "Die URL verwendet unverschlüsseltes HTTP." },
-    { id: "http", label: "HTTP-Antwort", status: status >= 200 && status < 400 ? "pass" : "warn",
-      detail: "HTTP-Status " + status + (redirected ? " (Weiterleitung erkannt, nicht verfolgt)." : "") },
-    { id: "hsts", label: "HSTS", status: headers.has("strict-transport-security") ? "pass" : "warn",
-      detail: headers.get("strict-transport-security") || "Strict-Transport-Security fehlt." },
-    { id: "csp", label: "Content Security Policy", status: headers.has("content-security-policy") ? "pass" : "warn",
-      detail: headers.has("content-security-policy") ? "CSP-Header vorhanden." : "Content-Security-Policy fehlt." },
-    { id: "nosniff", label: "X-Content-Type-Options", status: headers.get("x-content-type-options")?.toLowerCase() === "nosniff" ? "pass" : "warn",
-      detail: headers.get("x-content-type-options") || "X-Content-Type-Options: nosniff fehlt." },
-    { id: "referrer", label: "Referrer-Policy", status: headers.has("referrer-policy") ? "pass" : "warn",
-      detail: headers.get("referrer-policy") || "Referrer-Policy fehlt." },
-    { id: "permissions", label: "Permissions-Policy", status: headers.has("permissions-policy") ? "pass" : "info",
-      detail: headers.get("permissions-policy") || "Permissions-Policy fehlt." }
-  ];
-  let locationHost = "";
-  if (redirected) {
-    try { locationHost = new URL(headers.get("location") || "", target).hostname; } catch {}
-  }
+  const status = response.status, headers = response.headers, redirected = status >= 300 && status < 400;
+  const locationValue = headers.get("location") || "";
+  let redirectHost = "";
+  if (redirected) { try { redirectHost = new URL(locationValue, target).hostname; } catch {} }
+  const checks: any[] = [];
+  const add = (id: string, label: string, state: string, detail: string) => checks.push({ id, label, status: state, detail });
+  add("https", "HTTPS / TLS", target.protocol === "https:" ? "pass" : "warn", target.protocol === "https:" ? "HTTPS-Verbindung und TLS-Zertifikatsprüfung erfolgreich." : "Die Website verwendet unverschlüsseltes HTTP.");
+  add("http", "HTTP-Status", status >= 200 && status < 400 ? "pass" : "warn", "Serverantwort: HTTP " + status + (redirected ? " (Weiterleitung erkannt, nicht verfolgt)." : "."));
+  add("redirect", "Weiterleitungsverhalten", redirected ? "warn" : "pass", redirected ? "Weiterleitung auf " + (redirectHost || "unbekanntes Ziel") + " erkannt. Nicht verfolgt." : "Keine Weiterleitung in der ersten Antwort erkannt.");
+  const hsts = headers.get("strict-transport-security") || "";
+  add("hsts", "HSTS", /^max-age=\d+/i.test(hsts) ? "pass" : "warn", hsts || "Strict-Transport-Security fehlt.");
+  const csp = headers.get("content-security-policy") || "";
+  add("csp", "Content Security Policy", csp ? (/(unsafe-inline|unsafe-eval)/i.test(csp) ? "warn" : "pass") : "warn", csp ? (/(unsafe-inline|unsafe-eval)/i.test(csp) ? "CSP enthält unsafe-inline oder unsafe-eval." : "CSP-Header vorhanden.") : "Content-Security-Policy fehlt.");
+  const nosniff = headers.get("x-content-type-options") || "";
+  add("nosniff", "MIME-Sniffing-Schutz", nosniff.toLowerCase() === "nosniff" ? "pass" : "warn", nosniff || "X-Content-Type-Options: nosniff fehlt.");
+  const referrer = headers.get("referrer-policy") || "";
+  add("referrer", "Referrer-Policy", referrer ? "pass" : "warn", referrer || "Referrer-Policy fehlt.");
+  const permissions = headers.get("permissions-policy") || "";
+  add("permissions", "Permissions-Policy", permissions ? "pass" : "info", permissions || "Permissions-Policy fehlt.");
+  const frame = headers.get("x-frame-options") || "";
+  add("frame", "Clickjacking-Schutz", frame || /frame-ancestors/i.test(csp) ? "pass" : "warn", frame || (/frame-ancestors/i.test(csp) ? "CSP frame-ancestors ist gesetzt." : "X-Frame-Options und CSP frame-ancestors fehlen."));
+  const contentType = headers.get("content-type") || "";
+  add("content-type", "Content-Type", contentType ? "pass" : "warn", contentType || "Server sendet keinen Content-Type.");
+  const corsHeader = headers.get("access-control-allow-origin") || "";
+  add("cors", "CORS-Freigabe", corsHeader === "*" ? "warn" : corsHeader ? "info" : "pass", corsHeader === "*" ? "CORS erlaubt jeder Website den Zugriff." : corsHeader ? "CORS-Origin: " + corsHeader : "Keine öffentliche CORS-Freigabe erkannt.");
+  const server = headers.get("server") || "";
+  add("server", "Server-Informationen", server ? "info" : "pass", server ? "Server-Header: " + server.slice(0, 120) : "Kein Server-Banner offengelegt.");
+  const powered = headers.get("x-powered-by") || "";
+  add("powered", "Technologie-Offenlegung", powered ? "warn" : "pass", powered ? "X-Powered-By: " + powered.slice(0, 120) : "Kein X-Powered-By-Header erkannt.");
+  const cookies = headers.get("set-cookie") || "";
+  add("cookies", "Cookie-Sicherheit", !cookies ? "info" : (/;\s*secure/i.test(cookies) && /;\s*httponly/i.test(cookies) && /samesite=/i.test(cookies) ? "pass" : "warn"), !cookies ? "Keine Set-Cookie-Header sichtbar." : "Secure, HttpOnly und SameSite werden auf Cookie-Headern geprüft.");
+  const cache = headers.get("cache-control") || "";
+  add("cache", "Cache-Control", cache ? "pass" : "info", cache || "Cache-Control fehlt; sensible Inhalte sollten Caching explizit steuern.");
+  if (redirected && redirectHost && redirectHost !== host) add("redirect-host", "Externes Weiterleitungsziel", "warn", "Die Website leitet auf einen anderen Hostnamen weiter: " + redirectHost + ". Das Ziel wurde nicht aufgerufen.");
   try { await response.body?.cancel(); } catch {}
   const warnings = checks.filter(c => c.status === "warn").length;
-  return {
-    success: true, url: target.toString(), hostname: host, httpStatus: status,
-    responseTimeMs: Math.round(performance.now() - started), redirected,
-    redirectHost: locationHost, checkedAt: new Date().toISOString(),
-    verdict: checks.some(c => c.id === "https" && c.status === "warn") || status >= 400 ? "warning" : warnings ? "review" : "good",
-    checks
-  };
+  const errors = status >= 400 || checks.some(c => c.id === "https" && c.status === "warn");
+  return { success: true, url: target.toString(), hostname: host, httpStatus: status,
+    responseTimeMs: Math.round(performance.now() - started), redirected, redirectHost,
+    checkedAt: new Date().toISOString(), testCount: checks.length,
+    passCount: checks.filter(c => c.status === "pass").length,
+    warningCount: warnings, infoCount: checks.filter(c => c.status === "info").length,
+    verdict: errors ? "warning" : warnings ? "review" : "good", checks };
 }
 
 Deno.serve(async (req: Request) => {
@@ -509,6 +559,67 @@ Deno.serve(async (req: Request) => {
   try {
     const body = await req.json();
     const action = String(body.action ?? "");
+
+    if (action === "domain_application") {
+      const slug = String(body.slug ?? "").trim().toLowerCase();
+      const applicantName = String(body.applicantName ?? "").trim().slice(0, 80);
+      const applicantEmail = String(body.applicantEmail ?? "").trim().toLowerCase();
+      const websiteUrl = String(body.websiteUrl ?? "").trim();
+      const purpose = String(body.purpose ?? "").trim().slice(0, 1600);
+      const accessKey = String(body.accessKey ?? "");
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length < 3 || slug.length > 30) return json({ error: "Ungültiger Projektordner." }, 400);
+      if (!applicantName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(applicantEmail) || purpose.length < 30 || !body.termsAccepted || body.termsVersion !== "2026-11-07") return json({ error: "Bitte fülle Kontakt, Verwendungszweck (mindestens 30 Zeichen) und AGB-Zustimmung vollständig aus." }, 400);
+      let target: URL;
+      try { target = new URL(websiteUrl); } catch { return json({ error: "Bitte gib eine vollständige Website-Adresse an." }, 400); }
+      if (target.protocol !== "https:" || target.username || target.password || target.port) return json({ error: "Die Ziel-Website muss eine öffentliche HTTPS-Adresse ohne Zugangsdaten sein." }, 400);
+      if (!accessKey.startsWith("sf_")) return json({ error: "Bitte bestätige den Besitz des Projektordners mit deinem Zugangscode." }, 401);
+      const projectRows = await db("subfree_sites?slug=eq." + encodeURIComponent(slug) + "&select=id,slug,site_type,status,registration_data,access_key_hash");
+      const project = projectRows[0];
+      if (!project || project.status !== "active" || project.access_key_hash !== await sha256(accessKey)) return json({ error: "Projektordner oder Zugangscode stimmt nicht. Nur der Projektinhaber kann einen Antrag stellen." }, 403);
+      if (project.registration_data?.domainMode === "active") return json({ error: "Für diesen Projektordner ist bereits ein Domain-Modus aktiv." }, 409);
+      if (!GITHUB_TOKEN) return json({ error: "GitHub-PR-Erstellung ist noch nicht konfiguriert." }, 503);
+      const ip = req.headers.get("cf-connecting-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+      const ipHash = await sha256("subfree-domain:" + ip);
+      const recent = await db("subfree_domain_applications?request_ip_hash=eq." + ipHash + "&status=in.(pending,pr_open)&select=id&created_at=gt." + encodeURIComponent(new Date(Date.now()-86400000).toISOString()));
+      if (recent.length >= 2) return json({ error: "Du hast bereits zwei offene Domain-Anträge gestellt. Bitte warte auf die Prüfung." }, 429);
+      const existing = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&status=in.(pending,pr_open)&select=id");
+      if (existing.length) return json({ error: "Für diesen Projektordner gibt es bereits einen offenen Antrag." }, 409);
+      let checkResults: any;
+      try { checkResults = await runWebsiteCheck(target.toString(), req); }
+      catch (error) { return json({ error: "Die angegebene Website konnte nicht geprüft werden: " + String(error instanceof Error ? error.message : error).slice(0, 160) }, 400); }
+      const inserted = await db("subfree_domain_applications", {
+        method: "POST", headers: { Prefer: "return=representation" },
+        body: JSON.stringify({ slug, applicant_name: applicantName, applicant_email: applicantEmail, website_url: target.toString(), purpose, terms_version: "2026-11-07", status: "pending", request_ip_hash: ipHash, check_results: checkResults })
+      });
+      const application = inserted[0];
+      try {
+        const pr = await openDomainApplicationPullRequest({ id: application.id, slug, website_url: target.toString(), purpose, terms_version: "2026-11-07", created_at: application.created_at, check_results: checkResults });
+        await db("subfree_domain_applications?id=eq." + application.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "pr_open", github_pr_number: pr.number, github_pr_url: pr.url, updated_at: new Date().toISOString() }) });
+        return json({ success: true, prUrl: pr.url, prNumber: pr.number, message: "Antrag eingereicht. Die GitHub-Pull-Request wurde erstellt. Die Veröffentlichung bleibt bis zu deiner manuellen Genehmigung deaktiviert." }, 201);
+      } catch (error) {
+        await db("subfree_domain_applications?id=eq." + application.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "error", updated_at: new Date().toISOString() }) });
+        return json({ error: "Antrag gespeichert, aber GitHub konnte die Pull-Request nicht erstellen: " + String(error instanceof Error ? error.message : error).slice(0, 180) }, 502);
+      }
+    }
+
+    if (action === "sync_domain_approval") {
+      const slug = String(body.slug ?? "").trim().toLowerCase(), prNumber = Number(body.prNumber);
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !Number.isInteger(prNumber) || prNumber < 1) return json({ error: "Ungültige Freigabeangaben." }, 400);
+      const pr = await githubApi("/pulls/" + prNumber);
+      if (pr.state !== "closed" || !pr.merged_at || pr.base?.ref !== BRANCH) return json({ error: "Die Pull-Request wurde noch nicht durch einen manuellen Merge genehmigt." }, 409);
+      const files = await githubApi("/pulls/" + prNumber + "/files?per_page=100");
+      if (!files.some((file: any) => file.filename === "domain-requests/" + slug + ".json" && file.status !== "removed")) return json({ error: "Die Pull-Request enthält keinen passenden Domain-Antrag." }, 403);
+      const apps = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(slug) + "&github_pr_number=eq." + prNumber + "&status=eq.pr_open&select=*");
+      const application = apps[0];
+      if (!application) return json({ error: "Kein passender offener Domain-Antrag gefunden." }, 404);
+      const sites = await db("subfree_sites?slug=eq." + encodeURIComponent(slug) + "&select=id,registration_data,site_type,redirect_url");
+      const site = sites[0];
+      if (!site) return json({ error: "Das zugehörige SubFree-Projekt wurde nicht gefunden." }, 404);
+      const registrationData = { ...(site.registration_data || {}), domainMode: "active", domainApplicationId: application.id, domainWebsiteUrl: application.website_url, domainApprovedAt: pr.merged_at, domainPullRequest: prNumber, domainPrevious: { siteType: site.site_type, redirectUrl: site.redirect_url, registrationData: site.registration_data || {} } };
+      await db("subfree_sites?id=eq." + site.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ site_type: "redirect", redirect_url: application.website_url, registration_data: registrationData, updated_at: new Date().toISOString() }) });
+      await db("subfree_domain_applications?id=eq." + application.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ status: "approved", updated_at: new Date().toISOString() }) });
+      return json({ success: true, path: "https://subfree.pntr.dev/" + slug + "/", message: "Manuell genehmigte Domain-Anfrage aktiviert. Die bisherigen Projekteinstellungen bleiben gespeichert." });
+    }
 
     if (action === "site_check") {
       try { return json(await runWebsiteCheck(String(body.url ?? "").trim(), req)); }
