@@ -32,3 +32,14 @@ test("scanner reports HTTP security headers without following redirects", () => 
   assert.match(edge, /content-security-policy/);
   assert.match(edge, /redirect:\s*"manual"/);
 });
+test("dashboard exposes all four independent redirect modes", () => {
+  const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  for (const mode of ["direct", "simple", "secure", "strict"]) assert.match(page, new RegExp('value="' + mode + '"'));
+  assert.match(edge, /redirectModes/);
+  assert.match(edge, /activeRedirectMode/);
+  assert.match(edge, /update_redirect_modes/);
+});
+test("legacy direct mode keeps the previous safety defaults", () => {
+  assert.match(edge, /direct: \{ checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true \}/);
+  assert.match(edge, /mode === "direct" \? site\.registration_data\?\.redirectSecurity/);
+});
