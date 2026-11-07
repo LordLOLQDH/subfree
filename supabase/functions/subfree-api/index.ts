@@ -536,7 +536,7 @@ Deno.serve(async (req: Request) => {
         success: true,
         siteType: site.site_type,
         redirectUrl: site.site_type === "redirect" ? site.redirect_url : null,
-        redirectSecurity: site.site_type === "redirect" ? (site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }) : null,
+        redirectSecurity: site.site_type === "redirect" ? ((site.registration_data?.redirectModes?.[site.registration_data?.activeRedirectMode || "direct"]) ?? site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }) : null,
         username: site.github_username === "subfree-user" ? site.slug : site.github_username,
         html: files[0] && !files[0].is_private ? files[0].content : "<h1>Diese Website ist noch nicht verfügbar.</h1>"
       });
@@ -680,24 +680,22 @@ Deno.serve(async (req: Request) => {
     if (action === "load") {
       const files = await db(`subfree_site_files?site_id=eq.${site.id}&select=file_path,content,mime_type,updated_at,is_private&order=file_path.asc`);
       const folders = await db(`subfree_site_folders?site_id=eq.${site.id}&select=folder_path,is_private&order=folder_path.asc`);
-      return json({ success: true, site, redirectSecurity: site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }, files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
+      const defaultModes = { direct: { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }, simple: { checkStatus: true, checkHeaders: false, checkRedirect: false, requireDomainAck: true, requireExternalAck: false }, secure: { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: false }, strict: { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true } };
+      const savedModes = site.registration_data?.redirectModes || {};
+      const redirectModes = Object.fromEntries(Object.keys(defaultModes).map(mode => [mode, { ...defaultModes[mode], ...(savedModes[mode] || (mode === "direct" ? site.registration_data?.redirectSecurity || {} : {})) }]));
+      const activeRedirectMode = ["direct","simple","secure","strict"].includes(site.registration_data?.activeRedirectMode) ? site.registration_data.activeRedirectMode : "direct";
+      return json({ success: true, site, redirectModes, activeRedirectMode, redirectSecurity: redirectModes[activeRedirectMode], files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
     }
 
-    if (action === "update_redirect_security") {
+    if (action === "update_redirect_modes") {
       if (site.site_type !== "redirect") return json({ error: "Dieses Projekt ist keine Weiterleitung." }, 400);
-      const settings = {
-        checkStatus: body.checkStatus !== false,
-        checkHeaders: body.checkHeaders !== false,
-        checkRedirect: body.checkRedirect !== false,
-        requireDomainAck: body.requireDomainAck !== false,
-        requireExternalAck: body.requireExternalAck !== false
-      };
-      const registrationData = { ...(site.registration_data || {}), redirectSecurity: settings };
-      await db(`subfree_sites?id=eq.${site.id}`, {
-        method: "PATCH", headers: { Prefer: "return=minimal" },
-        body: JSON.stringify({ registration_data: registrationData, updated_at: new Date().toISOString() })
-      });
-      return json({ success: true, settings, message: "Sicherheitsregeln gespeichert. DNS-/IP-Schutz und HTTPS-Prüfung bleiben immer aktiv." });
+      const allowedModes = ["direct", "simple", "secure", "strict"];
+      const activeMode = allowedModes.includes(body.activeMode) ? body.activeMode : "direct";
+      const defaults = { direct: { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }, simple: { checkStatus: true, checkHeaders: false, checkRedirect: false, requireDomainAck: true, requireExternalAck: false }, secure: { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: false }, strict: { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true } };
+      const modes = Object.fromEntries(allowedModes.map(mode => { const input = body.modes?.[mode] || {}; return [mode, Object.fromEntries(Object.keys(defaults[mode]).map(key => [key, input[key] !== false]))]; }));
+      const registrationData = { ...(site.registration_data || {}), redirectModes: modes, activeRedirectMode: activeMode, redirectSecurity: modes[activeMode] };
+      await db(`subfree_sites?id=eq.${site.id}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ registration_data: registrationData, updated_at: new Date().toISOString() }) });
+      return json({ success: true, activeMode, modes, message: "Modus und unabhängige Einstellungen gespeichert. DNS-/IP-Schutz und HTTPS bleiben immer aktiv." });
     }
 
     if (action === "update_redirect") {
