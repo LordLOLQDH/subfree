@@ -61,13 +61,13 @@ test("domain application requires project ownership, HTTPS target, purpose and t
 });
 test("public pull request excludes applicant private information", () => {
   const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));
-  assert.match(block, /Applicant name, email, access key and IP data are intentionally excluded/);
+  assert.match(block, /Private applicant contact data and access credentials are excluded/);
   assert.doesNotMatch(block, /applicantEmail|applicantName|accessKey/);
   assert.match(block, /Not automatically merge|Nicht automatisch mergen/);
 });
-test("approved path only activates after a merged GitHub pull request", () => {
+test("domain application requires a real Groq review and blocks explicit illegal drug sales", () => {\n  assert.match(edge, /Deno\.env\.get\("GROQ_SUBFREE"\)/);\n  assert.match(edge, /reviewDomainApplicationWithAI\(purpose, target\.toString\(\)\)/);\n  assert.match(edge, /controlledDrugMention && salesIntent/);\n  assert.match(edge, /decision = "rejected"/);\n  assert.match(edge, /KI-Prüfung fehlgeschlagen/);\n});\ntest("domain PR summarizes AI and technical checks without dumping the JSON payload", () => {\n  const block = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function writeGitHubFile"));\n  assert.match(block, /KI-Inhaltsprüfung/);\n  assert.match(block, /Technischer Website-Check/);\n  assert.doesNotMatch(block, /JSON\.stringify\(application\.check_results, null, 2\)/);\n});\ntest("approved path only activates after a merged GitHub pull request", () => {
   const block = edge.slice(edge.indexOf('if (action === "sync_domain_approval")'), edge.indexOf('if (action === "site_check")'));
-  assert.match(block, /pr\.merged_at/);
+  assert.match(block, /pr\.merged_at/);\n  assert.match(block, /aiDecision/);\n  assert.match(block, /approved.*manual_review/);
   assert.match(block, /domain-requests\//);
   assert.match(block, /domainMode: "active"/);
   assert.match(block, /domainPrevious:/);
@@ -90,7 +90,7 @@ test("domain application form requests terms and purpose and links to the correc
 test("domain request workflow never merges automatically", () => {
   const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
   assert.match(workflow, /Post automatic validation result/);
-  assert.match(workflow, /Keine KI-Prüfung/);
+  assert.match(workflow, /KEINE Inhaltsfreigabe/);
   assert.doesNotMatch(workflow, /OPENAI_API_KEY|api.openai.com/);
   assert.match(workflow, /gh pr comment/);
   assert.match(workflow, /sync_domain_approval/);
