@@ -10,7 +10,7 @@
 <p>Prüfe Verbindung, HTTPS/TLS, HTTP-Status, Weiterleitungen, Sicherheitsheader, CORS, Cookies und weitere öffentlich sichtbare Merkmale. Die Zielseite wird nicht im Browser geöffnet und Weiterleitungen werden nicht verfolgt.</p>
 <form class="check-form" id="check-form"><input id="check-url" type="url" placeholder="https://example.com" required autocomplete="url"><button class="button button-primary" id="check-submit">Website prüfen →</button></form>
 <p id="check-status" role="status" aria-live="polite"></p>
-<section class="report" id="report" hidden><h2 id="verdict"></h2><p id="summary"></p><div id="checks"></div><p class="disclaimer">Hinweis: Diese Prüfung ist kein Malware- oder Phishing-Scan und keine Sicherheitsgarantie. Sie prüft nur öffentlich sichtbare Verbindungs- und HTTP-Merkmale. Weiterleitungen werden erkannt, aber niemals verfolgt.</p></section>
+<section class="report" id="report" hidden><h2 id="verdict"></h2><p id="summary"></p><div id="checks"></div><p class="disclaimer">Hinweis: Diese Prüfung ist kein vollständiger Malware-, Phishing- oder Schwachstellen-Scan und keine Sicherheitsgarantie. Sie untersucht öffentlich sichtbare Verbindungs- und HTTP-Merkmale sowie eine begrenzte HTML-Stichprobe. Weiterleitungen werden erkannt, aber niemals verfolgt.</p></section>
 </main><script>
 const API="https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api";
 const form=document.querySelector("#check-form"),input=document.querySelector("#check-url"),status=document.querySelector("#check-status"),report=document.querySelector("#report"),button=document.querySelector("#check-submit");
