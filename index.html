@@ -193,16 +193,20 @@
             <p id="redirect-settings-message" class="form-message" role="status" aria-live="polite"></p>
           </section>
           <section class="redirect-settings-panel" id="redirect-security-settings" hidden>
-<div class="redirect-settings-heading"><span class="eyebrow">SECURITY.EXE // RULES</span><h3>Weiterleitungs-Sicherheit</h3></div>
-<p>DNS-/IP-Schutz, HTTPS und manuelle Bestätigung bleiben immer aktiv. Diese Optionen steuern zusätzliche Prüfungen und Besucherhinweise.</p>
-<div class="security-options">
-<label class="setting-toggle"><input type="checkbox" id="sec-check-status" checked> HTTP-Statuscode prüfen</label>
-<label class="setting-toggle"><input type="checkbox" id="sec-check-headers" checked> Sicherheitsheader (HSTS, CSP, nosniff) prüfen</label>
-<label class="setting-toggle"><input type="checkbox" id="sec-check-redirect" checked> Server-Weiterleitungen erkennen</label>
-<label class="setting-toggle"><input type="checkbox" id="sec-domain-ack" checked> Besucher muss Zieldomain bestätigen</label>
-<label class="setting-toggle"><input type="checkbox" id="sec-external-ack" checked> Besucher muss externes Zielrisiko bestätigen</label>
-<button class="button button-primary" id="save-redirect-security" type="button">Sicherheitsregeln speichern</button>
-<p id="redirect-security-message" class="form-message" role="status"></p></div></section>\n          <section class="api-access-panel" id="api-access">
+            <div class="redirect-settings-heading"><span class="eyebrow">REDIRECT.EXE // MODES</span><h3>Weiterleitungsmodus</h3></div>
+            <p>Wähle einen Modus. Jeder Modus besitzt eigene Einstellungen. Die Auswahl wird sofort als aktiver Modus gespeichert.</p>
+            <label for="redirect-mode-select">Aktiver Modus</label>
+            <select id="redirect-mode-select"><option value="direct">Direktmodus</option><option value="simple">Einfacher Modus</option><option value="secure">Sicherheitsmodus</option><option value="strict">Strenger Modus</option></select>
+            <p id="redirect-mode-description" class="form-message" role="status"></p>
+            <div class="security-options"><strong>Einstellungen dieses Modus</strong>
+              <label class="setting-toggle"><input type="checkbox" id="sec-check-status" checked> HTTP-Statuscode prüfen</label>
+              <label class="setting-toggle"><input type="checkbox" id="sec-check-headers" checked> Sicherheitsheader (HSTS, CSP, nosniff) prüfen</label>
+              <label class="setting-toggle"><input type="checkbox" id="sec-check-redirect" checked> Server-Weiterleitungen erkennen</label>
+              <label class="setting-toggle"><input type="checkbox" id="sec-domain-ack" checked> Besucher muss Zieldomain bestätigen</label>
+              <label class="setting-toggle"><input type="checkbox" id="sec-external-ack" checked> Besucher muss externes Zielrisiko bestätigen</label>
+              <button class="button button-primary" id="save-redirect-security" type="button">Modus-Einstellungen speichern</button><p id="redirect-security-message" class="form-message" role="status"></p>
+            </div>
+          </section>\n          <section class="api-access-panel" id="api-access">
             <div class="api-panel-heading"><span class="eyebrow">SUBFREE API // AI ACCESS</span><h3>ChatGPT und andere Tools verbinden.</h3></div>
             <p>Erstelle einen eigenen API-Schlüssel für dieses Projekt. Damit können autorisierte Tools Dateien direkt in SubFree speichern und veröffentlichen. Der Schlüssel wird nur bei der Erstellung vollständig angezeigt.</p>
             <div class="api-token-create"><label for="api-token-name">Bezeichnung</label><input id="api-token-name" maxlength="80" value="ChatGPT"><button class="button button-primary" id="create-api-token" type="button">API-Schlüssel erstellen</button></div>
@@ -256,6 +260,6 @@
   </main>
 
   <footer class="site-footer"><a class="brand" href="#"><span class="brand-mark">S</span><span>subfree</span></a><p>Ein unabhängiges Hosting-Projekt in Entwicklung.</p><div><a href="README.md">Projektinfos</a><a href="datenschutz.html">Datenschutz</a><a href="impressum.html">Impressum</a><a href="kontakt.html">Kontakt</a></div><small>© <span id="year"></span> SubFree. Kostenlos geplant, sorgfältig verwaltet.</small></footer>
-  <script src="script.js?v=20261107-01" defer></script>
+  <script src="script.js?v=20261107-02" defer></script>
 </body>
 </html>
