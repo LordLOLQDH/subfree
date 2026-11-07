@@ -260,6 +260,21 @@ async function reviewDomainApplicationWithAI(purpose: string, websiteUrl: string
       typeof result.reason !== "string" || typeof result.summary !== "string") {
     throw new Error("KI-Prüfung lieferte ein ungültiges Ergebnis. Antrag bleibt gesperrt.");
   }
+  const combinedText = (purpose + " " + sample.text).toLowerCase();
+  const controlledDrugMention = /\\b(drogen|betäubungsmittel|marihuana|marijuana|cannabis|hash|hasch|crack|opium|kokain|cocaine|heroin|fentanyl)\\b/i.test(combinedText);
+  const salesIntent = /\\b(verkauf|verkaufe|verkaufen|verkauft|handel|deal|bestell|liefer|shop|preise|sell|selling|buy|order|delivery)\\w*\\b/i.test(combinedText);
+  if (controlledDrugMention && salesIntent) {
+    result.decision = "rejected";
+    result.category = "illegal-drug-sales";
+    result.summary = "Der Antrag bewirbt den Verkauf oder die Vermittlung von Betäubungsmitteln.";
+    result.reason = "Explizite Verkaufs- oder Vermittlungsabsicht für Drogen erkannt. Solche Angebote sind auf SubFree nicht zulässig.";
+    result.confidence = 1;
+  } else if (!sample.text && result.decision === "approved") {
+    result.decision = "manual_review";
+    result.category = "insufficient-website-evidence";
+    result.summary = "Die Zielwebsite lieferte keinen auswertbaren Inhalt.";
+    result.reason = "Ohne sichtbaren Website-Inhalt kann die KI den Antrag nicht sicher freigeben. Eine manuelle Prüfung ist erforderlich.";
+  }
   return {
     provider: "Groq",
     model: "llama-3.3-70b-versatile",
