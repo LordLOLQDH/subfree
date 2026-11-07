@@ -297,7 +297,7 @@ document.querySelector("#publish-project")?.addEventListener("click", async () =
 });
 
 
-/* Temporäre PNTR-E-Mail-Adressen */
+/* PNTR Temp-Mail: Adressgenerator für den öffentlichen Test-Posteingang */
 const tempMailName = document.querySelector("#temp-mail-name");
 const tempMailResult = document.querySelector("#temp-mail-result");
 const tempMailCopy = document.querySelector("#copy-temp-mail");
