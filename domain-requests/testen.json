@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "slug": "testen",
+  "websiteUrl": "https://drogen.de/",
+  "purpose": "Ich verkaufe Drogen wie marihuana, hash, Crack, Opium und mehr!!",
+  "termsVersion": "2026-11-07",
+  "requestedAt": "2026-11-07T20:53:22.995779+00:00",
+  "termsAccepted": true,
+  "termsAcceptedAt": "2026-11-07T20:53:22.995779+00:00",
+  "checks": {
+    "success": true,
+    "url": "https://drogen.de/",
+    "hostname": "drogen.de",
+    "httpStatus": 302,
+    "responseTimeMs": 974,
+    "redirected": true,
+    "redirectHost": "ww38.drogen.de",
+    "checkedAt": "2026-11-07T20:53:22.924Z",
+    "testCount": 18,
+    "passCount": 6,
+    "warningCount": 7,
+    "infoCount": 5,
+    "verdict": "review",
+    "checks": [
+      {
+        "id": "dns",
+        "label": "DNS / öffentliche IP",
+        "status": "pass",
+        "detail": "Hostname wurde aufgelöst und private bzw. reservierte IP-Adressen wurden blockiert."
+      },
+      {
+        "id": "https",
+        "label": "HTTPS / TLS",
+        "status": "pass",
+        "detail": "HTTPS-Verbindung und TLS-Zertifikatsprüfung erfolgreich."
+      },
+      {
+        "id": "http",
+        "label": "HTTP-Status",
+        "status": "pass",
+        "detail": "Serverantwort: HTTP 302 (Weiterleitung erkannt, nicht verfolgt)."
+      },
+      {
+        "id": "redirect",
+        "label": "Weiterleitungsverhalten",
+        "status": "warn",
+        "detail": "Weiterleitung auf ww38.drogen.de erkannt. Nicht verfolgt."
+      },
+      {
+        "id": "hsts",
+        "label": "HSTS",
+        "status": "warn",
+        "detail": "Strict-Transport-Security fehlt."
+      },
+      {
+        "id": "csp",
+        "label": "Content Security Policy",
+        "status": "warn",
+        "detail": "Content-Security-Policy fehlt."
+      },
+      {
+        "id": "nosniff",
+        "label": "MIME-Sniffing-Schutz",
+        "status": "warn",
+        "detail": "X-Content-Type-Options: nosniff fehlt."
+      },
+      {
+        "id": "referrer",
+        "label": "Referrer-Policy",
+        "status": "warn",
+        "detail": "Referrer-Policy fehlt."
+      },
+      {
+        "id": "permissions",
+        "label": "Permissions-Policy",
+        "status": "info",
+        "detail": "Permissions-Policy fehlt."
+      },
+      {
+        "id": "frame",
+        "label": "Clickjacking-Schutz",
+        "status": "warn",
+        "detail": "X-Frame-Options und CSP frame-ancestors fehlen."
+      },
+      {
+        "id": "content-type",
+        "label": "Content-Type",
+        "status": "pass",
+        "detail": "text/html; charset=UTF-8"
+      },
+      {
+        "id": "cors",
+        "label": "CORS-Freigabe",
+        "status": "pass",
+        "detail": "Keine öffentliche CORS-Freigabe erkannt."
+      },
+      {
+        "id": "server",
+        "label": "Server-Informationen",
+        "status": "info",
+        "detail": "Server-Header: Apache"
+      },
+      {
+        "id": "powered",
+        "label": "Technologie-Offenlegung",
+        "status": "pass",
+        "detail": "Kein X-Powered-By-Header erkannt."
+      },
+      {
+        "id": "cookies",
+        "label": "Cookie-Sicherheit",
+        "status": "info",
+        "detail": "Keine Set-Cookie-Header sichtbar."
+      },
+      {
+        "id": "cache",
+        "label": "Cache-Control",
+        "status": "info",
+        "detail": "Cache-Control fehlt; sensible Inhalte sollten Caching explizit steuern."
+      },
+      {
+        "id": "redirect-host",
+        "label": "Externes Weiterleitungsziel",
+        "status": "warn",
+        "detail": "Die Website leitet auf einen anderen Hostnamen weiter: ww38.drogen.de. Das Ziel wurde nicht aufgerufen."
+      },
+      {
+        "id": "html-sample",
+        "label": "HTML-Stichprobe",
+        "status": "info",
+        "detail": "Keine HTML-Stichprobe möglich (Weiterleitung, Fehlerstatus oder kein HTML-Inhalt)."
+      }
+    ]
+  },
+  "note": "Applicant name, email, access key and IP data are intentionally excluded."
+}
