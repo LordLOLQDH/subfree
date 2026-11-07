@@ -136,7 +136,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentKey = key;
     currentSite = result.site;
     currentFolders = result.folders || [];
-    const redirectPanel = document.querySelector("#redirect-settings");
+    const redirectPanel = document.querySelector("#redirect-settings");\n    const securityPanel = document.querySelector("#redirect-security-settings");\n    if(securityPanel){ securityPanel.hidden=result.site.site_type!=="redirect"; const cfg=result.redirectSecurity||{}; for(const [id,key] of [["sec-check-status","checkStatus"],["sec-check-headers","checkHeaders"],["sec-check-redirect","checkRedirect"],["sec-domain-ack","requireDomainAck"],["sec-external-ack","requireExternalAck"]]) document.querySelector("#"+id).checked=cfg[key]!==false; }
     if (redirectPanel) {
       redirectPanel.hidden = result.site.site_type !== "redirect";
       const targetInput = document.querySelector("#redirect-target");
@@ -399,5 +399,15 @@ document.querySelector("#delete-project")?.addEventListener("click",async()=>{
   try{const settings=JSON.parse(localStorage.getItem(localStoreKey)||"{}");if(settings.accessKey===deletedKey){settings.accessKey="";settings.rememberKey=false;localStorage.setItem(localStoreKey,JSON.stringify(settings));}}catch{}
   message.textContent=result.message;manageMessage.textContent="Projekt gelöscht. Du kannst jetzt ein neues Projekt registrieren.";
  }catch(error){message.textContent="Löschung fehlgeschlagen: "+error.message;}
+ finally{button.disabled=false;}
+});
+
+document.querySelector("#save-redirect-security")?.addEventListener("click",async()=>{
+ if(!currentKey||!currentSite||currentSite.site_type!=="redirect")return;
+ const button=document.querySelector("#save-redirect-security"),message=document.querySelector("#redirect-security-message");
+ const settings={checkStatus:document.querySelector("#sec-check-status").checked,checkHeaders:document.querySelector("#sec-check-headers").checked,checkRedirect:document.querySelector("#sec-check-redirect").checked,requireDomainAck:document.querySelector("#sec-domain-ack").checked,requireExternalAck:document.querySelector("#sec-external-ack").checked};
+ button.disabled=true;message.textContent="Sicherheitsregeln werden gespeichert …";
+ try{const result=await api({action:"update_redirect_security",...settings},currentKey);message.textContent=result.message;}
+ catch(error){message.textContent="Speichern fehlgeschlagen: "+error.message;}
  finally{button.disabled=false;}
 });
