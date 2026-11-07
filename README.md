@@ -43,7 +43,7 @@ Die Registrierung kann bereits in Supabase gespeichert werden. Für das automati
 
 In Supabase unter **Project Settings → Edge Functions → Secrets** folgende Secrets hinzufügen:
 
-- `GITHUB_TOKEN`: Fine-grained Personal Access Token mit Zugriff nur auf `LordLOLQDH/subfree`, Repository permission **Contents: Read and write**.
+- `GITHUB_TOKEN`: Fine-grained Personal Access Token mit Zugriff nur auf `LordLOLQDH/subfree`, Repository permissions **Contents: Read and write** and **Pull requests: Read and write**. The latter is required to open domain-request pull requests.
 - Optional: `GITHUB_OWNER` = `LordLOLQDH`
 - Optional: `GITHUB_REPO` = `subfree`
 - Optional: `GITHUB_BRANCH` = `main`
