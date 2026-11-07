@@ -21,7 +21,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - name: Validate domain request data
+      - name: Validate compact public request summary
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
@@ -34,41 +34,34 @@ jobs:
           const file = process.argv[2];
           const data = JSON.parse(fs.readFileSync(file, 'utf8'));
           const slug = file.split('/').pop().replace(/\.json$/, '');
-          if (data.schemaVersion !== 2) throw new Error('Unsupported schemaVersion');\n          if (!data.aiReview || !['approved','rejected','manual_review'].includes(data.aiReview.decision)) throw new Error('Missing AI content review result');
-          if (data.termsAccepted !== true || typeof data.termsAcceptedAt !== 'string') throw new Error('Terms acceptance evidence is missing');
+          if (data.schemaVersion !== 2) throw new Error('Unsupported schemaVersion');
           if (data.slug !== slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error('Invalid slug');
+          if (typeof data.applicantName !== 'string' || !data.applicantName.trim()) throw new Error('Applicant name is missing');
           const url = new URL(data.websiteUrl);
           if (url.protocol !== 'https:' || url.username || url.password || url.port) throw new Error('Website URL must be public HTTPS on the default port');
           if (typeof data.purpose !== 'string' || data.purpose.trim().length < 30 || data.purpose.length > 1600) throw new Error('Purpose is missing or outside allowed length');
-          if (!data.checks || !Array.isArray(data.checks.checks) || data.checks.checks.length < 5) throw new Error('Missing technical check results');
           for (const forbidden of ['applicantEmail','accessKey','requestIp','request_ip_hash','check_results','aiReview']) {
-            if (Object.hasOwn(data, forbidden)) throw new Error('Private field found in public PR: ' + forbidden);
+            if (Object.hasOwn(data, forbidden)) throw new Error('Private or internal field found in public PR: ' + forbidden);
           }
           console.log('Validated compact public application summary: ' + file);
           NODE
           done <<< "$files"
-      - name: Post automatic validation result
+      - name: Post formal validation result
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
           files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/[^/]*\.json$' || true)"
-          count=0
-          for file in $files; do
-            checks="$(node -e 'const d=require("./"+process.argv[1]); console.log(d.checks.checks.length)' "$file")"
-            count=$((count + checks))
-          done
+          count="$(printf '%s\n' "$files" | grep -c . || true)"
           gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
 
-          Die Antragsdatei ist technisch lesbar:
           - JSON-Struktur und Pflichtfelder gültig
           - Pfadname und HTTPS-Ziel formal gültig
-          - Nutzungsbedingungen bestätigt
-          - Private Antragsdaten nicht in der öffentlichen PR
-          - Öffentliche PR-Datei enthält nur die kurze Antragsübersicht
+          - Nur die kurze öffentliche Antragsübersicht ist enthalten
+          - Private Kontakt- und Zugangsdaten sind ausgeschlossen
 
-          **Wichtig:** Dies ist nur eine formale Dateiprüfung und ausdrücklich KEINE Inhaltsfreigabe. KI- und technische Prüfergebnisse werden separat als PR-Kommentar veröffentlicht. Kein automatischer Merge."
+          **Wichtig:** Dies ist ausdrücklich KEINE Inhaltsfreigabe. KI- und technische Prüfergebnisse werden separat als PR-Kommentar veröffentlicht. Kein automatischer Merge."
   sync-approved-request:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -76,7 +69,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Synchronize manually merged requests
         env:
-          GH_TOKEN: ${{ github.token }}
           API_URL: https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api
           BEFORE_SHA: ${{ github.event.before }}
         run: |
