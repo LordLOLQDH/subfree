@@ -177,9 +177,9 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#publish-project").disabled=domainActive;
     const redirectPanel = document.querySelector("#redirect-settings");
     const securityPanel = document.querySelector("#redirect-security-settings");
-    if(securityPanel){ securityPanel.hidden=result.site.site_type!=="redirect"; redirectModes=result.redirectModes||defaultRedirectModes(); activeRedirectMode=result.activeRedirectMode||"direct"; document.querySelector("#redirect-mode-select").value=activeRedirectMode; applyRedirectMode(activeRedirectMode); }
+    if(securityPanel){ securityPanel.hidden=domainActive||result.site.site_type!=="redirect"; redirectModes=result.redirectModes||defaultRedirectModes(); activeRedirectMode=result.activeRedirectMode||"direct"; document.querySelector("#redirect-mode-select").value=activeRedirectMode; applyRedirectMode(activeRedirectMode); }
     if (redirectPanel) {
-      redirectPanel.hidden = result.site.site_type !== "redirect";
+      redirectPanel.hidden = domainActive || result.site.site_type !== "redirect";
       const targetInput = document.querySelector("#redirect-target");
       const targetLink = document.querySelector("#open-redirect-target");
       if (targetInput) targetInput.value = result.site.redirect_url || "";
