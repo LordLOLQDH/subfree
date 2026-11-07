@@ -109,7 +109,7 @@ test("domain application form requests terms and purpose and links to the correc
 });
 test("domain request workflow never merges automatically", () => {
   const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
-  assert.match(workflow, /Post automatic validation result/);
+  assert.match(workflow, /Post formal validation result/);
   assert.match(workflow, /KEINE Inhaltsfreigabe/);
   assert.doesNotMatch(workflow, /OPENAI_API_KEY|api.openai.com/);
   assert.match(workflow, /gh pr comment/);
