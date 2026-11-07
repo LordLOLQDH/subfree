@@ -137,7 +137,8 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentSite = result.site;
     currentFolders = result.folders || [];
     const redirectPanel = document.querySelector("#redirect-settings");
-    const securityPanel = document.querySelector("#redirect-security-settings");\n    if(securityPanel){ securityPanel.hidden=result.site.site_type!=="redirect"; const cfg=result.redirectSecurity||{}; for(const [id,key] of [["sec-check-status","checkStatus"],["sec-check-headers","checkHeaders"],["sec-check-redirect","checkRedirect"],["sec-domain-ack","requireDomainAck"],["sec-external-ack","requireExternalAck"]]) document.querySelector("#"+id).checked=cfg[key]!==false; }
+    const securityPanel = document.querySelector("#redirect-security-settings");
+    if(securityPanel){ securityPanel.hidden=result.site.site_type!=="redirect"; const cfg=result.redirectSecurity||{}; for(const [id,key] of [["sec-check-status","checkStatus"],["sec-check-headers","checkHeaders"],["sec-check-redirect","checkRedirect"],["sec-domain-ack","requireDomainAck"],["sec-external-ack","requireExternalAck"]]) document.querySelector("#"+id).checked=cfg[key]!==false; }
     if (redirectPanel) {
       redirectPanel.hidden = result.site.site_type !== "redirect";
       const targetInput = document.querySelector("#redirect-target");
