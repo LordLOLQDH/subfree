@@ -40,7 +40,7 @@ test("dashboard exposes all four independent redirect modes", () => {
   assert.match(edge, /update_redirect_modes/);
 });
 test("legacy direct mode keeps the previous safety defaults", () => {
-  assert.match(edge, /direct: \{ checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true \}/);
+  assert.match(edge, /direct: \{ checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true, requireStrictAck: false \}/);
   assert.match(edge, /mode === "direct" \? site\.registration_data\?\.redirectSecurity/);
 });
 
@@ -98,4 +98,15 @@ test("redirect mode selection persists and rolls back on save failure", () => {
   const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
   assert.match(script, /const previousMode=activeRedirectMode/);
   assert.match(script, /if\(!saved\)\{activeRedirectMode=previousMode/);
+});
+
+test("direct mode remains unchanged while strict mode adds a third confirmation", () => {
+  const direct = edge.match(/direct: \{[^}]+\}/)?.[0] || "";
+  const strict = edge.match(/strict: \{[^}]+\}/)?.[0] || "";
+  assert.match(direct, /requireStrictAck: false/);
+  assert.match(strict, /requireStrictAck: true/);
+  assert.match(edge, /security\.requireStrictAck===true/);
+  assert.match(edge, /strictCheck\.checked/);
+  const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(page, /id="sec-strict-ack"/);
 });
