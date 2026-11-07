@@ -42,8 +42,8 @@
 /* PNTR public inbox panel */
 .temp-mail-section{padding-top:20px}
 .temp-mail-panel{max-width:950px;margin:30px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:28px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px}
-.temp-mail-generator,.temp-mail-info{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-width:0}
-.temp-mail-generator label{font-size:13px;font-weight:700}
+.temp-mail-access,.temp-mail-info{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-width:0}
+.temp-mail-access label{font-size:13px;font-weight:700}
 .temp-mail-info p,.temp-mail-info small{color:var(--muted);font-size:13px;line-height:1.65;margin:0}
 .temp-mail-info a{font-size:13px;font-weight:700;color:var(--ink);text-decoration:underline}
 .temp-mail-info small{font-size:11px}
@@ -323,8 +323,8 @@ table caption{padding:10px;text-align:left;color:#00ff88}
 .hero-temp-mail{max-width:560px;margin:24px 0 0;padding:16px;display:grid;grid-template-columns:1fr;gap:12px;background:#030604;border:1px solid #1d4930;border-radius:0;box-shadow:4px 4px 0 #092013}
 .temp-mail-terminal-heading{display:flex;align-items:center;flex-wrap:wrap;gap:9px;color:#00ff88;font:8px/1.8 "Press Start 2P","VT323",monospace}
 .temp-mail-status{margin-left:auto;color:#ffca70;font:7px/1.8 "Press Start 2P","VT323",monospace}
-.hero-temp-mail .temp-mail-generator{gap:9px}
-.hero-temp-mail .temp-mail-generator label{color:#a9c8b3;font:8px/1.8 "Press Start 2P","VT323",monospace}
+.hero-temp-mail .temp-mail-access{gap:9px}
+.hero-temp-mail .temp-mail-access label{color:#a9c8b3;font:8px/1.8 "Press Start 2P","VT323",monospace}
 .hero-temp-mail .button{align-self:flex-start}
 .temp-mail-disclaimer{color:#91a397;font-size:14px;line-height:1.4}
 .hero-temp-mail .temp-mail-info{gap:6px;border-top:1px solid #1d3325;padding-top:10px}
