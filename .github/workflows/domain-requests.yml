@@ -59,16 +59,16 @@ jobs:
             checks="$(node -e 'const d=require("./"+process.argv[1]); console.log(d.checks.checks.length)' "$file")"
             count=$((count + checks))
           done
-          gh pr comment "$PR_NUMBER" --body "## SubFree automatische Prüfung: bestanden
+          gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
 
-          Die formalen Prüfungen sind erfolgreich:
-          - Antragsdatei und JSON-Struktur gültig
+          Die Antragsdatei ist technisch lesbar:
+          - JSON-Struktur und Pflichtfelder gültig
           - Pfadname und HTTPS-Ziel formal gültig
           - Nutzungsbedingungen bestätigt
           - Private Antragsdaten nicht in der öffentlichen PR
           - Technische Prüfergebnisse vorhanden ($count Einzelprüfungen)
 
-          **Keine KI-Prüfung:** SubFree verwendet keine kostenpflichtige KI-API. Diese automatischen Regeln können Phishing, Betrug oder schädliche Inhalte nicht zuverlässig erkennen. Prüfe die Zielwebsite und den Antrag selbst. Erst deine manuelle PR-Freigabe darf den Pfad aktivieren."
+          **Wichtig:** Dies ist ausdrücklich KEINE Inhaltsfreigabe. Die KI-Inhaltsprüfung steht separat in der PR-Beschreibung und im SubFree-KI-Kommentar. Bei Ablehnung bleibt die PR geschlossen. Ein technischer Website-Check beweist keine Rechtmäßigkeit. Kein automatischer Merge."
   sync-approved-request:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
