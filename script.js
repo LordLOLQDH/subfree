@@ -297,29 +297,6 @@ document.querySelector("#publish-project")?.addEventListener("click", async () =
 });
 
 
-/* PNTR Temp-Mail: Adressgenerator für den öffentlichen Test-Posteingang */
-const tempMailName = document.querySelector("#temp-mail-name");
-const tempMailResult = document.querySelector("#temp-mail-result");
-const tempMailCopy = document.querySelector("#copy-temp-mail");
-function getTempMailAddress() {
-  const name = (tempMailName?.value || "deinname").trim().toLowerCase().replace(/[^a-z0-9._+-]/g, "").replace(/^\.+|\.+$/g, "") || "deinname";
-  return name + "@temp-admin-001.pntr.dev";
-}
-tempMailName?.addEventListener("input", () => {
-  if (tempMailResult) tempMailResult.textContent = getTempMailAddress();
-  if (tempMailCopy) tempMailCopy.textContent = "E-Mail-Adresse kopieren";
-});
-tempMailCopy?.addEventListener("click", async () => {
-  const address = getTempMailAddress();
-  try {
-    await navigator.clipboard.writeText(address);
-    tempMailCopy.textContent = "Adresse kopiert";
-  } catch {
-    if (tempMailResult) tempMailResult.textContent = address + " (bitte manuell kopieren)";
-  }
-});
-
-
 /* PUBLIC GITHUB PAGES DEPLOY MONITOR */
 (() => {
   const panel = document.querySelector("#deploy-status");
