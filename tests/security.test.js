@@ -160,6 +160,7 @@ test("domain request PR is created before public path availability is checked", 
   const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
   assert.ok(!block.includes("domainRequestPathIsFree"));
   assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("runWebsiteCheck"));
+  assert.ok(!block.includes("domainMode === \"active\""));
 });
 
 test("post-creation validation checks collisions without overwriting request files", () => {
