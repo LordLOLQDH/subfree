@@ -24,22 +24,24 @@ jobs:
       - name: Validate compact public request summary
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           git fetch origin "$BASE_REF"
-          changes="$(git diff --name-status "origin/$BASE_REF...HEAD" -- 'domain-requests/*.json')"
-          test -n "$changes" || { echo "No domain request JSON found"; exit 1; }
-          invalid="$(printf '%s\n' "$changes" | awk '$1 != "A" { print }')"
-          test -z "$invalid" || { echo "Only new request files may be added; existing request files cannot be edited or replaced."; printf '%s\n' "$invalid"; exit 1; }
-          files="$(printf '%s\n' "$changes" | awk '$1 == "A" { print $2 }')"
-          test -n "$files" || { echo "No new domain request JSON found"; exit 1; }
+          files="$(git diff --name-only "origin/$BASE_REF...HEAD" -- 'domain-requests/pending/*.json')"
+          test -n "$files" || { echo "No pending domain request JSON found"; exit 1; }
+          count="$(printf '%s\\n' "$files" | grep -c . || true)"
+          test "$count" -eq 1 || { echo "Exactly one pending request file is required"; exit 1; }
           while IFS= read -r file; do
             node - "$file" <<'NODE'
           const fs = require('node:fs');
           const file = process.argv[2];
           const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-          const slug = file.split('/').pop().replace(/\.json$/, '');
+          const name = file.split('/').pop().replace(/\\.json$/, '');
           if (data.schemaVersion !== 2) throw new Error('Unsupported schemaVersion');
-          if (data.slug !== slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error('Invalid slug');
+          if (typeof data.applicationId !== 'string' || !/^[0-9a-f-]{36}$/.test(data.applicationId)) throw new Error('Invalid application ID');
+          if (name !== data.slug + '-' + data.applicationId) throw new Error('Slug or application ID does not match filename');
+          if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(data.slug)) throw new Error('Invalid slug');
           if (typeof data.applicantName !== 'string' || !data.applicantName.trim()) throw new Error('Applicant name is missing');
           const url = new URL(data.websiteUrl);
           if (url.protocol !== 'https:' || url.username || url.password || url.port) throw new Error('Website URL must be public HTTPS on the default port');
@@ -49,6 +51,11 @@ jobs:
           }
           console.log('Validated compact public application summary: ' + file);
           NODE
+            slug="$(basename "$file" | sed -E 's/-[0-9a-f-]{36}\\.json$//')"
+            if git cat-file -e "origin/$BASE_REF:domain-requests/$slug.json" 2>/dev/null; then
+              echo "::error title=Domain path already occupied::The requested path /$slug/ already has a public request file. PR remains open for manual review."
+              exit 1
+            fi
           done <<< "$files"
       - name: Post formal validation result
         env:
