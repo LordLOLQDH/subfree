@@ -812,7 +812,6 @@ Deno.serve(async (req: Request) => {
       const projectRows = await db("subfree_sites?slug=eq." + encodeURIComponent(slug) + "&select=id,slug,site_type,status,registration_data,access_key_hash");
       const project = projectRows[0];
       if (!project || project.status !== "active" || project.access_key_hash !== await sha256(accessKey)) return json({ error: "Projektordner oder Zugangscode stimmt nicht. Nur der Projektinhaber kann einen Antrag stellen." }, 403);
-      if (project.registration_data?.domainMode === "active") return json({ error: "Für diesen Projektordner ist bereits ein Domain-Modus aktiv." }, 409);
       if (!GITHUB_TOKEN) return json({ error: "GitHub-PR-Erstellung ist noch nicht konfiguriert." }, 503);
       const ip = req.headers.get("cf-connecting-ip") ?? req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
       const ipHash = await sha256("subfree-domain:" + ip);
