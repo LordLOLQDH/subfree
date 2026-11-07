@@ -58,12 +58,46 @@ jobs:
             fi
           done <<< "$files"
       - name: Post formal validation result
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
+          VALIDATION_STATUS: ${{ job.status }}
         run: |
-          files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/[^/]*\.json$' || true)"
+          files="$(git diff --name-only "origin/$BASE_REF...HEAD" | grep '^domain-requests/pending/.*\\.json || true)"
+          count="$(printf '%s\n' "$files" | grep -c . || true)"
+          gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
+
+          - JSON-Struktur und Pflichtfelder gültig
+          - Pfadname und HTTPS-Ziel formal gültig
+          - Nur die kurze öffentliche Antragsübersicht ist enthalten
+          - Private Kontakt- und Zugangsdaten sind ausgeschlossen
+
+          **Automatische Prüfungen:** $VALIDATION_STATUS
+
+          **Wichtig:** Dies ist ausdrücklich KEINE Inhaltsfreigabe. KI- und technische Prüfergebnisse werden separat als PR-Kommentar veröffentlicht. Kein automatischer Merge."
+  sync-approved-request:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Synchronize manually merged requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          API_URL: https://eopvkwhcgznvubesaszv.supabase.co/functions/v1/subfree-api
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          git fetch origin main
+          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/[^/]*\.json$' || true)"
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            slug="$(basename "$file" .json)"
+            pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
+            [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
+            curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
+          done <<< "$files"
+ || true)"
           count="$(printf '%s\n' "$files" | grep -c . || true)"
           gh pr comment "$PR_NUMBER" --body "## SubFree: Formale Dateiprüfung abgeschlossen
 
@@ -85,7 +119,15 @@ jobs:
           BEFORE_SHA: ${{ github.event.before }}
         run: |
           git fetch origin main
-          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/[^/]*\.json$' || true)"
+          files="$(git diff --name-only "$BEFORE_SHA" "${GITHUB_SHA}" | grep '^domain-requests/pending/.*\\.json || true)"
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            slug="$(basename "$file" .json)"
+            pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
+            [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
+            curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
+          done <<< "$files"
+ || true)"
           while IFS= read -r file; do
             [ -n "$file" ] || continue
             slug="$(basename "$file" .json)"
