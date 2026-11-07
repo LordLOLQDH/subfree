@@ -252,7 +252,7 @@ const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className
 try{
 const response=await fetch(api,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"public_site",slug})});
 const data=await response.json();if(!response.ok)throw new Error(data.error||"Website nicht verfügbar");
-if(data.siteType==="redirect"){await renderRedirect(data.redirectUrl,data.username||slug);return;}
+if(data.siteType==="redirect"){await renderRedirect(data.redirectUrl,data.username||slug,data.redirectSecurity||{});return;}
 let html=data.html||"<h1>Diese Website ist noch leer.</h1>";
 const base="<base href=\\""+location.pathname.replace(/[^/]*$/,"")+"\\">";
 if(/<head[^>]*>/i.test(html))html=html.replace(/<head[^>]*>/i,m=>m+base);else html="<!doctype html><head>"+base+"</head>"+html;
@@ -261,7 +261,7 @@ const badge=document.createElement("footer");badge.className="subfree-ad";badge.
 badge.innerHTML='<div class="subfree-ad-copy"><div class="subfree-ad-kicker">HOSTED ON SUBFREE</div><strong>Diese Website läuft mit SubFree.</strong><p>Erstelle deine eigene Website. Kostenlos und unkompliziert.</p></div><a href="https://lordlolqdh.github.io/subfree/" target="_top" rel="noopener">Eigene Website starten</a>';
 document.body.replaceChildren(frame,badge);
 }catch(error){document.getElementById("status").textContent="Diese Website ist derzeit nicht verfügbar: "+error.message;}
-async function renderRedirect(target,username){
+async function renderRedirect(target,username,security){
 const shell=el("main","redirect-shell"),header=el("header","redirect-header"),brand=el("div","redirect-brand");
 brand.innerHTML='SUBFREE<span>.</span>';header.append(brand,el("div","redirect-online","● SYSTEM ONLINE"));
 const panel=el("section","redirect-panel");panel.append(el("div","redirect-kicker","▶ SUBFREE_NET.EXE // NETWORK DIAGNOSTIC"));
@@ -270,7 +270,17 @@ const status=el("div","redirect-status","[ STATUS ] INITIALIZING"),top=el("div",
 const percent=el("strong","redirect-percent","0%"),timer=el("span","","0.0s");top.append(percent,timer);
 const bar=el("div","redirect-bar","--------------------"),log=el("div","redirect-log","> SubFree system started");
 const button=el("a","redirect-button","[ OPEN DESTINATION ]");button.href=target;button.hidden=true;
-panel.append(status,top,bar,log,button);
+panel.append(status,top,bar,log);
+const destination=el("p","redirect-description","Ziel: "+new URL(target).hostname);
+const acknowledgements=el("div","redirect-log");
+const domainLabel=el("label");const domainCheck=el("input");domainCheck.type="checkbox";domainLabel.append(domainCheck,document.createTextNode(" Ich habe die angezeigte Zieldomain geprüft."));
+const externalLabel=el("label");const externalCheck=el("input");externalCheck.type="checkbox";externalLabel.append(externalCheck,document.createTextNode(" Mir ist bewusst, dass SubFree keine Garantie für die Vertrauenswürdigkeit der Zielwebsite geben kann."));
+if(security.requireDomainAck!==false)acknowledgements.append(domainLabel);
+if(security.requireExternalAck!==false)acknowledgements.append(externalLabel);
+button.hidden=true;button.target="_blank";button.rel="noopener noreferrer";
+const refreshConsent=()=>{button.hidden=(security.requireDomainAck!==false&&!domainCheck.checked)||(security.requireExternalAck!==false&&!externalCheck.checked);};
+domainCheck.addEventListener("change",refreshConsent);externalCheck.addEventListener("change",refreshConsent);
+panel.append(destination,acknowledgements,button);
 const footer=el("footer","redirect-footer");footer.append(el("span","","SUBFREE OS // 32-BIT"),el("span","","@"+username));
 shell.append(header,panel,footer);document.body.className="redirect-mode";document.body.replaceChildren(shell);
 async function runTest(){
@@ -285,15 +295,15 @@ else{status.textContent="[ STATUS ] WAITING FOR RESPONSE";log.textContent="> Wai
 requestAnimationFrame(animate);}
 requestAnimationFrame(animate);
 const minimumWait=new Promise(resolve=>setTimeout(resolve,2000));let result;
-try{const check=await fetch(api,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"diagnostic",slug})});
+try{const check=await fetch(api,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"diagnostic",slug,security})});
 result=await check.json();if(!check.ok)throw new Error(result.error||"Diagnostic request failed");}
 catch(error){result={reachable:false,ok:false,error:error.message,dnsStatus:"unknown"};}
 await minimumWait;done=true;percent.textContent="100%";bar.textContent="#".repeat(20);timer.textContent=((performance.now()-started)/1000).toFixed(1)+"s";
 if(result.reachable){status.textContent=result.ok?"[ STATUS ] TARGET ONLINE":"[ STATUS ] SERVER RESPONSE // HTTP ERROR";
-log.textContent="> DNS: "+result.dnsStatus+" | HTTP: "+result.httpStatus+" | RTT: "+result.responseTimeMs+" ms";
+log.textContent="> DNS: "+result.dnsStatus+" | HTTP: "+result.httpStatus+" | RTT: "+result.responseTimeMs+" ms"+(result.securityWarnings?.length?" | WARNINGS: "+result.securityWarnings.join(", "):"");
 button.hidden=false;button.textContent=result.ok?"[ OPEN DESTINATION ]":"[ OPEN ANYWAY ]";
-if(result.ok){log.textContent+=" | CONNECTION SUCCESSFUL | MANUELLE BESTÄTIGUNG ERFORDERLICH";button.hidden=false;button.textContent="[ ICH HABE DAS ZIEL GEPRÜFT – WEITER ]";button.target="_self";button.rel="noopener noreferrer";}
-else{status.classList.add("redirect-error");log.textContent+=" | Server antwortet, meldet aber einen HTTP-Fehler. Öffnen nur nach eigener Entscheidung.";button.hidden=false;button.textContent="[ TROTZDEM MANUELL ÖFFNEN ]";button.target="_blank";button.rel="noopener noreferrer";}}
+if(result.ok){log.textContent+=" | CONNECTION SUCCESSFUL | MANUELLE BESTÄTIGUNG ERFORDERLICH";button.textContent="[ ICH HABE DAS ZIEL GEPRÜFT – WEITER ]";button.target="_blank";button.rel="noopener noreferrer";refreshConsent();}
+else{status.classList.add("redirect-error");log.textContent+=" | Server antwortet, meldet aber einen HTTP-Fehler. Öffnen nur nach eigener Entscheidung.";button.textContent="[ TROTZDEM MANUELL ÖFFNEN ]";button.target="_blank";button.rel="noopener noreferrer";refreshConsent();}}
 else{status.textContent="[ STATUS ] TARGET UNREACHABLE";status.classList.add("redirect-error");panel.classList.add("redirect-error-border");
 log.textContent="> DNS: "+(result.dnsStatus||"UNKNOWN")+" | ERROR: "+(result.error||"No response");
 const retry=el("button","redirect-button","[ RETRY DIAGNOSTIC ]");retry.type="button";retry.addEventListener("click",runTest);panel.append(retry);}
@@ -361,7 +371,7 @@ async function resolvePublicHost(host: string) {
     throw new Error("Das Ziel verweist auf eine private oder reservierte IP-Adresse und wurde blockiert.");
   }
 }
-async function runRedirectDiagnostic(slug: string, request: Request) {
+async function runRedirectDiagnostic(slug: string, request: Request, settings: any = {}) {
   const rows = await db("subfree_sites?slug=eq." + encodeURIComponent(slug) +
     "&status=eq.active&site_type=eq.redirect&select=slug,redirect_url");
   const site = rows[0];
@@ -419,6 +429,72 @@ async function runRedirectDiagnostic(slug: string, request: Request) {
   }
 }
 
+
+const scanRate = new Map<string, number>();
+async function runWebsiteCheck(rawUrl: string, request: Request) {
+  if (rawUrl.length > 2048) throw new Error("Die URL ist zu lang.");
+  let target: URL;
+  try { target = new URL(rawUrl); } catch { throw new Error("Bitte gib eine vollständige URL mit https:// oder http:// ein."); }
+  if (!["https:", "http:"].includes(target.protocol) || target.username || target.password ||
+      (target.port && !((target.protocol === "https:" && target.port === "443") || (target.protocol === "http:" && target.port === "80"))) ||
+      !target.hostname || target.hostname.includes("%")) {
+    throw new Error("Nur öffentliche HTTP-/HTTPS-Websites auf Standardports sind erlaubt. Zugangsdaten in URLs sind verboten.");
+  }
+  const host = target.hostname.replace(/^\[|\]$/g, "").toLowerCase();
+  await resolvePublicHost(host);
+  const clientIp = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const key = clientIp + ":" + host;
+  const now = Date.now(), previous = scanRate.get(key) || 0;
+  if (now - previous < 5000) throw new Error("Bitte warte fünf Sekunden zwischen Website-Prüfungen.");
+  scanRate.set(key, now);
+  if (scanRate.size > 5000) for (const [k, stamp] of scanRate) if (now - stamp > 60000) scanRate.delete(k);
+
+  const started = performance.now();
+  let response: Response;
+  try {
+    response = await fetch(target.toString(), {
+      method: "HEAD", redirect: "manual", cache: "no-store",
+      signal: AbortSignal.timeout(5000),
+      headers: { "User-Agent": "SubFree-Site-Check/1.0" }
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    throw new Error(/timed out|abort/i.test(msg) ? "Zeitüberschreitung beim Verbindungsaufbau." : "Verbindung fehlgeschlagen. TLS-Zertifikat oder Server prüfen.");
+  }
+  const status = response.status;
+  const headers = response.headers;
+  const redirected = status >= 300 && status < 400;
+  const checks = [
+    { id: "https", label: "HTTPS / TLS", status: target.protocol === "https:" ? "pass" : "warn",
+      detail: target.protocol === "https:" ? "HTTPS-Verbindung wurde aufgebaut. Zertifikatsprüfung durch den Verbindungsaufbau bestanden." : "Die URL verwendet unverschlüsseltes HTTP." },
+    { id: "http", label: "HTTP-Antwort", status: status >= 200 && status < 400 ? "pass" : "warn",
+      detail: "HTTP-Status " + status + (redirected ? " (Weiterleitung erkannt, nicht verfolgt)." : "") },
+    { id: "hsts", label: "HSTS", status: headers.has("strict-transport-security") ? "pass" : "warn",
+      detail: headers.get("strict-transport-security") || "Strict-Transport-Security fehlt." },
+    { id: "csp", label: "Content Security Policy", status: headers.has("content-security-policy") ? "pass" : "warn",
+      detail: headers.has("content-security-policy") ? "CSP-Header vorhanden." : "Content-Security-Policy fehlt." },
+    { id: "nosniff", label: "X-Content-Type-Options", status: headers.get("x-content-type-options")?.toLowerCase() === "nosniff" ? "pass" : "warn",
+      detail: headers.get("x-content-type-options") || "X-Content-Type-Options: nosniff fehlt." },
+    { id: "referrer", label: "Referrer-Policy", status: headers.has("referrer-policy") ? "pass" : "warn",
+      detail: headers.get("referrer-policy") || "Referrer-Policy fehlt." },
+    { id: "permissions", label: "Permissions-Policy", status: headers.has("permissions-policy") ? "pass" : "info",
+      detail: headers.get("permissions-policy") || "Permissions-Policy fehlt." }
+  ];
+  let locationHost = "";
+  if (redirected) {
+    try { locationHost = new URL(headers.get("location") || "", target).hostname; } catch {}
+  }
+  try { await response.body?.cancel(); } catch {}
+  const warnings = checks.filter(c => c.status === "warn").length;
+  return {
+    success: true, url: target.toString(), hostname: host, httpStatus: status,
+    responseTimeMs: Math.round(performance.now() - started), redirected,
+    redirectHost: locationHost, checkedAt: new Date().toISOString(),
+    verdict: checks.some(c => c.id === "https" && c.status === "warn") || status >= 400 ? "warning" : warnings ? "review" : "good",
+    checks
+  };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Nur POST ist erlaubt." }, 405);
@@ -426,11 +502,11 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = String(body.action ?? "");
 
-    if (action === "diagnostic") {
+    if (action === "site_check") {\n      try { return json(await runWebsiteCheck(String(body.url ?? "").trim(), req)); }\n      catch (error) { return json({ error: String(error instanceof Error ? error.message : error).slice(0, 220) }, 400); }\n    }\n\n    if (action === "diagnostic") {
       const slug = String(body.slug ?? "").toLowerCase();
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return json({ error: "Ungültiger Projektname." }, 400);
       try {
-        return json({ success: true, ...(await runRedirectDiagnostic(slug, req)) });
+        return json({ success: true, ...(await runRedirectDiagnostic(slug, req, body.security || {})) });
       } catch (error) {
         return json({ error: String(error instanceof Error ? error.message : error).slice(0, 220) }, 429);
       }
@@ -439,14 +515,14 @@ Deno.serve(async (req: Request) => {
     if (action === "public_site") {
       const slug = String(body.slug ?? "").toLowerCase();
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return json({ error: "Ungültiger Projektname." }, 400);
-      const rows = await db(`subfree_sites?slug=eq.${encodeURIComponent(slug)}&status=eq.active&select=id,slug,display_name,description,site_type,redirect_url,github_username`);
+      const rows = await db(`subfree_sites?slug=eq.${encodeURIComponent(slug)}&status=eq.active&select=id,slug,display_name,description,site_type,redirect_url,github_username,registration_data`);
       const site = rows[0];
       if (!site) return json({ error: "Projekt nicht gefunden oder noch nicht veröffentlicht." }, 404);
       const files = await db(`subfree_site_files?site_id=eq.${site.id}&file_path=eq.index.html&select=content,is_private`);
       return json({
         success: true,
         siteType: site.site_type,
-        redirectUrl: site.site_type === "redirect" ? site.redirect_url : null,
+        redirectUrl: site.site_type === "redirect" ? site.redirect_url : null,\n        redirectSecurity: site.site_type === "redirect" ? (site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }) : null,
         username: site.github_username === "subfree-user" ? site.slug : site.github_username,
         html: files[0] && !files[0].is_private ? files[0].content : "<h1>Diese Website ist noch nicht verfügbar.</h1>"
       });
@@ -583,14 +659,31 @@ Deno.serve(async (req: Request) => {
     const accessKey = req.headers.get("x-subfree-key") ?? String(body.accessKey ?? "");
     if (!accessKey.startsWith("sf_")) return json({ error: "Zugangscode fehlt oder ist ungültig." }, 401);
     const hash = await sha256(accessKey);
-    const rows = await db(`subfree_sites?access_key_hash=eq.${hash}&select=id,slug,display_name,github_username,description,site_type,redirect_url,status,github_folder_created,created_at`);
+    const rows = await db(`subfree_sites?access_key_hash=eq.${hash}&select=id,slug,display_name,github_username,description,site_type,redirect_url,status,github_folder_created,created_at,registration_data`);
     const site = rows[0];
     if (!site) return json({ error: "Zugangscode ist ungültig." }, 401);
 
     if (action === "load") {
       const files = await db(`subfree_site_files?site_id=eq.${site.id}&select=file_path,content,mime_type,updated_at,is_private&order=file_path.asc`);
       const folders = await db(`subfree_site_folders?site_id=eq.${site.id}&select=folder_path,is_private&order=folder_path.asc`);
-      return json({ success: true, site, files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
+      return json({ success: true, site, redirectSecurity: site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }, files, folders, githubConfigured: Boolean(GITHUB_TOKEN) });
+    }
+
+    if (action === "update_redirect_security") {
+      if (site.site_type !== "redirect") return json({ error: "Dieses Projekt ist keine Weiterleitung." }, 400);
+      const settings = {
+        checkStatus: body.checkStatus !== false,
+        checkHeaders: body.checkHeaders !== false,
+        checkRedirect: body.checkRedirect !== false,
+        requireDomainAck: body.requireDomainAck !== false,
+        requireExternalAck: body.requireExternalAck !== false
+      };
+      const registrationData = { ...(site.registration_data || {}), redirectSecurity: settings };
+      await db(`subfree_sites?id=eq.${site.id}`, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ registration_data: registrationData, updated_at: new Date().toISOString() })
+      });
+      return json({ success: true, settings, message: "Sicherheitsregeln gespeichert. DNS-/IP-Schutz und HTTPS-Prüfung bleiben immer aktiv." });
     }
 
     if (action === "update_redirect") {
