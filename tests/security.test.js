@@ -168,3 +168,22 @@ test("post-creation validation checks collisions without overwriting request fil
   assert.ok(workflow.includes("git cat-file -e"));
   assert.ok(workflow.includes("Domain path already occupied"));
 });
+
+test("duplicate domain slugs are allowed to create independent PRs before checks", () => {
+  const pr = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function finalizeDomainApplicationPullRequest"));
+  assert.ok(pr.includes("domain-requests/pending/"));
+  assert.ok(pr.includes("application.id"));
+  const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
+  assert.ok(!block.includes("domainRequestPathIsFree"));
+  assert.ok(!block.includes("status=in.(pending,pr_open)"));
+  assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("runWebsiteCheck"));
+});
+
+test("domain path collision is checked by GitHub Actions after the PR exists", () => {
+  const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
+  assert.ok(workflow.includes("pull_request:"));
+  assert.ok(workflow.includes("domain-requests/pending/*.json"));
+  assert.ok(workflow.includes("git cat-file -e"));
+  assert.ok(workflow.includes("The PR was created and remains open"));
+  assert.ok(workflow.includes("if: always()"));
+});
