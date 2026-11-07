@@ -139,7 +139,20 @@ domainRequestForm?.addEventListener("submit",async(event)=>{
   });
   message.textContent=result.message;
   const link=document.querySelector("#domain-request-pr");
-  link.href=result.prUrl;link.textContent="Pull-Request #"+result.prNumber+" auf GitHub öffnen ↗";
+  const resultTitle=document.querySelector("#domain-request-result-title");
+  const resultText=document.querySelector("#domain-request-result-text");
+  link.href=result.prUrl;
+  link.textContent="Prüfbericht / Pull-Request #"+result.prNumber+" auf GitHub öffnen ↗";
+  if(result.decision==="rejected"){
+   resultTitle.textContent="Antrag durch KI abgelehnt";
+   resultText.textContent="Der Antrag verstößt gegen die SubFree-Inhaltsrichtlinien. Die Pull-Request wurde geschlossen und der Pfad nicht aktiviert.";
+  }else if(result.decision==="manual_review"){
+   resultTitle.textContent="Manuelle Prüfung erforderlich";
+   resultText.textContent="Die KI konnte den Antrag nicht sicher freigeben. Der Pfad bleibt deaktiviert, bis der Betreiber den Fall geprüft hat.";
+  }else{
+   resultTitle.textContent="KI-Erstprüfung abgeschlossen";
+   resultText.textContent="Es wurden keine eindeutigen Richtlinienverstöße erkannt. Eine manuelle Betreiberfreigabe ist weiterhin zwingend erforderlich.";
+  }
   resultPanel.hidden=false;
  }catch(error){message.textContent=error.message||"Der Antrag konnte nicht eingereicht werden.";}
  finally{button.disabled=false;}
