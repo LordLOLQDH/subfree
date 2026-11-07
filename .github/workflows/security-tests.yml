@@ -13,3 +13,5 @@ jobs:
         with:
           node-version: 22
       - run: node --test tests/security.test.js
+      - name: Check browser JavaScript syntax
+        run: node --check script.js
