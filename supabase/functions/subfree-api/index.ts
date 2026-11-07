@@ -252,7 +252,7 @@ async function reviewDomainApplicationWithAI(purpose: string, websiteUrl: string
     })
   });
   const raw = await response.text();
-  if (!response.ok) throw new Error("KI-Prüfung fehlgeschlagen (Groq HTTP " + response.status + "). Antrag bleibt gesperrt.");
+  if (!response.ok) throw new Error("KI-Prüfung fehlgeschlagen (Groq HTTP " + response.status + "): " + raw.slice(0, 220) + ". Antrag bleibt gesperrt.");
   let result: any;
   try { result = JSON.parse(JSON.parse(raw).choices?.[0]?.message?.content || "{}"); }
   catch { throw new Error("KI-Prüfung lieferte keine gültige JSON-Entscheidung. Antrag bleibt gesperrt."); }
