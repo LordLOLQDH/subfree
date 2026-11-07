@@ -482,3 +482,42 @@ textarea{white-space:pre-wrap;overflow-wrap:anywhere}
 .redirect-settings-actions>a{color:#00ff88;font-size:12px}
 .redirect-settings-panel .form-message{margin-top:12px;color:#00ff88}
 @media(max-width:600px){.redirect-settings-heading h3{font-size:10px}.redirect-settings-actions{align-items:stretch;flex-direction:column}.redirect-settings-actions .button{width:100%}}
+
+/* Domain application, checker, and small-screen repair */
+.domain-request-section{align-items:start}
+.domain-request-section .request-form,.domain-request-section .request-intro{min-width:0}
+.domain-request-section .domain-input{display:flex;min-width:0;flex-wrap:nowrap}
+.domain-request-section .domain-input span{flex:0 0 auto;overflow-wrap:anywhere}
+.domain-request-section .domain-input input{min-width:0;width:100%}
+.domain-request-section .checkbox-label{align-items:flex-start}
+.domain-request-section .checkbox-label input{flex:0 0 auto;margin-top:5px}
+.domain-active-banner{margin:20px 0;padding:22px;border:1px solid #00a957;background:#06170d;box-shadow:4px 4px 0 #092013}
+.domain-active-banner[hidden]{display:none}
+.domain-active-banner h3{margin:12px 0;color:#effff1;font:12px/1.8 "Press Start 2P",monospace}
+.domain-active-banner p{color:#a9c8b3;line-height:1.5}
+.domain-active-banner a{color:#00ff88;overflow-wrap:anywhere}
+#redirect-mode-select{position:relative;z-index:2;display:block;width:100%;min-height:48px;pointer-events:auto;cursor:pointer}
+#redirect-security-settings .security-options{display:grid;gap:10px}
+#redirect-security-settings .setting-toggle{display:flex;align-items:flex-start;gap:10px;line-height:1.4}
+#redirect-security-settings .setting-toggle input{width:18px;min-width:18px;height:18px;margin:2px 0 0;flex:0 0 18px}
+.checker{box-sizing:border-box;width:min(100% - 36px,960px);margin:clamp(34px,7vw,76px) auto 90px;min-width:0}
+.checker h1{max-width:100%;overflow-wrap:anywhere}
+.check-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:stretch}
+.check-form input{width:100%;min-width:0}
+.report{min-width:0;overflow-wrap:anywhere}
+.report-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:18px 0}
+.report-stat{padding:12px;background:#030604;border:1px solid #244d2d}
+.report-stat strong{display:block;color:#00ff66;font:17px "VT323",monospace}
+.report-stat span{color:#9ab19d;font-size:14px}
+.check-row{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
+.check-row strong,.check-row small{overflow-wrap:anywhere}
+#domain-request-result a{display:inline-block;overflow-wrap:anywhere}
+@media(max-width:700px){
+ .domain-request-section .domain-input{flex-wrap:wrap}
+ .domain-request-section .domain-input span{width:100%;padding:10px 12px}
+ .domain-active-banner h3{font-size:10px}
+ .check-form{grid-template-columns:minmax(0,1fr)}
+ .checker{width:calc(100% - 28px)}
+ .checker h1{font-size:clamp(18px,6vw,30px)!important;line-height:1.6}
+ .report{padding:14px}
+}
