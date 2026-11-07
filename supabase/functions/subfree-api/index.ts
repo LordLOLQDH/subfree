@@ -852,6 +852,7 @@ Deno.serve(async (req: Request) => {
         method: "PATCH", headers: { Prefer: "return=minimal" },
         body: JSON.stringify({ site_type: previous.siteType || "static", redirect_url: previous.redirectUrl || null, registration_data: registrationData, updated_at: new Date().toISOString() })
       });
+      if (GITHUB_TOKEN && site.status === "active") { try { await updatePublicRegistry({ ...site, site_type: previous.siteType || "static", redirect_url: previous.redirectUrl || null }); } catch (error) { console.error("SubFree restored registry update failed", String(error)); } }
       return json({ success: true, message: "Domain-Modus beendet. Die vorherige Projektart und alle gespeicherten Einstellungen wurden wiederhergestellt." });
     }
 
