@@ -16,6 +16,8 @@ jobs:
   validate-request:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      HAS_AI_REVIEW: ${{ secrets.OPENAI_API_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,7 +49,7 @@ jobs:
           NODE
           done <<< "$files"
       - name: Optional AI review
-        if: ${{ secrets.OPENAI_API_KEY != '' }}
+        if: env.HAS_AI_REVIEW == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GH_TOKEN: ${{ github.token }}
@@ -66,7 +68,7 @@ jobs:
           test -n "$review" || { echo "AI review returned no text"; exit 1; }
           gh pr comment "$PR_NUMBER" --body "## SubFree KI-Prüfung\n\n$review\n\n_KI-Prüfung ist eine Hilfestellung, keine Freigabe. Der Betreiber muss die PR weiterhin manuell prüfen und mergen._"
       - name: AI review configuration notice
-        if: ${{ secrets.OPENAI_API_KEY == '' }}
+        if: env.HAS_AI_REVIEW != 'true'
         run: echo "::warning::OPENAI_API_KEY ist nicht als Repository-Secret gesetzt. Automatische KI-Prüfung wurde übersprungen; manuelle Prüfung bleibt erforderlich."
   sync-approved-request:
     if: github.event_name == 'push'
@@ -84,7 +86,7 @@ jobs:
           while IFS= read -r file; do
             [ -n "$file" ] || continue
             slug="$(basename "$file" .json)"
-            pr="$(gh pr list --state merged --base main --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
+            pr="$(gh pr list --state merged --base main --limit 100 --json number,title --jq '.[] | select(.title == "Domain-Antrag: /'"$slug"'") | .number' | head -n 1)"
             [ -n "$pr" ] || { echo "No merged PR found for $slug"; exit 1; }
             curl -fsS "$API_URL" -H "Content-Type: application/json" -d "$(jq -n --arg slug "$slug" --argjson prNumber "$pr" '{action:"sync_domain_approval",slug:$slug,prNumber:$prNumber}')"
           done <<< "$files"
