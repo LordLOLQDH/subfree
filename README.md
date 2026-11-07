@@ -25,7 +25,7 @@ Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und D
 - Öffentlicher Website Check: `check.html`. Er prüft DNS-/IP-Schutz, HTTPS/TLS-Verbindung, HTTP-Status, Weiterleitungen, Sicherheitsheader, CORS, Cookies und weitere sichtbare Merkmale. Zielseiten werden nicht im Browser geöffnet und HTTP-Weiterleitungen nicht verfolgt. Es ist kein vollständiger Malware- oder Phishing-Scan.
 - Bestehende Projektinhaber können unter `#domain-antrag` einen Pfad-Antrag mit Zugangscode, HTTPS-Ziel, Verwendungszweck und Nutzungsbedingungen stellen.
 - Anträge werden privat in `subfree_domain_applications` gespeichert. GitHub-PRs enthalten keine Namen, E-Mail-Adressen, Zugangscodes oder IP-Hashes.
-- GitHub Actions validiert die PR. Eine optionale KI-Prüfung benötigt das Repository-Secret `OPENAI_API_KEY`; ohne dieses Secret wird sie übersprungen und als Warnung markiert.
+- GitHub Actions prüft die PR mit festen Regeln und kommentiert das Ergebnis. Es wird keine KI-API verwendet und es entstehen dafür keine KI-API-Kosten. Diese Prüfung ersetzt keine manuelle Prüfung auf Phishing oder Betrug.
 - Ein genehmigter Pfad wird erst nach manuellem Merge synchronisiert. Der Merge löst die Aktivierung aus. Frühere Projekteinstellungen bleiben gespeichert und werden im Domain-Modus schreibgeschützt.
 
 ## Backend
