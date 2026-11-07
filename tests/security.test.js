@@ -110,3 +110,14 @@ test("direct mode remains unchanged while strict mode adds a third confirmation"
   const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   assert.match(page, /id="sec-strict-ack"/);
 });
+
+test("approved domain mode can restore the original project settings without deleting them", () => {
+  assert.match(edge, /if \(action === "restore_domain_mode"\)/);
+  assert.match(edge, /site\.registration_data\.domainPrevious/);
+  assert.match(edge, /previous\.registrationData/);
+  assert.match(edge, /previous\.siteType/);
+  const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
+  assert.match(page, /id="restore-domain-mode"/);
+  assert.match(script, /restore_domain_mode/);
+});
