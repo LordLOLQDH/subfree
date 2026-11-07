@@ -39,15 +39,11 @@
 @media(max-width:760px){.file-manager{grid-template-columns:1fr}.file-list{max-height:220px}.file-workspace .editor-controls{grid-template-columns:1fr}.editor-heading-actions{align-items:flex-start;flex-direction:column}.editor-heading{align-items:flex-start;gap:12px}}
 
 
-/* Temporary PNTR email address generator */
+/* PNTR public inbox panel */
 .temp-mail-section{padding-top:20px}
 .temp-mail-panel{max-width:950px;margin:30px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:28px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px}
 .temp-mail-generator,.temp-mail-info{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-width:0}
 .temp-mail-generator label{font-size:13px;font-weight:700}
-.temp-mail-address{width:100%;display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#f7f9fc}
-.temp-mail-address input{min-width:0;flex:1;border:0;background:transparent;padding:13px;font:inherit;outline:none}
-.temp-mail-address span{padding:0 12px 0 0;color:var(--muted);font-size:12px;white-space:nowrap}
-.temp-mail-result{font-size:14px;font-weight:700;overflow-wrap:anywhere;margin:0;color:var(--ink)}
 .temp-mail-info p,.temp-mail-info small{color:var(--muted);font-size:13px;line-height:1.65;margin:0}
 .temp-mail-info a{font-size:13px;font-weight:700;color:var(--ink);text-decoration:underline}
 .temp-mail-info small{font-size:11px}
