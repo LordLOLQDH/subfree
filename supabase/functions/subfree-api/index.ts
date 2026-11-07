@@ -318,11 +318,13 @@ const destination=el("p","redirect-description","Ziel: "+new URL(target).hostnam
 const acknowledgements=el("div","redirect-log");
 const domainLabel=el("label");const domainCheck=el("input");domainCheck.type="checkbox";domainLabel.append(domainCheck,document.createTextNode(" Ich habe die angezeigte Zieldomain geprüft."));
 const externalLabel=el("label");const externalCheck=el("input");externalCheck.type="checkbox";externalLabel.append(externalCheck,document.createTextNode(" Mir ist bewusst, dass SubFree keine Garantie für die Vertrauenswürdigkeit der Zielwebsite geben kann."));
+const strictLabel=el("label");const strictCheck=el("input");strictCheck.type="checkbox";strictLabel.append(strictCheck,document.createTextNode(" Ich habe Ziel, Betreiber und Zweck dieser Website zusätzlich geprüft."));
 if(security.requireDomainAck!==false)acknowledgements.append(domainLabel);
 if(security.requireExternalAck!==false)acknowledgements.append(externalLabel);
+if(security.requireStrictAck===true)acknowledgements.append(strictLabel);
 button.hidden=true;button.target="_blank";button.rel="noopener noreferrer";
-const refreshConsent=()=>{button.hidden=(security.requireDomainAck!==false&&!domainCheck.checked)||(security.requireExternalAck!==false&&!externalCheck.checked);};
-domainCheck.addEventListener("change",refreshConsent);externalCheck.addEventListener("change",refreshConsent);
+const refreshConsent=()=>{button.hidden=(security.requireDomainAck!==false&&!domainCheck.checked)||(security.requireExternalAck!==false&&!externalCheck.checked)||(security.requireStrictAck===true&&!strictCheck.checked);};
+domainCheck.addEventListener("change",refreshConsent);externalCheck.addEventListener("change",refreshConsent);strictCheck.addEventListener("change",refreshConsent);
 panel.append(destination,acknowledgements,button);
 const footer=el("footer","redirect-footer");footer.append(el("span","","SUBFREE OS // 32-BIT"),el("span","","@"+username));
 shell.append(header,panel,footer);document.body.className="redirect-mode";document.body.replaceChildren(shell);
