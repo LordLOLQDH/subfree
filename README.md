@@ -22,7 +22,7 @@ Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und D
 
 ## Temp-Mail
 
-- Der Adressgenerator verwendet `temp-admin-001.pntr.dev`. Beliebige Empfänger vor dem `@` landen im gemeinsamen PNTR-Posteingang.
+- SubFree verlinkt den öffentlichen PNTR-Test-Posteingang. Die Empfängeradresse muss die zu diesem Postfach gehörende PNTR-Maildomain verwenden; diese Domain wird nicht aus dem öffentlichen Inbox-Link abgeleitet.
 - Öffentlicher, schreibgeschützter Postfach-Link: [PNTR-Posteingang öffnen](https://pntr.dev/inbox/7a217ed95d05e478cdc25e4f978cdb1d4386892b9274a2dc55f7eb14dbd9aa06). Jeder mit diesem Link kann Nachrichten lesen. Nur für Testkonten verwenden, niemals für private oder vertrauliche Nachrichten. PNTR löscht Nachrichten im kostenlosen Tarif nach 48 Stunden.
 
 ## Website Check und Pfad-Anträge
