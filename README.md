@@ -30,7 +30,7 @@ Die benutzerdefinierte Domain ist erst aktiv, wenn die Domainregistrierung und D
 - Öffentlicher Website Check: `check.html`. Er prüft DNS-/IP-Schutz, HTTPS/TLS-Verbindung, HTTP-Status, Weiterleitungen, Sicherheitsheader, CORS, Cookies und weitere sichtbare Merkmale. Zielseiten werden nicht im Browser geöffnet und HTTP-Weiterleitungen nicht verfolgt. Es ist kein vollständiger Malware- oder Phishing-Scan.
 - Bestehende Projektinhaber können unter `#domain-antrag` einen Pfad-Antrag mit Zugangscode, HTTPS-Ziel, Verwendungszweck und Nutzungsbedingungen stellen.
 - Anträge werden privat in `subfree_domain_applications` gespeichert. GitHub-PRs enthalten keine Namen, E-Mail-Adressen, Zugangscodes oder IP-Hashes.
-- GitHub Actions prüft die PR mit festen Regeln und kommentiert das Ergebnis. Eine KI-Inhaltsprüfung ist derzeit noch nicht in den Antragsablauf integriert. Die formalen Prüfungen ersetzen keine manuelle Prüfung auf Phishing oder Betrug.
+- GitHub Actions prüft die PR mit festen Regeln und kommentiert das Ergebnis. Die Supabase-Edge-Function führt vor jeder Domain-PR eine Groq-KI-Inhaltsprüfung des Verwendungszwecks und eines begrenzten öffentlichen Website-Textauszugs aus. Entscheidungen: unauffällig (manuelle Freigabe bleibt Pflicht), manuelle Prüfung oder Ablehnung. Bei fehlender KI-Konfiguration bzw. API-Fehler wird kein Antrag freigegeben. GitHub Actions prüft zusätzlich nur die Dateiform und darf daraus keine Inhaltsfreigabe ableiten.
 - Ein genehmigter Pfad wird erst nach manuellem Merge synchronisiert. Der Merge löst die Aktivierung aus. Frühere Projekteinstellungen bleiben gespeichert und werden im Domain-Modus schreibgeschützt.
 
 ## Backend
