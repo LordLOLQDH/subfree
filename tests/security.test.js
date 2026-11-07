@@ -168,3 +168,21 @@ test("Vercel automatic deployments and GitHub bot comments are disabled", () => 
   assert.equal(config.git.deploymentEnabled, false);
   assert.equal(config.github.silent, true);
 });
+
+
+test("domain request PR is created before public path availability is checked", () => {
+  assert.ok(!edge.includes("async function domainRequestPathIsFree"));
+  const pr = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function finalizeDomainApplicationPullRequest"));
+  assert.ok(pr.includes("domain-requests/pending/"));
+  assert.ok(pr.includes("application.id"));
+  const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
+  assert.ok(!block.includes("domainRequestPathIsFree"));
+  assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("runWebsiteCheck"));
+});
+
+test("post-creation validation checks collisions without overwriting request files", () => {
+  const workflow = readFileSync(new URL("../.github/workflows/domain-requests.yml", import.meta.url), "utf8");
+  assert.ok(workflow.includes("domain-requests/pending/*.json"));
+  assert.ok(workflow.includes("git cat-file -e"));
+  assert.ok(workflow.includes("Domain path already occupied"));
+});
