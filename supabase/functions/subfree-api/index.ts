@@ -416,7 +416,15 @@ async function runRedirectDiagnostic(slug: string, request: Request, settings: a
     }
     try { await response.body?.cancel(); } catch {}
     const status = response.status;
-    return { reachable: true, ok: status >= 200 && status < 400, dnsStatus: "ok",
+    const securityWarnings: string[] = [];
+    if (settings.checkStatus !== false && status >= 400) securityWarnings.push("HTTP-Fehler");
+    if (settings.checkHeaders !== false) {
+      if (!response.headers.has("strict-transport-security")) securityWarnings.push("HSTS fehlt");
+      if (!response.headers.has("content-security-policy")) securityWarnings.push("CSP fehlt");
+      if (response.headers.get("x-content-type-options")?.toLowerCase() !== "nosniff") securityWarnings.push("nosniff fehlt");
+    }
+    if (settings.checkRedirect !== false && status >= 300 && status < 400) securityWarnings.push("Weiterleitung erkannt");
+    return { reachable: true, ok: status >= 200 && status < 400, dnsStatus: "ok", securityWarnings,
       httpStatus: status, responseTimeMs: Math.round(performance.now() - started),
       method, redirected: status >= 300 && status < 400,
       error: status >= 400 ? "Der Server antwortet, meldet aber einen HTTP-Fehler." : null };
@@ -502,7 +510,12 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = String(body.action ?? "");
 
-    if (action === "site_check") {\n      try { return json(await runWebsiteCheck(String(body.url ?? "").trim(), req)); }\n      catch (error) { return json({ error: String(error instanceof Error ? error.message : error).slice(0, 220) }, 400); }\n    }\n\n    if (action === "diagnostic") {
+    if (action === "site_check") {
+      try { return json(await runWebsiteCheck(String(body.url ?? "").trim(), req)); }
+      catch (error) { return json({ error: String(error instanceof Error ? error.message : error).slice(0, 220) }, 400); }
+    }
+
+    if (action === "diagnostic") {
       const slug = String(body.slug ?? "").toLowerCase();
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return json({ error: "Ungültiger Projektname." }, 400);
       try {
@@ -522,7 +535,8 @@ Deno.serve(async (req: Request) => {
       return json({
         success: true,
         siteType: site.site_type,
-        redirectUrl: site.site_type === "redirect" ? site.redirect_url : null,\n        redirectSecurity: site.site_type === "redirect" ? (site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }) : null,
+        redirectUrl: site.site_type === "redirect" ? site.redirect_url : null,
+        redirectSecurity: site.site_type === "redirect" ? (site.registration_data?.redirectSecurity ?? { checkStatus: true, checkHeaders: true, checkRedirect: true, requireDomainAck: true, requireExternalAck: true }) : null,
         username: site.github_username === "subfree-user" ? site.slug : site.github_username,
         html: files[0] && !files[0].is_private ? files[0].content : "<h1>Diese Website ist noch nicht verfügbar.</h1>"
       });
@@ -590,7 +604,7 @@ Deno.serve(async (req: Request) => {
       });
       const site = rows[0];
       const initialHtml = siteType === "redirect"
-        ? `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${redirectUrl}"><meta name="robots" content="noindex"><title>Weiterleitung</title></head><body><p>Weiterleitung zu <a href="${redirectUrl}">${redirectUrl}</a> …</p></body></html>`
+        ? `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Weiterleitung | SubFree</title></head><body><h1>Weiterleitung vorbereitet</h1><p>Das Ziel wird erst nach einer manuellen Bestätigung geöffnet.</p></body></html>`
         : starterWebsite(displayName, slug);
       await db("subfree_site_files?on_conflict=site_id%2Cfile_path", {
         method: "POST",
