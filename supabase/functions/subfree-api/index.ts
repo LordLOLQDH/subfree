@@ -743,7 +743,7 @@ Deno.serve(async (req: Request) => {
         }
       }
       return json({
-        success: true, slug, projectUrl: `https://lordlolqdh.github.io/subfree/${slug}/`,
+        success: true, slug, projectUrl: `https://subfree.pntr.dev/${slug}/`,
         accessKey: key, folderCreated, message: publishMessage,
         warning: "Speichere diesen Zugangscode sicher. Er wird nur einmal angezeigt und kann dein Projekt vollständig verwalten."
       }, 201);
@@ -787,6 +787,10 @@ Deno.serve(async (req: Request) => {
     const rows = await db(`subfree_sites?access_key_hash=eq.${hash}&select=id,slug,display_name,github_username,description,site_type,redirect_url,status,github_folder_created,created_at,registration_data`);
     const site = rows[0];
     if (!site) return json({ error: "Zugangscode ist ungültig." }, 401);
+
+    const domainLocked = site.registration_data?.domainMode === "active";
+    const domainWriteActions = new Set(["update_redirect_modes","update_redirect","save_file","create_folder","set_folder_privacy","publish","offline","api_push","create_api_token","revoke_api_token","delete_project"]);
+    if (domainLocked && domainWriteActions.has(action)) return json({ error: "Dieser Projektpfad ist im genehmigten Domain-Modus schreibgeschützt. Die bisherigen Daten und Einstellungen bleiben erhalten." }, 423);
 
     if (action === "load") {
       const files = await db(`subfree_site_files?site_id=eq.${site.id}&select=file_path,content,mime_type,updated_at,is_private&order=file_path.asc`);
