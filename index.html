@@ -64,7 +64,7 @@
         <div class="preview-content">
           <div class="preview-icon">S</div>
           <p class="preview-label">Deine Website unter</p>
-          <div class="domain-example"><span>subfree.is-a.dev/</span><strong>deinprojekt</strong></div>
+          <div class="domain-example"><span>subfree.pntr.dev/</span><strong>deinprojekt</strong></div>
           <span class="preview-tag"><i></i> DOMAIN STATUS: IN VORBEREITUNG</span>
           <div class="preview-terminal"><span>subfree://project</span><code>deploy --target /deinprojekt</code><small>STATUS <b>READY</b> · ACCESS <b>PUBLIC</b></small></div>
         </div>
@@ -129,7 +129,7 @@
       </div>
       <form id="register-form" class="request-form" onsubmit="return false;">
         <label for="slug">Gewünschter Projektname</label>
-        <div class="domain-input"><span>subfree.is-a.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
+        <div class="domain-input"><span>subfree.pntr.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
         <small>3–30 Zeichen, nur Kleinbuchstaben, Zahlen und Bindestriche.</small>
 
         <label for="displayName">Projekt- oder Anzeigename</label>
@@ -171,6 +171,34 @@
       </form>
     </section>
 
+    <section class="request-section domain-request-section" id="domain-antrag">
+      <div class="request-intro">
+        <span class="eyebrow">SUBFREE PATH REGISTRY</span>
+        <h2>Eigenen Projektpfad beantragen.</h2>
+        <p>Beantrage die Freigabe deines bestehenden Projektordners als eigene SubFree-Adresse. Die Adresse bleibt ein Pfad unter subfree.pntr.dev, keine separate DNS-Domain.</p>
+        <div class="notice"><strong>Prüfung statt Blindflug:</strong> Dein Antrag wird technisch geprüft, als GitHub-Pull-Request eingereicht und erst nach KI-Prüfung sowie deiner manuellen Freigabe durch den Betreiber aktiviert.</div>
+      </div>
+      <form id="domain-request-form" class="request-form">
+        <label for="domain-slug">Dein bestehender Projektordner</label>
+        <div class="domain-input"><span>subfree.pntr.dev/</span><input id="domain-slug" name="slug" required minlength="3" maxlength="30" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="meinprojekt" autocomplete="off"></div>
+        <small>Der Projektordner muss bereits existieren und online sein.</small>
+        <label for="domain-access-key">Persönlicher Projekt-Zugangscode</label>
+        <input id="domain-access-key" name="accessKey" type="password" required autocomplete="off" placeholder="sf_…">
+        <label for="domain-applicant-name">Dein Name</label>
+        <input id="domain-applicant-name" name="applicantName" required maxlength="80" autocomplete="name" placeholder="Vor- und Nachname">
+        <label for="domain-applicant-email">Kontakt-E-Mail</label>
+        <input id="domain-applicant-email" name="applicantEmail" type="email" required maxlength="254" autocomplete="email" placeholder="name@example.com">
+        <label for="domain-website-url">Website, für die du den Pfad beantragst</label>
+        <input id="domain-website-url" name="websiteUrl" type="url" required placeholder="https://example.com" autocomplete="url">
+        <label for="domain-purpose">Wofür benötigst du den Pfad und was wird auf der Website angeboten?</label>
+        <textarea id="domain-purpose" name="purpose" rows="5" minlength="30" maxlength="1600" required placeholder="Beschreibe den Zweck, die Inhalte, die Zielgruppe und warum du diesen SubFree-Pfad benötigst."></textarea>
+        <label class="checkbox-label"><input id="domain-terms" name="termsAccepted" type="checkbox" required><span>Ich stimme den <a href="agb.html" target="_blank" rel="noopener">Nutzungsbedingungen für SubFree-Pfade</a> zu und bestätige, dass ich die Website betreiben darf.</span></label>
+        <button class="button button-primary submit-button" type="submit">Domain-Antrag einreichen →</button>
+        <p id="domain-request-message" class="form-message" role="status" aria-live="polite"></p>
+        <div id="domain-request-result" class="key-result" hidden><strong>GitHub-Pull-Request erstellt</strong><p>Dein Antrag ist eingereicht. Die Adresse wird erst nach Prüfung und manuellem Merge aktiviert.</p><a id="domain-request-pr" target="_blank" rel="noopener">Pull-Request auf GitHub öffnen ↗</a></div>
+      </form>
+    </section>
+
     <section class="manage-section" id="verwalten">
       <div class="section-heading"><span class="eyebrow">PROJEKTVERWALTUNG</span><h2>Deine Website bearbeiten.</h2><p>Gib deinen Zugangscode ein. Damit erhältst du Zugriff auf genau das Projekt, für das der Code erstellt wurde.</p></div>
       <div class="manage-panel">
@@ -183,6 +211,12 @@
         </div>
         <div id="editor" class="editor" hidden>
           <div class="editor-heading"><div><strong id="project-title">Projekt</strong><span id="project-meta"></span><span id="project-status" class="project-status">Status wird geladen</span></div><div class="editor-heading-actions"><a id="project-url" target="_blank" rel="noopener">Website öffnen ↗</a><a id="email-shortcut" href="mailto:adam_kraus@icloud.com">E-Mail-Schnellzugriff ↗</a><button class="button button-secondary" id="offline-project" type="button">Website offline nehmen</button></div></div>
+          <section class="domain-active-banner" id="domain-active-status" hidden>
+            <span class="eyebrow">DOMAIN MODE // APPROVED</span>
+            <h3>Projektpfad ist als Domain-Modus freigegeben.</h3>
+            <p>Die Adresse bleibt aktiv. Die bisherigen Projektdateien und Einstellungen wurden nicht gelöscht, sind während des Domain-Modus aber schreibgeschützt.</p>
+            <a id="domain-active-link" href="#" target="_blank" rel="noopener">Freigegebenen Pfad öffnen ↗</a>
+          </section>
           <p class="deploy-notice">Nach dem Veröffentlichen kann es einen Moment dauern, bis GitHub Pages die Änderungen bereitstellt und die Website erreichbar ist.</p>
           <section class="redirect-settings-panel" id="redirect-settings" hidden>
             <div class="redirect-settings-heading"><span class="eyebrow">REDIRECT.EXE // CONFIG</span><h3>Weiterleitungsziel ändern</h3></div>
