@@ -1023,7 +1023,7 @@ Deno.serve(async (req: Request) => {
           method: "PATCH", headers: { Prefer: "return=minimal" },
           body: JSON.stringify({ github_folder_created: true, status: "active", updated_at: new Date().toISOString() })
         });
-        return json({ success: true, message: "Projektordner erstellt und Website veröffentlicht.", projectUrl: `https://lordlolqdh.github.io/subfree/${site.slug}/` });
+        return json({ success: true, message: "Projektordner erstellt und Website veröffentlicht.", projectUrl: `https://subfree.pntr.dev/${site.slug}/` });
       } catch (publishError) {
         const detail = String(publishError instanceof Error ? publishError.message : publishError).slice(0, 500);
         console.error("SubFree publish failed", { slug: site.slug, detail });
