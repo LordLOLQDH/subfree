@@ -462,3 +462,124 @@ document.querySelector("#redirect-mode-select")?.addEventListener("change",async
 for(const id of ["sec-check-status","sec-check-headers","sec-check-redirect","sec-domain-ack","sec-external-ack"])document.querySelector("#"+id)?.addEventListener("change",()=>{if(redirectModes?.[activeRedirectMode])redirectModes[activeRedirectMode]=readRedirectModeSettings();});
 document.querySelector("#save-redirect-security")?.addEventListener("click",saveRedirectModes);
 
+/* Domain application owner dashboard */
+const domainManageForm = document.querySelector("#domain-manage-form");
+const domainManageKey = document.querySelector("#domain-manage-key");
+const domainManageMessage = document.querySelector("#domain-manage-message");
+const domainApplicationsList = document.querySelector("#domain-applications-list");
+const domainStatusLabels = {
+  pending: "Antrag eingegangen",
+  pr_open: "Wird geprüft",
+  approved: "Genehmigt",
+  rejected: "Abgelehnt",
+  error: "Technischer Fehler"
+};
+function domainStatusCard(application, accessKey) {
+  const card = document.createElement("article");
+  card.className = "domain-application-card";
+  const heading = document.createElement("div");
+  heading.className = "domain-application-heading";
+  const title = document.createElement("h3");
+  title.textContent = "/" + application.slug;
+  const badge = document.createElement("span");
+  badge.className = "domain-status-pill";
+  badge.dataset.status = application.status;
+  badge.textContent = domainStatusLabels[application.status] || application.status;
+  heading.append(title, badge);
+  card.append(heading);
+  const meta = document.createElement("p");
+  meta.className = "domain-application-meta";
+  meta.textContent = "Antrag vom " + new Date(application.created_at).toLocaleString("de-DE");
+  card.append(meta);
+  if (application.github_pr_url) {
+    const pr = document.createElement("a");
+    pr.href = application.github_pr_url;
+    pr.target = "_blank";
+    pr.rel = "noopener noreferrer";
+    pr.textContent = "Prüfbericht / Pull-Request #" + (application.github_pr_number || "") + " öffnen ↗";
+    card.append(pr);
+  }
+  const aiDecision = application.check_results?.aiReview?.decision;
+  if (aiDecision) {
+    const ai = document.createElement("p");
+    ai.className = "domain-application-meta";
+    ai.textContent = "KI-Erstprüfung: " + ({approved:"unauffällig",manual_review:"manuelle Prüfung",rejected:"abgelehnt",error:"technischer Fehler"}[aiDecision] || aiDecision);
+    card.append(ai);
+  }
+  if (application.status === "approved") {
+    const activeText = document.createElement("p");
+    activeText.className = "domain-approved-copy";
+    activeText.textContent = "Dein Pfad ist freigegeben. Hier kannst du das Ziel ändern, auf das Besucher weitergeleitet werden.";
+    card.append(activeText);
+    const label = document.createElement("label");
+    label.textContent = "Aktuelles HTTPS-Weiterleitungsziel";
+    const input = document.createElement("input");
+    input.type = "url";
+    input.inputMode = "url";
+    input.autocomplete = "url";
+    input.value = application.website_url || "";
+    input.maxLength = 2048;
+    input.className = "domain-target-input";
+    const actions = document.createElement("div");
+    actions.className = "domain-target-actions";
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "button button-primary";
+    save.textContent = "Weiterleitungsziel speichern";
+    const status = document.createElement("p");
+    status.className = "form-message";
+    status.setAttribute("role", "status");
+    save.addEventListener("click", async () => {
+      save.disabled = true;
+      status.textContent = "Änderung wird geprüft und gespeichert …";
+      try {
+        const result = await api({
+          action: "update_domain_target",
+          accessKey,
+          applicationId: application.id,
+          websiteUrl: input.value.trim()
+        });
+        status.textContent = result.message || "Weiterleitungsziel gespeichert.";
+        input.value = result.websiteUrl || input.value.trim();
+      } catch (error) {
+        status.textContent = error.message || "Änderung konnte nicht gespeichert werden.";
+      } finally {
+        save.disabled = false;
+      }
+    });
+    actions.append(save);
+    card.append(label, input, actions, status);
+  } else if (application.status === "rejected") {
+    const note = document.createElement("p");
+    note.className = "domain-application-meta";
+    note.textContent = "Dieser Antrag wurde abgelehnt. Der Pfad ist nicht aktiv.";
+    card.append(note);
+  } else {
+    const note = document.createElement("p");
+    note.className = "domain-application-meta";
+    note.textContent = "Der Pfad bleibt bis zur endgültigen Genehmigung inaktiv.";
+    card.append(note);
+  }
+  return card;
+}
+domainManageForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!domainManageForm.reportValidity()) return;
+  const key = domainManageKey.value.trim();
+  domainManageMessage.textContent = "Deine Anträge werden geladen …";
+  domainApplicationsList.replaceChildren();
+  try {
+    const result = await api({ action: "domain_applications_list", accessKey: key });
+    if (!result.applications?.length) {
+      domainManageMessage.textContent = "Für dieses Projekt wurden noch keine Domain-Anträge gefunden.";
+      return;
+    }
+    domainManageMessage.textContent = result.applications.length + " Antrag/Anträge gefunden.";
+    for (const application of result.applications) {
+      domainApplicationsList.append(domainStatusCard(application, key));
+    }
+  } catch (error) {
+    domainManageMessage.textContent = error.message || "Anträge konnten nicht geladen werden.";
+  }
+});
+
