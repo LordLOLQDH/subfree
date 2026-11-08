@@ -195,7 +195,7 @@ test("domain request dashboard lists only applications belonging to the supplied
   assert.match(list, /sha256\(accessKey\)/);
   assert.match(list, /access_key_hash=eq\./);
   assert.match(list, /subfree_domain_applications/);
-  assert.doesNotMatch(list, /applicant_email|request_ip_hash|access_key_hash,?/);
+  assert.match(list, /select=id,slug,applicant_name,website_url,status,github_pr_number,github_pr_url,created_at,updated_at,check_results/);\n  assert.doesNotMatch(list, /select=[^"]*(applicant_email|request_ip_hash|access_key_hash)/);
   const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
   assert.match(page, /id="domain-status"/);
@@ -217,7 +217,7 @@ test("only the owner can change the target of the currently approved domain path
 test("domain path UI explains why per-path CNAME records are unavailable", () => {
   const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
-  assert.match(page, /kein separater CNAME-Eintrag/i);
+  assert.match(page, /keinen separaten CNAME-Eintrag/i);
   assert.match(page, /Weiterleitungsziel/);
   assert.match(script, /update_domain_target/);
 });
