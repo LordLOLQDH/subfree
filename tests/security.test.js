@@ -222,3 +222,16 @@ test("domain path UI explains why per-path CNAME records are unavailable", () =>
   assert.match(page, /Weiterleitungsziel/);
   assert.match(script, /update_domain_target/);
 });
+
+
+test("domain status is refreshed from live GitHub pull request state", () => {
+  const list = edge.slice(edge.indexOf('if (action === "domain_applications_list")'), edge.indexOf('if (action === "update_domain_target")'));
+  assert.match(list, /githubApi\("\/pulls\/" \+ application\.github_pr_number\)/);
+  assert.match(list, /pr\.merged_at/);
+  assert.match(list, /pr\.state === "closed" && !pr\.merged_at/);
+  assert.match(list, /status: "closed"/);
+  assert.match(list, /domainApplicationId === application\.id/);
+  const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
+  assert.match(script, /Geschlossen \(nicht zusammengeführt\)/);
+  assert.match(script, /Zusammengeführt, Aktivierung ausstehend/);
+});
