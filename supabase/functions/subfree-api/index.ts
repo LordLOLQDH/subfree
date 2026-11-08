@@ -907,6 +907,38 @@ Deno.serve(async (req: Request) => {
       const project = projects[0];
       if (!project) return json({ error: "Der Zugangscode ist ungültig oder das Projekt ist nicht aktiv." }, 403);
       const applications = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(project.slug) + "&select=id,slug,applicant_name,website_url,status,github_pr_number,github_pr_url,created_at,updated_at,check_results&order=created_at.desc");
+      for (const application of applications) {
+        if (!application.github_pr_number) continue;
+        try {
+          const pr = await githubApi("/pulls/" + application.github_pr_number);
+          application.github_pr_state = pr.state;
+          application.merged_at = pr.merged_at || null;
+          application.closed_at = pr.closed_at || null;
+          if (pr.merged_at && application.status !== "rejected") {
+            const isActive = project.registration_data?.domainMode === "active" &&
+              project.registration_data?.domainApplicationId === application.id;
+            if (isActive) {
+              if (application.status !== "approved") {
+                await db("subfree_domain_applications?id=eq." + application.id, {
+                  method: "PATCH", headers: { Prefer: "return=minimal" },
+                  body: JSON.stringify({ status: "approved", updated_at: new Date().toISOString() })
+                });
+                application.status = "approved";
+              }
+            } else if (application.status !== "approved") {
+              application.status = "merged_pending_activation";
+            }
+          } else if (pr.state === "closed" && !pr.merged_at && application.status === "pr_open") {
+            await db("subfree_domain_applications?id=eq." + application.id, {
+              method: "PATCH", headers: { Prefer: "return=minimal" },
+              body: JSON.stringify({ status: "closed", updated_at: new Date().toISOString() })
+            });
+            application.status = "closed";
+          }
+        } catch (error) {
+          application.status_sync_error = String(error instanceof Error ? error.message : error).slice(0, 160);
+        }
+      }
       return json({ success: true, applications });
     }
 
