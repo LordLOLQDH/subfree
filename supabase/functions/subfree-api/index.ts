@@ -898,6 +898,51 @@ Deno.serve(async (req: Request) => {
       }, 201);
     }
 
+
+    if (action === "domain_applications_list") {
+      const accessKey = String(body.accessKey ?? "");
+      if (!accessKey.startsWith("sf_")) return json({ error: "Bitte gib deinen persönlichen Projekt-Zugangscode ein." }, 401);
+      const keyHash = await sha256(accessKey);
+      const projects = await db("subfree_sites?access_key_hash=eq." + keyHash + "&status=eq.active&select=id,slug,registration_data");
+      const project = projects[0];
+      if (!project) return json({ error: "Der Zugangscode ist ungültig oder das Projekt ist nicht aktiv." }, 403);
+      const applications = await db("subfree_domain_applications?slug=eq." + encodeURIComponent(project.slug) + "&select=id,slug,applicant_name,website_url,status,github_pr_number,github_pr_url,created_at,updated_at,check_results&order=created_at.desc");
+      return json({ success: true, applications });
+    }
+
+    if (action === "update_domain_target") {
+      const accessKey = String(body.accessKey ?? "");
+      const applicationId = String(body.applicationId ?? "");
+      const websiteUrl = String(body.websiteUrl ?? "").trim();
+      if (!accessKey.startsWith("sf_")) return json({ error: "Bitte gib deinen persönlichen Projekt-Zugangscode ein." }, 401);
+      if (!/^[0-9a-f-]{36}$/i.test(applicationId)) return json({ error: "Ungültige Antrags-ID." }, 400);
+      let target: URL;
+      try { target = new URL(websiteUrl); } catch { return json({ error: "Bitte gib eine gültige HTTPS-Zieladresse ein." }, 400); }
+      if (target.protocol !== "https:" || target.username || target.password || target.port || target.search || target.hash || !target.hostname || websiteUrl.length > 2048) {
+        return json({ error: "Erlaubt sind nur gültige HTTPS-Ziele ohne Zugangsdaten, Port, URL-Parameter oder Fragmente." }, 400);
+      }
+      const keyHash = await sha256(accessKey);
+      const projects = await db("subfree_sites?access_key_hash=eq." + keyHash + "&status=eq.active&select=id,slug,registration_data,site_type");
+      const project = projects[0];
+      if (!project) return json({ error: "Der Zugangscode ist ungültig oder das Projekt ist nicht aktiv." }, 403);
+      if (project.registration_data?.domainMode !== "active" || project.registration_data?.domainApplicationId !== applicationId) {
+        return json({ error: "Dieser Antrag ist nicht die aktuell freigegebene Domain dieses Projekts." }, 403);
+      }
+      const rows = await db("subfree_domain_applications?id=eq." + applicationId + "&slug=eq." + encodeURIComponent(project.slug) + "&status=eq.approved&select=id,slug");
+      if (!rows[0]) return json({ error: "Nur genehmigte Domain-Anträge können geändert werden." }, 403);
+      const normalizedTarget = target.toString();
+      const registrationData = { ...(project.registration_data || {}), domainWebsiteUrl: normalizedTarget };
+      await db("subfree_sites?id=eq." + project.id, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ redirect_url: normalizedTarget, registration_data: registrationData, updated_at: new Date().toISOString() })
+      });
+      await db("subfree_domain_applications?id=eq." + applicationId, {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ website_url: normalizedTarget, updated_at: new Date().toISOString() })
+      });
+      return json({ success: true, websiteUrl: normalizedTarget, message: "Weiterleitungsziel gespeichert. Die Änderung ist für deinen freigegebenen Pfad aktiv." });
+    }
+
     if (action === "sync_domain_approval") {
       const slug = String(body.slug ?? "").trim().toLowerCase(), prNumber = Number(body.prNumber);
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || !Number.isInteger(prNumber) || prNumber < 1) return json({ error: "Ungültige Freigabeangaben." }, 400);
