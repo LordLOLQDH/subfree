@@ -23,6 +23,7 @@
       <a href="#funktionen">Funktionen</a>
       <a href="check.html">Website prüfen</a>
       <a href="#domain-antrag">Pfad beantragen</a>
+      <a href="#domain-status">Domain-Status</a>
       <a class="nav-manage" href="#verwalten">Verwalten</a>
       <a href="#temp-mail">Temp-Mail</a>
       <a href="mailto:adam_kraus@icloud.com">E-Mail ↗</a>
@@ -196,6 +197,20 @@
         <p id="domain-request-message" class="form-message" role="status" aria-live="polite"></p>
         <div id="domain-request-result" class="key-result" hidden><strong id="domain-request-result-title">Prüfung abgeschlossen</strong><p id="domain-request-result-text">Dein Antrag wurde geprüft.</p><a id="domain-request-pr" target="_blank" rel="noopener">Prüfbericht auf GitHub öffnen ↗</a></div>
       </form>
+    </section>
+
+    <section class="section domain-customer-area" id="domain-status">
+      <div class="section-heading"><span class="eyebrow">SUBFREE PATH CONTROL</span><h2>Deinen Domain-Antrag verwalten.</h2><p>Mit demselben persönlichen Projekt-Zugangscode kannst du den Prüfstatus deiner Anträge sehen. Nach der Genehmigung lässt sich auch das Weiterleitungsziel ändern.</p></div>
+      <div class="domain-customer-panel">
+        <form id="domain-manage-form" class="domain-manage-login">
+          <label for="domain-manage-key">Persönlicher Projekt-Zugangscode</label>
+          <input id="domain-manage-key" type="password" autocomplete="off" placeholder="sf_…" required>
+          <button class="button button-primary" type="submit">Meine Anträge laden →</button>
+          <p id="domain-manage-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+        <div id="domain-applications-list" class="domain-applications-list" aria-live="polite"></div>
+        <p class="domain-dns-note"><strong>Hinweis zu CNAME:</strong> Ein SubFree-Pfad wie <code>subfree.pntr.dev/deinprojekt/</code> ist keine eigene DNS-Domain. Deshalb gibt es dafür keinen separaten CNAME-Eintrag. Du kannst nach der Freigabe stattdessen das HTTPS-Weiterleitungsziel hier ändern.</p>
+      </div>
     </section>
 
     <section class="manage-section" id="verwalten">
