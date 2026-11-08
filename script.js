@@ -472,6 +472,8 @@ const domainStatusLabels = {
   pr_open: "Wird geprüft",
   approved: "Genehmigt",
   rejected: "Abgelehnt",
+  closed: "Geschlossen (nicht zusammengeführt)",
+  merged_pending_activation: "Zusammengeführt, Aktivierung ausstehend",
   error: "Technischer Fehler"
 };
 function domainStatusCard(application, accessKey) {
@@ -552,7 +554,17 @@ function domainStatusCard(application, accessKey) {
   } else if (application.status === "rejected") {
     const note = document.createElement("p");
     note.className = "domain-application-meta";
-    note.textContent = "Dieser Antrag wurde abgelehnt. Der Pfad ist nicht aktiv.";
+    note.textContent = "Dieser Antrag wurde inhaltlich abgelehnt. Der Pfad ist nicht aktiv.";
+    card.append(note);
+  } else if (application.status === "closed") {
+    const note = document.createElement("p");
+    note.className = "domain-application-meta";
+    note.textContent = "Diese Pull-Request wurde geschlossen, ohne zusammengeführt zu werden. Der Antrag ist nicht genehmigt.";
+    card.append(note);
+  } else if (application.status === "merged_pending_activation") {
+    const note = document.createElement("p");
+    note.className = "domain-application-meta";
+    note.textContent = "Die Pull-Request wurde zusammengeführt. Die Aktivierung des Pfads ist noch nicht vollständig synchronisiert.";
     card.append(note);
   } else {
     const note = document.createElement("p");
