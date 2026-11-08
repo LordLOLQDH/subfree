@@ -505,3 +505,29 @@ textarea{white-space:pre-wrap;overflow-wrap:anywhere}
  .checker h1{font-size:clamp(18px,6vw,30px)!important;line-height:1.6}
  .report{padding:14px}
 }
+
+/* Domain application owner dashboard */
+.domain-customer-area{padding-top:34px}
+.domain-customer-panel{max-width:980px;margin:0 auto;padding:clamp(18px,3vw,28px);border:1px solid #24512e;background:#050806;box-shadow:5px 5px 0 #092013}
+.domain-manage-login{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 14px;align-items:end}
+.domain-manage-login label{grid-column:1/-1;color:#00ff88;font:9px/1.8 "Press Start 2P",monospace}
+.domain-manage-login input,.domain-target-input{width:100%;min-width:0;padding:13px 14px;border:1px solid #24512e;border-radius:0;background:#020403;color:#eaffed;font:18px "VT323",monospace}
+.domain-manage-login input:focus,.domain-target-input:focus{outline:1px solid #00ff88;box-shadow:0 0 0 3px #00ff8818}
+.domain-manage-login .form-message{grid-column:1/-1;margin:0;color:#9ab19d}
+.domain-applications-list{display:grid;gap:14px;margin-top:22px}
+.domain-application-card{min-width:0;padding:18px;border:1px solid #24512e;background:#030604}
+.domain-application-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.domain-application-heading h3{margin:0;color:#effff1;font:12px/1.8 "Press Start 2P",monospace;overflow-wrap:anywhere}
+.domain-status-pill{padding:6px 9px;border:1px solid #59705f;color:#b7c9bb;font-size:15px}
+.domain-status-pill[data-status="approved"]{border-color:#00a957;color:#00ff88}
+.domain-status-pill[data-status="rejected"]{border-color:#a33b3b;color:#ff8888}
+.domain-application-meta{color:#91a397;font-size:17px;line-height:1.4;overflow-wrap:anywhere}
+.domain-application-card>a{display:inline-block;margin:5px 0;color:#00ff88;overflow-wrap:anywhere}
+.domain-approved-copy{color:#b7c9bb;line-height:1.45}
+.domain-application-card>label{display:block;margin:16px 0 8px;color:#00ff88;font:9px/1.8 "Press Start 2P",monospace}
+.domain-target-actions{display:flex;gap:12px;margin-top:12px}
+.domain-application-card .form-message{color:#00ff88;overflow-wrap:anywhere}
+.domain-dns-note{margin:22px 0 0;padding:14px;border-left:2px solid #00ff88;background:#07120a;color:#9ab19d;line-height:1.5}
+.domain-dns-note strong{color:#effff1}
+.domain-dns-note code{color:#00ff88;overflow-wrap:anywhere}
+@media(max-width:640px){.domain-manage-login{grid-template-columns:minmax(0,1fr)}.domain-manage-login label,.domain-manage-login .form-message{grid-column:auto}.domain-manage-login .button,.domain-target-actions .button{width:100%}.domain-target-actions{flex-direction:column}}
