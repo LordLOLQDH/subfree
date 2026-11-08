@@ -188,3 +188,36 @@ test("domain path collision is checked by GitHub Actions after the PR exists", (
   assert.ok(workflow.includes("The PR was created and remains open"));
   assert.ok(workflow.includes("if: always()"));
 });
+
+
+test("domain request dashboard lists only applications belonging to the supplied project key", () => {
+  const list = edge.slice(edge.indexOf('if (action === "domain_applications_list")'), edge.indexOf('if (action === "update_domain_target")'));
+  assert.match(list, /sha256\(accessKey\)/);
+  assert.match(list, /access_key_hash=eq\./);
+  assert.match(list, /subfree_domain_applications/);
+  assert.doesNotMatch(list, /applicant_email|request_ip_hash|access_key_hash,?/);
+  const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
+  assert.match(page, /id="domain-status"/);
+  assert.match(page, /id="domain-manage-key"/);
+  assert.match(script, /domain_applications_list/);
+});
+
+test("only the owner can change the target of the currently approved domain path", () => {
+  const update = edge.slice(edge.indexOf('if (action === "update_domain_target")'), edge.indexOf('if (action === "sync_domain_approval")'));
+  assert.match(update, /sha256\(accessKey\)/);
+  assert.match(update, /domainMode !== "active"/);
+  assert.match(update, /domainApplicationId !== applicationId/);
+  assert.match(update, /status=eq\.approved/);
+  assert.match(update, /target\.protocol !== "https:"/);
+  assert.match(update, /redirect_url: normalizedTarget/);
+  assert.match(update, /website_url: normalizedTarget/);
+});
+
+test("domain path UI explains why per-path CNAME records are unavailable", () => {
+  const page = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
+  assert.match(page, /kein separater CNAME-Eintrag/i);
+  assert.match(page, /Weiterleitungsziel/);
+  assert.match(script, /update_domain_target/);
+});
