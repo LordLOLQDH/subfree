@@ -157,7 +157,7 @@ test("domain request PR is created before public path availability is checked", 
   const pr = edge.slice(edge.indexOf("async function openDomainApplicationPullRequest"), edge.indexOf("async function finalizeDomainApplicationPullRequest"));
   assert.ok(pr.includes("domain-requests/pending/"));
   assert.ok(pr.includes("application.id"));
-  const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "sync_domain_approval")'));
+  const block = edge.slice(edge.indexOf('if (action === "domain_application")'), edge.indexOf('if (action === "domain_applications_list")'));
   assert.ok(!block.includes("domainRequestPathIsFree"));
   assert.ok(block.indexOf("openDomainApplicationPullRequest") < block.indexOf("runWebsiteCheck"));
   assert.ok(!block.includes("domainMode === \"active\""));
