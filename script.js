@@ -78,7 +78,7 @@ githubInput?.addEventListener("input",()=>{
  },450);
 });
 addressType?.addEventListener("change", () => {
-  if (addressPrefix) addressPrefix.textContent = addressType.value === "subdomain" ? "" : "subfree.pntr.dev/";
+  if (addressPrefix) addressPrefix.textContent = addressType.value === "subdomain" ? "" : "adam.is-a-fullstack.dev/";
   const slugInput = document.querySelector("#slug");
   if (slugInput) slugInput.placeholder = addressType.value === "subdomain" ? "projekt" : "meinprojekt";
 });
@@ -177,7 +177,7 @@ domainRequestForm?.addEventListener("submit",async(event)=>{
  const contentMode=String(data.get("contentMode")||"standard");
  const websiteUrl=contentMode==="external"
    ? String(data.get("websiteUrl")||"").trim()
-   : "https://subfree.pntr.dev/"+slug+"/";
+   : "https://"+slug+"/";
  const dnsRecords=String(data.get("dnsRecords")||"").trim();
  try{
   const result=await api({
@@ -228,11 +228,11 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentFolders = result.folders || [];
     const domainActive = result.site.registration_data?.domainMode === "active";
     const domainBanner = document.querySelector("#domain-active-status");
-    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://subfree.pntr.dev/"+result.site.slug+"/";domainLink.textContent="https://subfree.pntr.dev/"+result.site.slug+"/ ↗";}}
+    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://"+result.site.slug+"/";domainLink.textContent="https://"+result.site.slug+"/ ↗";}}
     if(domainActive){
-      for(const selector of ["#redirect-settings","#redirect-security-settings","#api-access","#delete-project-zone",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=true;}
+      for(const selector of ["#redirect-settings","#redirect-security-settings","#api-access",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=true;}
     }else{
-      for(const selector of ["#api-access","#delete-project-zone",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=false;}
+      for(const selector of ["#api-access",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=false;}
     }
     document.querySelector("#offline-project").disabled=domainActive;
     document.querySelector("#publish-project").disabled=domainActive;
@@ -255,7 +255,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#project-title").textContent = result.site.display_name;
     document.querySelector("#project-meta").textContent = (result.site.github_username && result.site.github_username !== "subfree-user" ? "@" + result.site.github_username : "SubFree-Account ohne GitHub") + " · " + result.site.slug;
     const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"adam_kraus@icloud.com";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:adam_kraus@icloud.com";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
-    document.querySelector("#project-url").href = "https://subfree.pntr.dev/" + result.site.slug + "/";
+    document.querySelector("#project-url").href = "https://" + result.site.slug + "/";
     await refreshApiTokens();
     const files = result.files || [];
     renderFiles(files, currentFolders);
