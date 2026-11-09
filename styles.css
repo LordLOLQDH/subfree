@@ -531,3 +531,32 @@ textarea{white-space:pre-wrap;overflow-wrap:anywhere}
 .domain-dns-note strong{color:#effff1}
 .domain-dns-note code{color:#00ff88;overflow-wrap:anywhere}
 @media(max-width:640px){.domain-manage-login{grid-template-columns:minmax(0,1fr)}.domain-manage-login label,.domain-manage-login .form-message{grid-column:auto}.domain-manage-login .button,.domain-target-actions .button{width:100%}.domain-target-actions{flex-direction:column}}
+
+/* Fix: consent checkboxes must remain visible despite the form input reset above */
+.request-form input[type="checkbox"],
+input[type="checkbox"] {
+  -webkit-appearance: checkbox !important;
+  appearance: auto !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  flex: 0 0 18px !important;
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
+  accent-color: #00d977;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+.checkbox-label span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
