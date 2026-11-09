@@ -27,6 +27,24 @@ let currentSite = null;
 let currentFolders = [];
 
 if (year) year.textContent = new Date().getFullYear();
+
+// Theme switch: keep the selection on this device.
+const themeToggle=document.querySelector("#theme-toggle");
+const savedTheme=(()=>{try{return localStorage.getItem("subfree-theme")||"dark"}catch{return "dark"}})();
+document.body.classList.toggle("theme-light",savedTheme==="light");
+function updateThemeButton(){
+ if(!themeToggle)return;
+ const light=document.body.classList.contains("theme-light");
+ themeToggle.textContent=light?"Dunkelmodus":"Hellmodus";
+ themeToggle.setAttribute("aria-pressed",String(light));
+}
+updateThemeButton();
+themeToggle?.addEventListener("click",()=>{
+ const light=document.body.classList.toggle("theme-light");
+ try{localStorage.setItem("subfree-theme",light?"light":"dark")}catch{}
+ updateThemeButton();
+});
+
 const localSettings = (()=>{try{return JSON.parse(localStorage.getItem(localStoreKey)||"{}")}catch{return {}}})();
 const localName=document.querySelector("#local-name"),localEmail=document.querySelector("#local-email"),rememberKey=document.querySelector("#remember-key");
 if(localName)localName.value=localSettings.name||"";
@@ -131,6 +149,22 @@ form?.addEventListener("submit", async (event) => {
 });
 
 const domainRequestForm=document.querySelector("#domain-request-form");
+const requestTypeSelect=document.querySelector("#domain-request-type");
+const requestedDomainWrap=document.querySelector("#requested-domain-wrap");
+const requestedDomainInput=document.querySelector("#requested-domain");
+const contentModeSelect=document.querySelector("#domain-content-mode");
+const externalWrap=document.querySelector("#domain-external-wrap");
+const externalUrlInput=document.querySelector("#domain-website-url");
+requestTypeSelect?.addEventListener("change",()=>{
+ const needsDomain=requestTypeSelect.value!=="path";
+ requestedDomainWrap.hidden=!needsDomain;
+ requestedDomainInput.required=needsDomain;
+});
+contentModeSelect?.addEventListener("change",()=>{
+ const external=contentModeSelect.value==="external";
+ externalWrap.hidden=!external;
+ externalUrlInput.required=external;
+});
 domainRequestForm?.addEventListener("submit",async(event)=>{
  event.preventDefault();
  if(!domainRequestForm.reportValidity())return;
@@ -138,35 +172,35 @@ domainRequestForm?.addEventListener("submit",async(event)=>{
  const button=domainRequestForm.querySelector("button[type=submit]");
  const message=document.querySelector("#domain-request-message");
  const resultPanel=document.querySelector("#domain-request-result");
- button.disabled=true;message.textContent="Website wird geprüft und GitHub-Pull-Request wird erstellt …";resultPanel.hidden=true;
+ button.disabled=true;message.textContent="Domain-Antrag wird gespeichert und eine GitHub-Pull-Request wird erstellt …";resultPanel.hidden=true;
+ const slug=String(data.get("slug")||"").trim().toLowerCase();
+ const contentMode=String(data.get("contentMode")||"standard");
+ const websiteUrl=contentMode==="external"
+   ? String(data.get("websiteUrl")||"").trim()
+   : "https://subfree.pntr.dev/"+slug+"/";
+ const dnsRecords=String(data.get("dnsRecords")||"").trim();
  try{
   const result=await api({
    action:"domain_application",
-   slug:String(data.get("slug")||"").trim().toLowerCase(),
+   slug,
    accessKey:String(data.get("accessKey")||""),
    applicantName:String(data.get("applicantName")||"").trim(),
    applicantEmail:String(data.get("applicantEmail")||"").trim(),
-   websiteUrl:String(data.get("websiteUrl")||"").trim(),
+   websiteUrl,
    purpose:String(data.get("purpose")||"").trim(),
+   requestType:String(data.get("requestType")||"path"),
+   requestedDomain:String(data.get("requestedDomain")||"").trim().toLowerCase(),
+   contentMode,
+   dnsRecords,
    termsAccepted:data.get("termsAccepted")==="on",
    termsVersion:"2026-11-07"
   });
   message.textContent=result.message;
   const link=document.querySelector("#domain-request-pr");
-  const resultTitle=document.querySelector("#domain-request-result-title");
-  const resultText=document.querySelector("#domain-request-result-text");
+  document.querySelector("#domain-request-result-title").textContent="Pull Request erstellt";
+  document.querySelector("#domain-request-result-text").textContent="Dein Antrag wurde gespeichert. Die Domain wird erst nach manueller Prüfung und Freigabe verbunden. Deine Standardseite bleibt bis dahin unter der bisherigen Projektadresse erreichbar.";
   link.href=result.prUrl;
-  link.textContent="Prüfbericht / Pull-Request #"+result.prNumber+" auf GitHub öffnen ↗";
-  if(result.decision==="rejected"){
-   resultTitle.textContent="Antrag durch KI abgelehnt";
-   resultText.textContent="Der Antrag verstößt gegen die SubFree-Inhaltsrichtlinien. Die Pull-Request wurde geschlossen und der Pfad nicht aktiviert.";
-  }else if(result.decision==="manual_review"){
-   resultTitle.textContent="Manuelle Prüfung erforderlich";
-   resultText.textContent="Die KI konnte den Antrag nicht sicher freigeben. Der Pfad bleibt deaktiviert, bis der Betreiber den Fall geprüft hat.";
-  }else{
-   resultTitle.textContent="KI-Erstprüfung abgeschlossen";
-   resultText.textContent="Es wurden keine eindeutigen Richtlinienverstöße erkannt. Eine manuelle Betreiberfreigabe ist weiterhin zwingend erforderlich.";
-  }
+  link.textContent="Pull Request #"+result.prNumber+" auf GitHub öffnen ↗";
   resultPanel.hidden=false;
  }catch(error){message.textContent=error.message||"Der Antrag konnte nicht eingereicht werden.";}
  finally{button.disabled=false;}
