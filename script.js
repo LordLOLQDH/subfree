@@ -228,7 +228,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentFolders = result.folders || [];
     const domainActive = result.site.registration_data?.domainMode === "active";
     const domainBanner = document.querySelector("#domain-active-status");
-    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://"+result.site.slug+".adam.is-a-fullstack.dev/";domainLink.textContent="https://"+result.site.slug+"/ ↗";}}
+    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://"+result.site.slug+".adam.is-a-fullstack.dev/";domainLink.textContent="https://"+result.site.slug+".adam.is-a-fullstack.dev/ ↗";}}
     if(domainActive){
       for(const selector of ["#redirect-settings","#redirect-security-settings","#api-access",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=true;}
     }else{
