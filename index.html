@@ -129,8 +129,14 @@
       </div>
       <form id="register-form" class="request-form" onsubmit="return false;">
         <label for="slug">Gewünschter Projektname</label>
-        <div class="domain-input"><span>subfree.pntr.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
+        <div class="domain-input"><span id="project-address-prefix">subfree.pntr.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
         <small>3–30 Zeichen, nur Kleinbuchstaben, Zahlen und Bindestriche.</small>
+        <label for="addressType">Projektadresse</label>
+        <select id="addressType" name="addressType">
+          <option value="path">SubFree-Pfad (subfree.pntr.dev/projekt)</option>
+          <option value="subdomain">Eigene Subdomain (projekt.adam.is-a-fullstack.dev)</option>
+        </select>
+        <small id="address-type-note">Subdomain-Adressen sind vorbereitet. Sie werden erst erreichbar, wenn die DNS-Delegierung und der HTTPS-Betrieb abgeschlossen sind.</small>
 
         <label for="displayName">Projekt- oder Anzeigename</label>
         <input id="displayName" name="displayName" type="text" maxlength="70" placeholder="Mein Portfolio" required>
