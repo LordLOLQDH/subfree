@@ -65,7 +65,7 @@
         <div class="preview-content">
           <div class="preview-icon">S</div>
           <p class="preview-label">Deine Website unter</p>
-          <div class="domain-example"><span>subfree.pntr.dev/</span><strong>deinprojekt</strong></div>
+          <div class="domain-example"><span>adam.is-a-fullstack.dev/</span><strong>deinprojekt</strong></div>
           <span class="preview-tag"><i></i> DOMAIN STATUS: IN VORBEREITUNG</span>
           <div class="preview-terminal"><span>subfree://project</span><code>deploy --target /deinprojekt</code><small>STATUS <b>READY</b> · ACCESS <b>PUBLIC</b></small></div>
         </div>
@@ -130,12 +130,12 @@
       </div>
       <form id="register-form" class="request-form" onsubmit="return false;">
         <label for="slug">Gewünschter Projektname</label>
-        <div class="domain-input"><span id="project-address-prefix">subfree.pntr.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
+        <div class="domain-input"><span id="project-address-prefix">adam.is-a-fullstack.dev/</span><input id="slug" name="slug" type="text" placeholder="meinprojekt" minlength="3" maxlength="30" pattern="[a-z0-9-]+" required autocomplete="off"></div>
         <small>3–30 Zeichen, nur Kleinbuchstaben, Zahlen und Bindestriche.</small>
         <label for="addressType">Projektadresse</label>
         <select id="addressType" name="addressType">
-          <option value="path">SubFree-Pfad (subfree.pntr.dev/projekt)</option>
-          <option value="subdomain">Eigene Subdomain (projekt.adam.is-a-fullstack.dev)</option>
+          <option value="path">Subdomain (projekt.adam.is-a-fullstack.dev)</option>
+          <option value="subdomain">Subdomain (projekt.adam.is-a-fullstack.dev)</option>
         </select>
         <small id="address-type-note">Subdomain-Adressen sind vorbereitet. Sie werden erst erreichbar, wenn die DNS-Delegierung und der HTTPS-Betrieb abgeschlossen sind.</small>
 
@@ -187,7 +187,7 @@
       </div>
       <form id="domain-request-form" class="request-form">
         <label for="domain-slug">Dein SubFree-Projekt</label>
-        <div class="domain-input"><span>subfree.pntr.dev/</span><input id="domain-slug" name="slug" required minlength="3" maxlength="30" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="meinprojekt" autocomplete="off"></div>
+        <div class="domain-input"><span>adam.is-a-fullstack.dev/</span><input id="domain-slug" name="slug" required minlength="3" maxlength="30" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="meinprojekt" autocomplete="off"></div>
         <label for="domain-access-key">Persönlicher Projekt-Zugangscode</label>
         <input id="domain-access-key" name="accessKey" type="password" required autocomplete="off" placeholder="sf_…">
         <label for="domain-request-type">Welche Adresse möchtest du verbinden?</label>
