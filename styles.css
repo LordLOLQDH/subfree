@@ -560,3 +560,19 @@ input[type="checkbox"] {
   flex: 1 1 auto;
   min-width: 0;
 }
+
+
+/* Domain setup and theme switch */
+.theme-toggle{flex:none;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:10px 13px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+#requested-domain-wrap[hidden],#domain-external-wrap[hidden]{display:none}
+body.theme-light{background:#f7f9fc!important;color:#172033!important}
+body.theme-light .site-header{background:rgba(255,255,255,.96)!important;border-color:#e5eaf2!important}
+body.theme-light .domain-customer-panel,body.theme-light .domain-application-card,body.theme-light .domain-manage-login input,body.theme-light .domain-target-input{background:#fff!important;color:#172033!important;border-color:#dfe5ef!important;box-shadow:none}
+body.theme-light .domain-application-heading h3,body.theme-light .domain-dns-note strong,body.theme-light .domain-active-banner h3{color:#172033!important}
+body.theme-light .domain-application-meta,body.theme-light .domain-approved-copy,body.theme-light .domain-dns-note{color:#586781!important}
+body.theme-light .domain-dns-note{background:#f4f7fc!important;border-color:#315ee8!important}
+body.theme-light .domain-status-pill{color:#586781!important}
+body.theme-light .domain-status-pill[data-status="approved"]{color:#168451!important}
+body.theme-light .request-section{background:#eef3ff!important}
+body.theme-light .request-form{background:#fff!important;color:#172033!important}
+@media(max-width:760px){.theme-toggle{padding:8px 10px;font-size:11px}.site-header{gap:8px}.site-header nav{gap:8px}}
