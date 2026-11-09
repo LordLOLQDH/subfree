@@ -228,7 +228,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     currentFolders = result.folders || [];
     const domainActive = result.site.registration_data?.domainMode === "active";
     const domainBanner = document.querySelector("#domain-active-status");
-    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://"+result.site.slug+"/";domainLink.textContent="https://"+result.site.slug+"/ ↗";}}
+    if(domainBanner){domainBanner.hidden=!domainActive;const domainLink=document.querySelector("#domain-active-link");if(domainLink){domainLink.href="https://"+result.site.slug+".adam.is-a-fullstack.dev/";domainLink.textContent="https://"+result.site.slug+"/ ↗";}}
     if(domainActive){
       for(const selector of ["#redirect-settings","#redirect-security-settings","#api-access",".file-manager",".editor-actions",".deploy-notice"]) {const node=document.querySelector(selector);if(node)node.hidden=true;}
     }else{
@@ -255,7 +255,7 @@ document.querySelector("#load-project")?.addEventListener("click", async () => {
     document.querySelector("#project-title").textContent = result.site.display_name;
     document.querySelector("#project-meta").textContent = (result.site.github_username && result.site.github_username !== "subfree-user" ? "@" + result.site.github_username : "SubFree-Account ohne GitHub") + " · " + result.site.slug;
     const mailShortcut=document.querySelector("#email-shortcut"); if(mailShortcut){const mail=localEmail?.value||localSettings.email||"adam_kraus@icloud.com";mailShortcut.href=mail?"mailto:"+encodeURIComponent(mail):"mailto:adam_kraus@icloud.com";mailShortcut.textContent=mail?"E-Mail an "+mail+" ↗":"Kontakt per E-Mail ↗";}
-    document.querySelector("#project-url").href = "https://" + result.site.slug + "/";
+    document.querySelector("#project-url").href = "https://" + result.site.slug + ".adam.is-a-fullstack.dev/";
     await refreshApiTokens();
     const files = result.files || [];
     renderFiles(files, currentFolders);
