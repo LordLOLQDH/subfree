@@ -8,14 +8,6 @@
     "createdAt": "2026-11-07T20:50:46.348945+00:00"
   },
   {
-    "slug": "test",
-    "displayName": "LordLOLQDH",
-    "github": "LordLOLQDH",
-    "description": "Gar nix bro",
-    "type": "static",
-    "createdAt": "2026-11-07T21:48:11.303316+00:00"
-  },
-  {
     "slug": "testbox",
     "displayName": "test",
     "github": "LordLOLQDH",
@@ -23,4 +15,4 @@
     "type": "static",
     "createdAt": "2026-11-09T12:53:12.608926+00:00"
   }
-]
+]\n
