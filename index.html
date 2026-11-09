@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261109-checkbox-fix-2">
+  <link rel="stylesheet" href="styles.css?v=20261109-domain-manager-light-1">
   <script defer src="https://analytics.open-domains.com/script.js" data-website-id="6677dee4-ef12-4860-b9e6-a8592821c343"></script>
 </head>
 <body>
@@ -30,6 +30,7 @@
       <a href="mailto:adam_kraus@icloud.com">E-Mail ↗</a>
       <a href="#ablauf">Ablauf</a>
       <a class="nav-cta" href="#registrieren">Projekt erstellen</a>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">Hellmodus</button>
     </nav>
   </header>
 
@@ -179,35 +180,53 @@
 
     <section class="request-section domain-request-section" id="domain-antrag">
       <div class="request-intro">
-        <span class="eyebrow">SUBFREE PATH REGISTRY</span>
-        <h2>Eigenen Projektpfad beantragen.</h2>
-        <p>Beantrage die Freigabe deines bestehenden Projektordners als eigene SubFree-Adresse. Die Adresse bleibt ein Pfad unter subfree.pntr.dev, keine separate DNS-Domain. Nach der Freigabe wird dieser Pfad als Weiterleitung auf die angegebene HTTPS-Website verwendet.</p>
+        <span class="eyebrow">SUBFREE DOMAIN CONNECT</span>
+        <h2>Domain verbinden.</h2>
+        <p>Verbinde einen SubFree-Unterordner, eine Subdomain oder deine eigene Domain. Jedes neue Projekt erhält bereits eine vorgefertigte Standardseite, die du im Editor anpassen kannst. Du kannst auch nur die Domain verbinden und deine vorhandene Website weiterverwenden.</p>
         <div class="notice"><strong>Mehrstufige Prüfung:</strong> Groq-KI prüft deinen Verwendungszweck und einen begrenzten Textauszug der Zielwebsite. Das Ergebnis ist „unauffällig“, „manuelle Prüfung“ oder „abgelehnt“. Auch bei unauffälligem Ergebnis ist eine manuelle Betreiberfreigabe nötig. Technische Erreichbarkeit ist keine Inhaltsfreigabe.</div>
       </div>
       <form id="domain-request-form" class="request-form">
-        <label for="domain-slug">Dein bestehender Projektordner</label>
+        <label for="domain-slug">Dein SubFree-Projekt</label>
         <div class="domain-input"><span>subfree.pntr.dev/</span><input id="domain-slug" name="slug" required minlength="3" maxlength="30" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="meinprojekt" autocomplete="off"></div>
-        <small>Der Projektordner muss bereits existieren und online sein.</small>
         <label for="domain-access-key">Persönlicher Projekt-Zugangscode</label>
         <input id="domain-access-key" name="accessKey" type="password" required autocomplete="off" placeholder="sf_…">
+        <label for="domain-request-type">Welche Adresse möchtest du verbinden?</label>
+        <select id="domain-request-type" name="requestType">
+          <option value="path">SubFree-Unterordner</option>
+          <option value="subdomain">Eigene Subdomain</option>
+          <option value="custom_domain">Eigene Domain (z. B. beispiel.de)</option>
+        </select>
+        <div id="requested-domain-wrap" hidden>
+          <label for="requested-domain">Gewünschte Domain / Subdomain</label>
+          <input id="requested-domain" name="requestedDomain" type="text" placeholder="www.beispiel.de" autocomplete="url">
+        </div>
+        <label for="domain-content-mode">Was soll unter der Adresse erscheinen?</label>
+        <select id="domain-content-mode" name="contentMode">
+          <option value="standard">SubFree-Standardseite verwenden (empfohlen)</option>
+          <option value="external">Vorhandene Website verbinden</option>
+        </select>
+        <div id="domain-external-wrap" hidden>
+          <label for="domain-website-url">URL deiner vorhandenen Website</label>
+          <input id="domain-website-url" name="websiteUrl" type="url" placeholder="https://example.com">
+        </div>
+        <label for="domain-dns-records">Vorhandene DNS-Einträge (optional)</label>
+        <textarea id="domain-dns-records" name="dnsRecords" rows="4" maxlength="3000" placeholder="Typ | Name | Wert&#10;CNAME | www | example.hosting.com&#10;A | @ | 203.0.113.10"></textarea>
+        <small>Du kannst CNAME-, A-, AAAA- oder TXT-Einträge angeben. SubFree prüft sie im Antrag und nennt dir später die benötigten Zielwerte.</small>
         <label for="domain-applicant-name">Dein Name</label>
         <input id="domain-applicant-name" name="applicantName" required maxlength="80" autocomplete="name" placeholder="Vor- und Nachname">
         <label for="domain-applicant-email">Kontakt-E-Mail</label>
         <input id="domain-applicant-email" name="applicantEmail" type="email" required maxlength="254" autocomplete="email" placeholder="name@example.com">
-        <label for="domain-website-url">Website, für die du den Pfad beantragst</label>
-        <input id="domain-website-url" name="websiteUrl" type="url" required placeholder="https://example.com" autocomplete="url">
-        <label for="domain-purpose">Wofür benötigst du den Pfad und was wird auf der Website angeboten?</label>
-        <textarea id="domain-purpose" name="purpose" rows="5" minlength="30" maxlength="1600" required placeholder="Beschreibe den Zweck, die Inhalte, die Zielgruppe und warum du diesen SubFree-Pfad benötigst."></textarea>
-        <label class="checkbox-label"><input id="domain-terms" name="termsAccepted" type="checkbox" required><span>Ich stimme den <a href="agb.html" target="_blank" rel="noopener">Nutzungsbedingungen für SubFree-Pfade</a> zu und bestätige, dass ich die Website betreiben darf.</span></label>
-        <small class="form-note">Für die KI-Prüfung werden Verwendungszweck, Ziel-URL und ein begrenzter öffentlicher Website-Textauszug an Groq übermittelt. Name, E-Mail und Zugangscode werden nicht an Groq gesendet.</small>
-        <button class="button button-primary submit-button" type="submit">Domain-Antrag einreichen →</button>
+        <label for="domain-purpose">Zusätzliche Informationen</label>
+        <textarea id="domain-purpose" name="purpose" rows="4" minlength="30" maxlength="1600" required placeholder="Beschreibe kurz, wofür du die Adresse nutzen möchtest."></textarea>
+        <label class="checkbox-label"><input id="domain-terms" name="termsAccepted" type="checkbox" required><span>Ich stimme den <a href="agb.html" target="_blank" rel="noopener">Nutzungsbedingungen für SubFree-Domains</a> zu und bestätige, dass ich die Domain verwenden darf.</span></label>
+        <button class="button button-primary submit-button" type="submit">Domain-Antrag als Pull Request einreichen →</button>
         <p id="domain-request-message" class="form-message" role="status" aria-live="polite"></p>
-        <div id="domain-request-result" class="key-result" hidden><strong id="domain-request-result-title">Prüfung abgeschlossen</strong><p id="domain-request-result-text">Dein Antrag wurde geprüft.</p><a id="domain-request-pr" target="_blank" rel="noopener">Prüfbericht auf GitHub öffnen ↗</a></div>
+        <div id="domain-request-result" class="key-result" hidden><strong id="domain-request-result-title">Antrag erstellt</strong><p id="domain-request-result-text">Dein Antrag wurde als Pull Request eingereicht.</p><a id="domain-request-pr" target="_blank" rel="noopener">Pull Request auf GitHub öffnen ↗</a></div>
       </form>
     </section>
 
     <section class="section domain-customer-area" id="domain-status">
-      <div class="section-heading"><span class="eyebrow">SUBFREE PATH CONTROL</span><h2>Deinen Domain-Antrag verwalten.</h2><p>Mit demselben persönlichen Projekt-Zugangscode kannst du den Prüfstatus deiner Anträge sehen. Nach der Genehmigung lässt sich auch das Weiterleitungsziel ändern.</p></div>
+      <div class="section-heading"><span class="eyebrow">SUBFREE DOMAIN CONTROL</span><h2>Deine Domain-Anträge verwalten.</h2><p>Mit demselben persönlichen Projekt-Zugangscode kannst du den Prüfstatus deiner Anträge sehen. Nach der Genehmigung lässt sich auch das Weiterleitungsziel ändern.</p></div>
       <div class="domain-customer-panel">
         <form id="domain-manage-form" class="domain-manage-login">
           <label for="domain-manage-key">Persönlicher Projekt-Zugangscode</label>
