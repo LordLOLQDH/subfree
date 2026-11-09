@@ -530,7 +530,7 @@ function domainStatusCard(application, accessKey) {
   const heading = document.createElement("div");
   heading.className = "domain-application-heading";
   const title = document.createElement("h3");
-  title.textContent = "/" + application.slug;
+  title.textContent = application.requested_domain || (application.request_type === "subdomain" ? application.slug + ".subdomain" : "/" + application.slug);
   const badge = document.createElement("span");
   badge.className = "domain-status-pill";
   badge.dataset.status = application.status;
