@@ -4,6 +4,8 @@ const form = document.querySelector("#register-form");
 const message = document.querySelector("#register-message");
 const year = document.querySelector("#year");
 const typeSelect = document.querySelector("#siteType");
+const addressType = document.querySelector("#addressType");
+const addressPrefix = document.querySelector("#project-address-prefix");
 const redirectField = document.querySelector("#redirect-field");
 const keyResult = document.querySelector("#key-result");
 const keyOutput = document.querySelector("#new-key");
@@ -57,6 +59,11 @@ githubInput?.addEventListener("input",()=>{
   catch{githubCheck.textContent="GitHub konnte nicht erreicht werden. Später erneut versuchen."}
  },450);
 });
+addressType?.addEventListener("change", () => {
+  if (addressPrefix) addressPrefix.textContent = addressType.value === "subdomain" ? "" : "subfree.pntr.dev/";
+  const slugInput = document.querySelector("#slug");
+  if (slugInput) slugInput.placeholder = addressType.value === "subdomain" ? "projekt" : "meinprojekt";
+});
 typeSelect?.addEventListener("change", () => {
   redirectField.hidden = typeSelect.value !== "redirect";
   document.querySelector("#redirectUrl").required = typeSelect.value === "redirect";
@@ -78,6 +85,7 @@ form?.addEventListener("submit", async (event) => {
   const payload = {
     action: "register",
     slug: String(data.get("slug") || "").trim().toLowerCase(),
+    addressType: String(data.get("addressType") || "path"),
     displayName: String(data.get("displayName") || "").trim(),
     githubUsername: accountType?.value === "subfree" ? "" : String(data.get("githubUsername") || "").trim().replace(/^@/, ""),
     accountType: accountType?.value || "github",
@@ -101,8 +109,14 @@ form?.addEventListener("submit", async (event) => {
     if(rememberKey?.checked){try{localStorage.setItem(localStoreKey,JSON.stringify({name:localName?.value||"",email:localEmail?.value||"",rememberKey:true,accessKey:currentKey}))}catch{}}
     keyOutput.textContent = currentKey;
     keyResult.hidden = false;
-    newProjectLink.href = result.projectUrl;
-    newProjectLink.textContent = result.projectUrl;
+    const requestedProjectUrl = payload.addressType === "subdomain"
+      ? "https://" + payload.slug + ".adam.is-a-fullstack.dev/"
+      : result.projectUrl;
+    newProjectLink.href = requestedProjectUrl;
+    newProjectLink.textContent = requestedProjectUrl;
+    if (payload.addressType === "subdomain") {
+      message.textContent = "Projekt registriert. Deine Subdomain ist vorgemerkt, aber noch nicht öffentlich erreichbar, solange DNS-Delegierung und HTTPS nicht abgeschlossen sind.";
+    }
     message.textContent = result.message;
     accessInput.value = currentKey;
     form.reset();
